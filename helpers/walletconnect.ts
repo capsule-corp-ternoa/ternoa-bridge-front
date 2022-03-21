@@ -16,7 +16,12 @@ const initWalletConnectProvider = async () => {
       infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
       bridge: WALLETCONNECT_BRIDGE,
     })
-    await walletConnectProvider.enable()
+    try {
+      await walletConnectProvider.enable()
+    } catch (err: any) {
+      if (err.message && err.message === 'User closed modal') console.log(err.message)
+      else throw err
+    }
   }
 }
 

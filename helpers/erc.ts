@@ -1,14 +1,20 @@
 import { ethers, Contract, Signer } from 'ethers'
-import {
-  BSC_CHAIN_ID,
-  CAPS_CONTRACT_ABI,
-  CAPS_TOKEN_ADDRESS_BSC,
-  CAPS_TOKEN_ADDRESS_ETH,
-  ETH_CHAIN_ID,
-  PROVIDER_BASE_URL_ETH,
-  PROVIDER_BASE_URL_BSC,
-} from '../helpers/constants'
+import { CAPS_CONTRACT_ABI } from './abis'
 import { ERCProvider, ErcWallet } from '../interfaces'
+
+// export const ETH_CHAIN_ID = 1 // REAL VALUE
+const ETH_CHAIN_ID = 4 // TEST VALUE
+const BSC_CHAIN_ID = 56
+
+// const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
+
+// export const CAPS_TOKEN_ADDRESS_ETH = '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2' // REAL VALUE
+const CAPS_TOKEN_ADDRESS_ETH = '0xcE9D9Db4264a50aEF8B5627E882Ed71dF66d2105' // TEST VALUE
+const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
+
+// export const PROVIDER_BASE_URL_ETH = `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}` // REAL VALUE
+const PROVIDER_BASE_URL_ETH = `https://rinkeby.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
+const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
 
 export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCProvider): Promise<ErcWallet> => {
   const chainId = await signer.getChainId()

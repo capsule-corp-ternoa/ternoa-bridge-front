@@ -1,4 +1,5 @@
 import { AnyAction, Reducer } from 'redux'
+import { safeDisconnect } from '../../helpers/polkadot'
 
 import { walletConnectProvider } from '../../helpers/walletconnect'
 import { User } from '../../interfaces'
@@ -65,6 +66,7 @@ export const userReducer: Reducer<{ user: User }, AnyAction> = (state = initialS
       }
     }
     case 'USER_LOGOUT_POLKADOT': {
+      safeDisconnect()
       return {
         ...state,
         user: {

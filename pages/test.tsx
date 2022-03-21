@@ -2,6 +2,8 @@ import Head from 'next/head'
 
 import { connect as connectMetamask } from '../helpers/metamask'
 import { connect as connectWalletConnect } from '../helpers/walletconnect'
+import { connect as connectPolkadot, getAccounts } from '../helpers/polkadot'
+
 import { useAppDispatch, useAppSelector } from '../redux/hooks'
 import { actions } from '../redux/user/actions'
 
@@ -24,10 +26,6 @@ export default function Test() {
         <div>{`- connectedWith: ${user.ercWallet?.connectedWith}`}</div>
         <div>{`- capsBalance: ${user.ercWallet?.capsBalance}`}</div>
         {user.ercWallet?.chainType === 'other' && <div>BAD NETWORK !</div>}
-        <br />
-        <div>User Polkadot Data</div>
-        <div>{`- connected: ${user.isConnectedPolkadot}`}</div>
-        <br />
         {user.isConnectedErc === false && (
           <button onClick={() => connectMetamask(dispatch)}>Connect ERC Metamask</button>
         )}
@@ -35,6 +33,28 @@ export default function Test() {
           <button onClick={() => connectWalletConnect(dispatch)}>Connect ERC WalletConnect</button>
         )}
         {user.isConnectedErc === true && <button onClick={() => dispatch(actions.logoutErc())}>Logout ERC</button>}
+        <br />
+        <br />
+        <br />
+        <div>User Polkadot Data</div>
+        <div>{`- connected: ${user.isConnectedPolkadot}`}</div>
+        <div>{`- address: ${user.polkadotWallet?.address}`}</div>
+        <div>{`- capsBalance: ${user.polkadotWallet?.capsBalance}`}</div>
+        {user.isConnectedPolkadot === false && (
+          <button
+            onClick={async () => {
+              const accounts = await getAccounts()
+              const account = accounts[3]
+              connectPolkadot(account, dispatch)
+            }}
+          >
+            Connect Polkadot
+          </button>
+        )}
+        {user.isConnectedPolkadot === true && (
+          <button onClick={() => dispatch(actions.logoutPolkadot())}>Logout Polkadot</button>
+        )}
+        <br />
       </main>
 
       <footer>FOOTERR</footer>
