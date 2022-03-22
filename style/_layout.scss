@@ -1,0 +1,134 @@
+@import './base.scss';
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  font-family: $font-regular;
+  line-height: 1.3;
+}
+
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  margin: 0;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+#__next {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+header {
+  width: 100%;
+}
+
+main {
+  width: 100%;
+}
+
+footer {
+  width: 100%;
+  margin-top: auto;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  background: transparent;
+  border: none;
+  margin: 0;
+}
+
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: $color-primary500;
+
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  border-radius: 6px;
+  width: 100%;
+  height: 5px;
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  /* box-shadow: ${({ theme }) => `0 0 10px ${theme.colors.primary500}, 0 0 5px ${theme.colors.primary500}`}; */
+  opacity: 1;
+
+  -webkit-transform: rotate(3deg) translate(0px, -4px);
+  -ms-transform: rotate(3deg) translate(0px, -4px);
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 128rem;
+  margin: 0 auto;
+  padding: 2.4rem 3.2rem;
+
+  &:first-child {
+    padding-top: 4rem;
+  }
+
+  &:last-child {
+    padding-bottom: 6.4rem;
+  }
+
+  @include md {
+    padding: 2.4rem 4rem;
+  }
+
+  @include lg {
+    padding: 3.2rem 4rem;
+
+    &:last-child {
+      padding-bottom: 6.4rem;
+    }
+  }
+
+  @include xl {
+    padding: 3.2rem 6.4rem;
+
+    &:first-child {
+      padding-top: 5.6rem;
+    }
+
+    &:last-child {
+      padding-bottom: 9.6rem;
+    }
+  }
+
+  @include xxl {
+    max-width: 1440px;
+  }
+}

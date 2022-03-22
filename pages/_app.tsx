@@ -1,6 +1,9 @@
 import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux'
-import { store } from '../redux/store'
+
+import { store } from 'redux/store'
+
+import 'style/main.scss'
 
 const App: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
