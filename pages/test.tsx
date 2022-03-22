@@ -3,16 +3,22 @@ import { useState } from 'react'
 
 import { switchBSCNetwork, switchETHNetwork, connect as connectMetamask } from '../helpers/metamask'
 import { connect as connectWalletConnect } from '../helpers/walletconnect'
-import { connect as connectPolkadot, getAccounts } from '../helpers/polkadot'
+import { getTransferFees as getTransferFeesErc, transfer as transferEthBsc } from '../helpers/erc'
+import {
+  connect as connectPolkadot,
+  getAccounts,
+  transfer as transferPolka,
+  getTransferFees as getTransferFeesPolka,
+} from '../helpers/polkadot'
 
 import { useAppDispatch, useAppSelector } from '../redux/hooks'
 import { actions } from '../redux/user/actions'
-import { getEstimateFees } from '../helpers/erc'
 
 export default function Test() {
   const { user } = useAppSelector((state) => state.user)
   const dispatch = useAppDispatch()
   const [estimateFees, setEstimateFees] = useState('')
+  const [estimateFeesPolka, setEstimateFeesPolka] = useState('')
 
   return (
     <div className="container">
@@ -50,11 +56,29 @@ export default function Test() {
           <button
             onClick={async () => {
               if (user.ercWallet) {
-                setEstimateFees(await getEstimateFees(user.ercWallet?.signer))
+                setEstimateFees(await getTransferFeesErc(user.ercWallet.signer))
               }
             }}
           >
-            update fees
+            Estimate fees for 100 caps
+          </button>
+        )}
+        {user.isConnectedErc === true && (
+          <button
+            onClick={async () => {
+              if (user.ercWallet) {
+                try {
+                  const tx = await transferEthBsc(user.ercWallet?.signer)
+                  const receipt = await tx.wait()
+                  console.log('receipt', receipt)
+                  console.log('etherscan link', `https://etherscan.io/tx/${receipt.transactionHash}`)
+                } catch (e) {
+                  console.error('transfer error', e)
+                }
+              }
+            }}
+          >
+            Bridge 100 caps from ERC
           </button>
         )}
         {user.isConnectedErc === true && <button onClick={() => dispatch(actions.logoutErc())}>Logout ERC</button>}
@@ -65,6 +89,7 @@ export default function Test() {
         <div>{`- connected: ${user.isConnectedPolkadot}`}</div>
         <div>{`- address: ${user.polkadotWallet?.address}`}</div>
         <div>{`- capsBalance: ${user.polkadotWallet?.capsBalance}`}</div>
+        <div>{`- EstimateFees: ${estimateFeesPolka}`}</div>
         {user.isConnectedPolkadot === false && (
           <button
             onClick={async () => {
@@ -74,6 +99,32 @@ export default function Test() {
             }}
           >
             Connect Polkadot
+          </button>
+        )}
+        {user.isConnectedPolkadot === true && (
+          <button
+            onClick={async () => {
+              if (user.polkadotWallet) {
+                setEstimateFeesPolka(await getTransferFeesPolka(user.polkadotWallet))
+              }
+            }}
+          >
+            Estimate fees for 100 caps
+          </button>
+        )}
+        {user.isConnectedPolkadot === true && (
+          <button
+            onClick={async () => {
+              if (user.polkadotWallet) {
+                try {
+                  await transferPolka(user.polkadotWallet)
+                } catch (e) {
+                  console.error('transfer error', e)
+                }
+              }
+            }}
+          >
+            Bridge 100 caps from Polkadot
           </button>
         )}
         {user.isConnectedPolkadot === true && (

@@ -2,6 +2,8 @@ import { ethers, Contract, Signer } from 'ethers'
 import { CAPS_CONTRACT_ABI } from './abis'
 import { ERCProvider, ErcWallet } from '../interfaces'
 
+const NUMBER_OF_DECIMALS = 18
+
 // export const ETH_CHAIN_ID = 1 // REAL VALUE
 const ETH_CHAIN_ID = 4 // TEST VALUE
 const BSC_CHAIN_ID = 56
@@ -16,6 +18,26 @@ const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
 const PROVIDER_BASE_URL_ETH = `https://rinkeby.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
 const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
 
+const getTokenContract = async (signer: Signer) => {
+  const chainId = await signer.getChainId()
+  const tokenContractAddress = chainId === ETH_CHAIN_ID ? CAPS_TOKEN_ADDRESS_ETH : CAPS_TOKEN_ADDRESS_BSC
+  const contract = new Contract(tokenContractAddress, CAPS_CONTRACT_ABI, signer)
+  return contract
+}
+
+const getDefaultProvider = async (chainId: number) => {
+  const providerUrl = chainId === ETH_CHAIN_ID ? PROVIDER_BASE_URL_ETH : PROVIDER_BASE_URL_BSC
+  const provider = ethers.providers.getDefaultProvider(providerUrl)
+  return provider
+}
+
+// const getTokenContractByProvider = async (chainId: number) => {
+//   const tokenContractAddress = chainId === ETH_CHAIN_ID ? CAPS_TOKEN_ADDRESS_ETH : CAPS_TOKEN_ADDRESS_BSC
+//   const provider = await getDefaultProvider(chainId)
+//   const contract = new Contract(tokenContractAddress, CAPS_CONTRACT_ABI, provider)
+//   return contract
+// }
+
 export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCProvider): Promise<ErcWallet> => {
   const chainId = await signer.getChainId()
   return {
@@ -28,26 +50,40 @@ export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCP
   }
 }
 
-export const getTokenContract = async (chainId: number) => {
-  const providerUrl = chainId === ETH_CHAIN_ID ? PROVIDER_BASE_URL_ETH : PROVIDER_BASE_URL_BSC
-  const tokenContractAddress = chainId === ETH_CHAIN_ID ? CAPS_TOKEN_ADDRESS_ETH : CAPS_TOKEN_ADDRESS_BSC
-  const provider = ethers.providers.getDefaultProvider(providerUrl)
-  const contract = new Contract(tokenContractAddress, CAPS_CONTRACT_ABI, provider)
-  return contract
-}
-
 export const getBalance = async (signer: Signer) => {
   const chainId = await signer.getChainId()
   if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) return '0'
-  const contract = await getTokenContract(chainId)
+  const contract = await getTokenContract(signer)
   const balance = await contract.balanceOf(await signer.getAddress())
   return ethers.utils.formatUnits(balance)
 }
 
-export const getEstimateFees = async (signer: Signer, amount = 100) => {
+export const getEstimateFees = async (signer: Signer, functionName: string, args: any[] = []) => {
   const chainId = await signer.getChainId()
   if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) throw new Error('Invalid chain id for gas estimation')
-  const contract = await getTokenContract(chainId)
-  const estimation = await contract.estimateGas.transfer(BSC_ETH_BRIDGE_ADDRESS, amount)
-  return ethers.utils.formatUnits(estimation)
+  const contract = await getTokenContract(signer)
+  const gasLimit = await contract.estimateGas[functionName](...args)
+  const defaultProvider = await getDefaultProvider(chainId)
+  const gasPrice = await defaultProvider.getGasPrice()
+  const fees = ethers.utils.formatEther(gasPrice.mul(gasLimit))
+  return fees
+}
+
+export const getTransferFees = async (signer: Signer, amount = 100) => {
+  const numberOfTokens = ethers.utils.parseUnits(amount.toString(), NUMBER_OF_DECIMALS)
+  const fees = await getEstimateFees(signer, 'transfer', [BSC_ETH_BRIDGE_ADDRESS, numberOfTokens])
+  return fees
+}
+
+// export const getBridgeFees = async (signer: Signer) => {
+// }
+// export const getClaimFees = async (signer: Signer) => {
+// }
+
+export const transfer = async (signer: Signer, amount = 100) => {
+  const chainId = await signer.getChainId()
+  if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) throw new Error('Invalid chain id for transfer')
+  const contract = await getTokenContract(signer)
+  const numberOfTokens = ethers.utils.parseUnits(amount.toString(), NUMBER_OF_DECIMALS)
+  return contract.transfer(BSC_ETH_BRIDGE_ADDRESS, numberOfTokens)
 }

@@ -4,6 +4,7 @@ import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
 import { AnyAction } from 'redux'
 import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
+import { PolkadotWallet } from '../interfaces'
 
 let api: ApiPromise
 
@@ -51,4 +52,25 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
     capsBalance: await getBalance(account.address),
   }
   dispatch(actions.loginPolkadot(data))
+}
+
+export const transfer = async (polkadotWallet: PolkadotWallet) => {
+  const api = await getApi()
+  const address = polkadotWallet.address
+  const injector = polkadotWallet.injector
+  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', 10)
+  await tx.signAndSend(address, { signer: injector.signer }, (data) => {
+    const { status } = data
+    if (status.isInBlock) {
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`)
+    } else {
+      console.log(`Current status: ${status.type}`)
+    }
+  })
+}
+
+export const getTransferFees = async (polkadotWallet: PolkadotWallet) => {
+  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', 10)
+  const info = await tx.paymentInfo(polkadotWallet.address)
+  return info.partialFee.toString()
 }
