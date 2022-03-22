@@ -1,15 +1,18 @@
 import Head from 'next/head'
+import { useState } from 'react'
 
-import { connect as connectMetamask } from '../helpers/metamask'
+import { switchBSCNetwork, switchETHNetwork, connect as connectMetamask } from '../helpers/metamask'
 import { connect as connectWalletConnect } from '../helpers/walletconnect'
 import { connect as connectPolkadot, getAccounts } from '../helpers/polkadot'
 
 import { useAppDispatch, useAppSelector } from '../redux/hooks'
 import { actions } from '../redux/user/actions'
+import { getEstimateFees } from '../helpers/erc'
 
 export default function Test() {
   const { user } = useAppSelector((state) => state.user)
   const dispatch = useAppDispatch()
+  const [estimateFees, setEstimateFees] = useState('')
 
   return (
     <div className="container">
@@ -25,12 +28,34 @@ export default function Test() {
         <div>{`- chainId: ${user.ercWallet?.chainId}`}</div>
         <div>{`- connectedWith: ${user.ercWallet?.connectedWith}`}</div>
         <div>{`- capsBalance: ${user.ercWallet?.capsBalance}`}</div>
+        <div>{`- EstimateFees: ${estimateFees}`}</div>
         {user.ercWallet?.chainType === 'other' && <div>BAD NETWORK !</div>}
         {user.isConnectedErc === false && (
           <button onClick={() => connectMetamask(dispatch)}>Connect ERC Metamask</button>
         )}
         {user.isConnectedErc === false && (
           <button onClick={() => connectWalletConnect(dispatch)}>Connect ERC WalletConnect</button>
+        )}
+        {user.isConnectedErc === true &&
+          user.ercWallet?.connectedWith === 'metamask' &&
+          user.ercWallet?.chainType !== 'bep20' && (
+            <button onClick={() => switchBSCNetwork()}>Add / Switch to bsc network</button>
+          )}
+        {user.isConnectedErc === true &&
+          user.ercWallet?.connectedWith === 'metamask' &&
+          user.ercWallet?.chainType !== 'erc20' && (
+            <button onClick={() => switchETHNetwork()}>Add / Switch to eth network</button>
+          )}
+        {user.isConnectedErc === true && (
+          <button
+            onClick={async () => {
+              if (user.ercWallet) {
+                setEstimateFees(await getEstimateFees(user.ercWallet?.signer))
+              }
+            }}
+          >
+            update fees
+          </button>
         )}
         {user.isConnectedErc === true && <button onClick={() => dispatch(actions.logoutErc())}>Logout ERC</button>}
         <br />

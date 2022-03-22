@@ -6,7 +6,7 @@ import { ERCProvider, ErcWallet } from '../interfaces'
 const ETH_CHAIN_ID = 4 // TEST VALUE
 const BSC_CHAIN_ID = 56
 
-// const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
+const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
 
 // export const CAPS_TOKEN_ADDRESS_ETH = '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2' // REAL VALUE
 const CAPS_TOKEN_ADDRESS_ETH = '0xcE9D9Db4264a50aEF8B5627E882Ed71dF66d2105' // TEST VALUE
@@ -28,14 +28,26 @@ export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCP
   }
 }
 
-export const getBalance = async (signer: Signer) => {
-  const chainId = await signer.getChainId()
-  if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) return '0'
+export const getTokenContract = async (chainId: number) => {
   const providerUrl = chainId === ETH_CHAIN_ID ? PROVIDER_BASE_URL_ETH : PROVIDER_BASE_URL_BSC
   const tokenContractAddress = chainId === ETH_CHAIN_ID ? CAPS_TOKEN_ADDRESS_ETH : CAPS_TOKEN_ADDRESS_BSC
   const provider = ethers.providers.getDefaultProvider(providerUrl)
   const contract = new Contract(tokenContractAddress, CAPS_CONTRACT_ABI, provider)
+  return contract
+}
+
+export const getBalance = async (signer: Signer) => {
+  const chainId = await signer.getChainId()
+  if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) return '0'
+  const contract = await getTokenContract(chainId)
   const balance = await contract.balanceOf(await signer.getAddress())
-  const readableBalance = ethers.utils.formatUnits(balance)
-  return readableBalance
+  return ethers.utils.formatUnits(balance)
+}
+
+export const getEstimateFees = async (signer: Signer, amount = 100) => {
+  const chainId = await signer.getChainId()
+  if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) throw new Error('Invalid chain id for gas estimation')
+  const contract = await getTokenContract(chainId)
+  const estimation = await contract.estimateGas.transfer(BSC_ETH_BRIDGE_ADDRESS, amount)
+  return ethers.utils.formatUnits(estimation)
 }

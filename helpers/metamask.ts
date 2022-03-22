@@ -45,3 +45,35 @@ export const connect = async (dispatch: (action: AnyAction) => void) => {
     throw new Error('No MetaMask account retrieved')
   }
 }
+
+export const switchBSCNetwork = async () => {
+  checkExtension()
+  await window.ethereum.request({
+    method: 'wallet_addEthereumChain',
+    params: [
+      {
+        chainId: '0x38', //56 in decimal
+        chainName: 'Binance Smart Chain',
+        rpcUrls: ['https://bsc-dataseed.binance.org/'],
+        nativeCurrency: {
+          name: 'BNB',
+          symbol: 'BNB',
+          decimals: 18,
+        },
+        blockExplorerUrls: ['https://bscscan.com'],
+      },
+    ],
+  })
+}
+
+export const switchETHNetwork = async () => {
+  checkExtension()
+  await window.ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [
+      {
+        chainId: '0x1',
+      },
+    ],
+  })
+}
