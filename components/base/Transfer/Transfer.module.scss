@@ -1,0 +1,123 @@
+@import 'style/base.scss';
+
+.outterContainer {
+  background: linear-gradient(90deg, rgba(11, 75, 254, 0.1) 0%, rgba(184, 13, 239, 0.1) 99.9%);
+  backdrop-filter: blur(4px);
+  border-radius: 1.6rem;
+  padding: 1.6rem;
+}
+
+.mainContainer {
+  background: $color-invertedContrast;
+  border-radius: 1.6rem;
+  padding: 2.4rem 1.6rem;
+}
+
+.field {
+  width: 100%;
+
+  &.amountField {
+    margin-top: 3.2rem;
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.8rem;
+
+    .label {
+      color: $color-contrast;
+      font-family: $font-bold;
+      font-size: 1.6rem;
+    }
+
+    .insight {
+      color: $color-neutral300;
+      font-size: 1.2rem;
+      text-align: right;
+    }
+  }
+
+  .networkInput {
+    width: 100%;
+    margin-top: 1.2rem;
+  }
+
+  .maxButton {
+    background: $color-neutral900;
+    border-radius: 0.6rem;
+    border: 1px solid;
+    border-color: $color-neutral900;
+    color: $color-contrast;
+    cursor: pointer;
+    font-family: $font-bold;
+    font-size: 1.2rem;
+    padding: 0.4rem 1.2rem;
+
+    &:hover {
+      border-color: $color-contrast;
+    }
+  }
+}
+
+.switch {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 1.6rem;
+
+  .separator {
+    height: 2px;
+    width: 100%;
+    position: absolute;
+    background: $color-neutral900;
+    border-radius: 6.4rem;
+  }
+
+  .switchButton {
+    height: 3.2rem;
+    width: 3.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: $color-neutral900;
+    border-radius: 50%;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 10;
+
+    .arrowSvg {
+      height: 1.6rem;
+      width: 1.6rem;
+    }
+
+    > * {
+      &:last-child {
+        display: none;
+      }
+    }
+
+    @include lg {
+      &:hover {
+        background: $color-primary500;
+
+        > * {
+          &:first-child {
+            display: none;
+          }
+
+          &:last-child {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}
+
+.button {
+  width: 100%;
+  margin-top: 3.2rem;
+}
