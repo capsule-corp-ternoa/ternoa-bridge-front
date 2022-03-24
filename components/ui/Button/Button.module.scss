@@ -18,8 +18,8 @@
 
   &.small {
     border: 2px solid;
-    font-size: 1.2rem;
-    padding: 0.8rem 2.4rem;
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
   }
 
   &.medium {
@@ -39,9 +39,14 @@
   &.danger {
     background: $color-danger500;
     color: $color-contrast;
+    border-color: $color-danger500;
 
-    &:active,
     &:hover {
+      border-color: $color-danger300;
+    }
+
+    &:active {
+      background: $color-danger300;
       border-color: $color-danger300;
     }
   }
@@ -55,29 +60,44 @@
   &.primary100 {
     background: $color-primary100;
     color: $color-contrast;
+    border-color: $color-primary100;
 
-    &:active,
     &:hover {
-      border-color: $color-neutral300;
+      border-color: #33335f;
+    }
+
+    &:active {
+      border-color: #33335f;
+      background: #33335f;
     }
   }
 
   &.primary500 {
     background: $color-primary500;
     color: $color-contrast;
+    border-color: $color-primary500;
 
-    &:active,
     &:hover {
-      border-color: #004fff4d;
+      border-color: #051d5b;
+    }
+
+    &:active {
+      border-color: #051d5b;
+      background: #051d5b;
     }
   }
 
   &.success {
     background: $color-success500;
     color: $color-contrast;
+    border-color: $color-success500;
 
-    &:active,
     &:hover {
+      border-color: $color-success300;
+    }
+
+    &:active {
+      background: $color-success300;
       border-color: $color-success300;
     }
   }

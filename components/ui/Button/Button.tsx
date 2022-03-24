@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 
-import Arrow from 'assets/svgComponents/Arrow'
+import LinkArrow from 'assets/svgComponents/LinkArrow'
 
 import Loader from '../Loader'
 
@@ -52,7 +52,7 @@ export const AnchorButton = ({
           title={title}
         >
           {text}
-          <Arrow />
+          <LinkArrow />
         </a>
       </Link>
     )
@@ -73,7 +73,7 @@ export const AnchorButton = ({
       rel="noopener noreferrer"
     >
       {text}
-      <Arrow />
+      <LinkArrow />
     </a>
   )
 }
