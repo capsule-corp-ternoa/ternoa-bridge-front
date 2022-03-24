@@ -6,13 +6,19 @@ import styles from './Homepage.module.scss'
 
 const Homepage = () => (
   <main className="container">
-    <div className="wrapper">
-      <h1 className={styles.title}>Token Bridge</h1>
-      <p className={styles.description}>The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.</p>
+    <div className={`wrapper ${styles.root}`}>
+      <h1 className={styles.mobileTitle}>Token Bridge</h1>
+      <p className={styles.mobileDescription}>
+        The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.
+      </p>
       <div className={styles.transfer}>
         <Transfer />
       </div>
-      <div className={styles.documentation}>
+      <div className={styles.body}>
+        <h1 className={styles.laptopTitle}>Token Bridge</h1>
+        <p className={styles.laptopDescription}>
+          The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.
+        </p>
         <div className={styles.indicator} />
         <p className={styles.insight}>
           💡 Unlike many other bridges, the Ternoa Bridge will lock your ERC20 CAPS and mint the equivalent in native

@@ -9,6 +9,10 @@
   cursor: pointer;
   padding: 1.6rem;
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+
+  @include xl {
+    padding: 2rem;
+  }
 }
 
 .network {
@@ -26,6 +30,16 @@
     .networkIcon {
       height: 1.4rem;
       width: 1.4rem;
+
+      @include xl {
+        height: 2rem;
+        width: 2rem;
+      }
+    }
+
+    @include xl {
+      height: 4rem;
+      width: 4rem;
     }
   }
 
@@ -37,6 +51,10 @@
     .networkName {
       font-family: $font-bold;
       font-size: 1.2rem;
+
+      @include xl {
+        font-size: 1.6rem;
+      }
     }
 
     .networkData {
@@ -52,6 +70,24 @@
           margin-left: 0.4rem;
         }
       }
+
+      @include xl {
+        font-size: 1.4rem;
+
+        > * {
+          &:not(:first-child) {
+            margin-left: 0.8rem;
+          }
+        }
+      }
+    }
+
+    @include xl {
+      margin-left: 1.6rem;
     }
   }
+}
+
+.connectButton {
+  margin-left: 1.6rem;
 }

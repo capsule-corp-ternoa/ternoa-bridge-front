@@ -1,0 +1,26 @@
+@import 'style/base.scss';
+
+.nav {
+  display: none;
+
+  @include lg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logoTitle {
+  color: $color-contrast;
+  font-size: 2rem;
+  margin-left: 0.4rem;
+}
+
+.expandIcon {
+  cursor: pointer;
+}

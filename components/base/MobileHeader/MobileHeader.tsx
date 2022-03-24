@@ -13,23 +13,21 @@ const MobileHeader = () => {
 
   return (
     <>
-      <header className="container">
-        <nav className={`wrapper ${styles.nav}`}>
-          <Link href="/">
-            <a className={styles.logo} title="Bridge homepage">
-              <TernoaIcon />
-              <div className={styles.logoTitle}>Ternoa Bridge</div>
-            </a>
-          </Link>
-          <button
-            className={styles.expandIcon}
-            onClick={() => setIsMenuExpanded((prevState) => !prevState)}
-            title="Open menu"
-          >
-            <Hamburger />
-          </button>
-        </nav>
-      </header>
+      <nav className={`wrapper ${styles.nav}`}>
+        <Link href="/">
+          <a className={styles.logo} title="Bridge homepage">
+            <TernoaIcon />
+            <div className={styles.logoTitle}>Ternoa Bridge</div>
+          </a>
+        </Link>
+        <button
+          className={styles.expandIcon}
+          onClick={() => setIsMenuExpanded((prevState) => !prevState)}
+          title="Open menu"
+        >
+          <Hamburger />
+        </button>
+      </nav>
 
       <SideMenu isExpanded={isMenuExpanded} setIsExpanded={setIsMenuExpanded} />
     </>

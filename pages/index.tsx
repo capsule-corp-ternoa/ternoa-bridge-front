@@ -1,8 +1,9 @@
 import Head from 'next/head'
 
 import Footer from 'components/base/Footer'
-import MobileHeader from 'components/base/MobileHeader'
+import Header from 'components/base/Header'
 import Homepage from 'components/pages/Homepage'
+import MobileHeader from 'components/base/MobileHeader'
 
 export default function Home() {
   return (
@@ -14,7 +15,10 @@ export default function Home() {
         <meta name="description" content="Ternoa Bridge" />
       </Head>
 
-      <MobileHeader />
+      <header className="container">
+        <Header />
+        <MobileHeader />
+      </header>
 
       <Homepage />
 

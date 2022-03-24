@@ -76,6 +76,7 @@ const NetworkInput = ({
       </div>
       {!noConnectButton && (
         <div
+          className={styles.connectButton}
           onMouseEnter={() => setIsConnectButtonHovering(true)}
           onMouseLeave={() => setIsConnectButtonHovering(false)}
         >

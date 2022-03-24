@@ -13,6 +13,10 @@
   &.expanded {
     transform: translateX(-100%);
   }
+
+  @include lg {
+    display: none;
+  }
 }
 
 .radialGradientBg {
