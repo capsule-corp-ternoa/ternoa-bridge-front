@@ -35,6 +35,13 @@ const Transfer = () => {
     }
   }
 
+  const handleNetworkSwicth = () => {
+    const newFrom = to
+    const newTo = from
+    setFrom(newFrom)
+    setTo(newTo)
+  }
+
   return (
     <>
       <div className={styles.outterContainer}>
@@ -58,7 +65,7 @@ const Transfer = () => {
 
           <div className={styles.switch}>
             <div className={styles.separator} />
-            <button className={styles.switchButton}>
+            <button className={styles.switchButton} onClick={handleNetworkSwicth}>
               <Arrow className={styles.arrowSvg} />
               <Switch />
             </button>
