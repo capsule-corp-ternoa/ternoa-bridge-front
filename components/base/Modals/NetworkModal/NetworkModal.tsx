@@ -54,10 +54,6 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
           }}
         />
       </div>
-      <div className={styles.helpWrapper}>
-        <span className={styles.helpWhite}>Need help ?</span>
-        <a className={styles.helpPrimary}>Learn more about bridges</a>
-      </div>
     </div>
   </Modal>
 )
