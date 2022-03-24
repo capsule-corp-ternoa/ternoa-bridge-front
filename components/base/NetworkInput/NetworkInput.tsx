@@ -15,10 +15,19 @@ interface Props {
   className?: string
   isConnected?: boolean
   network: 'erc20' | 'bep20' | 'other'
-  onClick: React.MouseEventHandler<HTMLButtonElement>
+  noConnectButton?: boolean
+  onClick: React.MouseEventHandler<HTMLDivElement>
 }
 
-const NetworkInput = ({ address, balance, className, isConnected = false, network, onClick }: Props) => {
+const NetworkInput = ({
+  address,
+  balance,
+  className,
+  isConnected = false,
+  network = 'other',
+  noConnectButton = false,
+  onClick,
+}: Props) => {
   const [isConnectButtonHovering, setIsConnectButtonHovering] = useState(false)
 
   const buttonColor = !isConnected ? 'primary100' : isConnectButtonHovering ? 'danger' : 'success'
@@ -35,36 +44,28 @@ const NetworkInput = ({ address, balance, className, isConnected = false, networ
     }
   }
 
-  const networkIcon = () => {
-    switch (network) {
-      case 'erc20':
-        return <Erc20 className={styles.networkIcon} />
-      case 'bep20':
-        return <Bep20 className={styles.networkIcon} />
-      default:
-        return <TernoaChain className={styles.networkIcon} />
-    }
-  }
-
-  const networkName = () => {
-    switch (network) {
-      case 'erc20':
-        return 'Ethereum Network'
-      case 'bep20':
-        return 'Binance Smart Chain'
-      default:
-        return 'Ternoa Chain'
-    }
-  }
-
   return (
-    <button className={[`${styles.root}`, className].join(' ')} onClick={onClick}>
+    <div className={[`${styles.root}`, className].join(' ')} onClick={onClick}>
       <div className={styles.network}>
         <div className={styles.icon} style={{ background: networkColor() }}>
-          {networkIcon()}
+          {
+            {
+              erc20: <Erc20 className={styles.networkIcon} />,
+              bep20: <Bep20 className={styles.networkIcon} />,
+              other: <TernoaChain className={styles.networkIcon} />,
+            }[network]
+          }
         </div>
         <div className={styles.data}>
-          <div className={styles.networkName}>{networkName()}</div>
+          <div className={styles.networkName}>
+            {
+              {
+                erc20: 'Ethereum Network',
+                bep20: 'Binance Smart Chain',
+                other: 'Ternoa Chain',
+              }[network]
+            }
+          </div>
           {isConnected && (
             <div className={styles.networkData}>
               <span className={styles.balance}>{`${balance} CAPS`}</span>
@@ -73,19 +74,24 @@ const NetworkInput = ({ address, balance, className, isConnected = false, networ
           )}
         </div>
       </div>
-      <div onMouseEnter={() => setIsConnectButtonHovering(true)} onMouseLeave={() => setIsConnectButtonHovering(false)}>
-        <Button
-          color={buttonColor}
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation()
-            console.log('Connect network')
-          }}
-          text={buttonText}
-          variant="rounded"
-        />
-      </div>
-    </button>
+      {!noConnectButton && (
+        <div
+          onMouseEnter={() => setIsConnectButtonHovering(true)}
+          onMouseLeave={() => setIsConnectButtonHovering(false)}
+        >
+          <Button
+            color={buttonColor}
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation()
+              console.log('Connect network')
+            }}
+            text={buttonText}
+            variant="rounded"
+          />
+        </div>
+      )}
+    </div>
   )
 }
 
