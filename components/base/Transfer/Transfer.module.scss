@@ -83,6 +83,14 @@
       font-size: 1.4rem;
     }
   }
+
+  @include lg {
+    min-width: 4rem;
+  }
+
+  @include xl {
+    min-width: 48rem;
+  }
 }
 
 .switch {
