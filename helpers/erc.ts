@@ -1,6 +1,10 @@
 import { ethers, Contract, Signer } from 'ethers'
 import { CAPS_CONTRACT_ABI } from './abis'
 import { ERCProvider, ErcWallet } from '../interfaces'
+import { AnyAction } from 'redux'
+import { clear, get, USER_ERC_CONNECTED_WITH } from './storage'
+import { connect as connectMetamask } from './metamask'
+import { connect as connectWalletConnect } from './walletconnect'
 
 const NUMBER_OF_DECIMALS = 18
 
@@ -37,6 +41,22 @@ const getDefaultProvider = async (chainId: number) => {
 //   const contract = new Contract(tokenContractAddress, CAPS_CONTRACT_ABI, provider)
 //   return contract
 // }
+
+export const reconnect = async (dispatch: (action: AnyAction) => void) => {
+  try {
+    const ercConnectedWith = get(USER_ERC_CONNECTED_WITH)
+    if (ercConnectedWith) {
+      if (ercConnectedWith === 'metamask') {
+        connectMetamask(dispatch)
+      } else {
+        connectWalletConnect(dispatch)
+      }
+    }
+  } catch (err) {
+    console.error(err)
+    clear(USER_ERC_CONNECTED_WITH)
+  }
+}
 
 export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCProvider): Promise<ErcWallet> => {
   const chainId = await signer.getChainId()

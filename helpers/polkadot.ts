@@ -5,6 +5,7 @@ import { AnyAction } from 'redux'
 import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
 import { PolkadotWallet } from '../interfaces'
+import { clear, get, USER_POLKADOT_ADDRESS } from './storage'
 
 let api: ApiPromise
 
@@ -33,6 +34,21 @@ export const getBalance = async (address: string) => {
   const api = await getApi()
   const balance: { free: BN } = ((await api.query.system.account(address)) as any).data
   return balance.free.toString()
+}
+
+export const reconnect = async (dispatch: (action: AnyAction) => void) => {
+  try {
+    const polkadotAddress = get(USER_POLKADOT_ADDRESS)
+    if (polkadotAddress) {
+      const accounts = await getAccounts()
+      const account = accounts.find((x) => x.address === polkadotAddress)
+      if (!account) throw new Error('Account not found in extenstion')
+      connect(account, dispatch)
+    }
+  } catch (err) {
+    console.error(err)
+    clear(USER_POLKADOT_ADDRESS)
+  }
 }
 
 export const getAccounts = async () => {

@@ -3,6 +3,7 @@ import { safeDisconnect } from '../../helpers/polkadot'
 
 import { walletConnectProvider } from '../../helpers/walletconnect'
 import { User } from '../../interfaces'
+import { clear, store, USER_ERC_CONNECTED_WITH, USER_POLKADOT_ADDRESS } from '../../helpers/storage'
 
 const initialState = {
   user: {
@@ -15,6 +16,7 @@ export const userReducer: Reducer<{ user: User }, AnyAction> = (state = initialS
   switch (action.type) {
     case 'USER_LOGIN_ERC': {
       const { value } = action
+      store(USER_ERC_CONNECTED_WITH, value.connectedWith)
       return {
         ...state,
         user: {
@@ -29,6 +31,7 @@ export const userReducer: Reducer<{ user: User }, AnyAction> = (state = initialS
       if (walletConnectProvider?.connected && isDisconnect) {
         walletConnectProvider.disconnect()
       }
+      clear(USER_ERC_CONNECTED_WITH)
       return {
         ...state,
         user: {
@@ -56,6 +59,7 @@ export const userReducer: Reducer<{ user: User }, AnyAction> = (state = initialS
     }
     case 'USER_LOGIN_POLKADOT': {
       const { value } = action
+      store(USER_POLKADOT_ADDRESS, value.address)
       return {
         ...state,
         user: {
@@ -67,6 +71,7 @@ export const userReducer: Reducer<{ user: User }, AnyAction> = (state = initialS
     }
     case 'USER_LOGOUT_POLKADOT': {
       safeDisconnect()
+      clear(USER_POLKADOT_ADDRESS)
       return {
         ...state,
         user: {

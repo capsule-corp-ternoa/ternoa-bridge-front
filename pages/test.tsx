@@ -1,14 +1,19 @@
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { switchBSCNetwork, switchETHNetwork, connect as connectMetamask } from '../helpers/metamask'
 import { connect as connectWalletConnect } from '../helpers/walletconnect'
-import { getTransferFees as getTransferFeesErc, transfer as transferEthBsc } from '../helpers/erc'
+import {
+  getTransferFees as getTransferFeesErc,
+  transfer as transferEthBsc,
+  reconnect as reconnectErc,
+} from '../helpers/erc'
 import {
   connect as connectPolkadot,
   getAccounts,
   transfer as transferPolka,
   getTransferFees as getTransferFeesPolka,
+  reconnect as reconnectPolkadot,
 } from '../helpers/polkadot'
 
 import { useAppDispatch, useAppSelector } from '../redux/hooks'
@@ -19,6 +24,11 @@ export default function Test() {
   const dispatch = useAppDispatch()
   const [estimateFees, setEstimateFees] = useState('')
   const [estimateFeesPolka, setEstimateFeesPolka] = useState('')
+
+  useEffect(() => {
+    reconnectErc(dispatch)
+    reconnectPolkadot(dispatch)
+  }, [dispatch])
 
   return (
     <div className="container">
