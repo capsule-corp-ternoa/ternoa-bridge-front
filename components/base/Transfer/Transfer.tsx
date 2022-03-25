@@ -65,7 +65,7 @@ const Transfer = () => {
 
           <div className={styles.switch}>
             <div className={styles.separator} />
-            <button className={styles.switchButton} onClick={handleNetworkSwicth}>
+            <button className={styles.switchButton} aria-label="Switch Network" onClick={handleNetworkSwicth}>
               <Arrow className={styles.arrowSvg} />
               <Switch />
             </button>
