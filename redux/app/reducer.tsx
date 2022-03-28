@@ -2,7 +2,7 @@ import { AnyAction, Reducer } from 'redux'
 
 const initialState = {
   app: {
-    isWalletModalOpen: true,
+    isWalletModalOpen: false,
   },
 }
 

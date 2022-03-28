@@ -6,12 +6,12 @@ import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import { connect as connectMetamask } from 'helpers/metamask'
 import { connect as connectWalletConnect } from 'helpers/walletconnect'
+import { actions } from 'redux/app/actions'
 import { useAppDispatch } from 'redux/hooks'
 
 import styles from './WalletModal.module.scss'
-import { actions } from 'redux/app/actions'
 
-const WalletModal = ({}) => {
+const WalletModal = () => {
   const dispatch = useAppDispatch()
 
   const handleModalExpanded = (value: boolean) => {

@@ -4,6 +4,7 @@ import { useAppSelector } from 'redux/hooks'
 
 import Arrow from 'assets/svgComponents/Arrow'
 import Switch from 'assets/svgComponents/Switch'
+import ConfirmModal from 'components/base/Modals/ConfirmModal'
 import NetworkModal from 'components/base/Modals/NetworkModal'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
@@ -15,6 +16,7 @@ import styles from './Transfer.module.scss'
 const Transfer = () => {
   const [from, setFrom] = useState<ChainType>('erc20')
   const [to, setTo] = useState<ChainType>('other')
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
   const [origin, setOrigin] = useState<'from' | 'to'>('from')
   const { user } = useAppSelector((state) => state.user)
@@ -105,13 +107,23 @@ const Transfer = () => {
           <Button
             className={styles.button}
             color="primary500"
-            onClick={() => console.log('Continue')}
+            onClick={() => setIsConfirmModalOpen(true)}
             size="medium"
             text="Continue"
             variant="rectangle"
           />
         </div>
       </div>
+      {isConfirmModalOpen && (
+        <ConfirmModal
+          from={from}
+          to={to}
+          handleNetworkSwicth={handleNetworkSwicth}
+          setExpanded={setIsConfirmModalOpen}
+          setIsNetworkModalOpen={setIsNetworkModalOpen}
+          setOrigin={setOrigin}
+        />
+      )}
       {isNetworkModalOpen && (
         <NetworkModal origin={origin} handleNetwork={handleNetwork} setExpanded={setIsNetworkModalOpen} />
       )}
