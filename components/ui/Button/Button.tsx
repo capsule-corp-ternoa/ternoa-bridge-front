@@ -24,6 +24,7 @@ interface AnchorButtonProps extends IButton {
 interface ButtonProps extends IButton {
   className?: string
   disabled?: boolean
+  icon?: React.ReactNode
   onClick?: React.MouseEventHandler<HTMLButtonElement>
   text?: string
 }
@@ -82,6 +83,7 @@ const Button = ({
   className,
   color = 'primary500',
   disabled,
+  icon,
   isLoading = false,
   onClick,
   size = 'medium',
@@ -100,6 +102,7 @@ const Button = ({
     disabled={disabled}
     onClick={onClick}
   >
+    {icon && <div className={styles.icon}>{icon}</div>}
     {isLoading ? <Loader className={styles.loader} size={size} /> : <>{text}</>}
   </button>
 )
