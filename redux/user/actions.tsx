@@ -9,7 +9,7 @@ export const actions = {
     type: 'USER_LOGOUT_ERC',
     isDisconnect: isDisconnect,
   }),
-  setCapsBalanceErc: (value: string) => ({
+  setCapsBalanceErc: (value: number) => ({
     type: 'USER_SET_CAPS_BALANCE_ERC',
     value: value,
   }),
@@ -20,7 +20,7 @@ export const actions = {
   logoutPolkadot: () => ({
     type: 'USER_LOGOUT_POLKADOT',
   }),
-  setCapsBalancePolkadot: (value: string) => ({
+  setCapsBalancePolkadot: (value: number) => ({
     type: 'USER_SET_CAPS_BALANCE_POLKADOT',
     value: value,
   }),

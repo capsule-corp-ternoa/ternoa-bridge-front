@@ -38,3 +38,6 @@ export const CAPS_CONTRACT_ABI = [
     payable: false,
   },
 ]
+
+//TODO
+export const BRIDGE_CONTRACT_ABI = []

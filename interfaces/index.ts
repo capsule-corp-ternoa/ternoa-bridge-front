@@ -2,11 +2,11 @@ import { Signer } from 'ethers'
 import type { InjectedExtension } from '@polkadot/extension-inject/types'
 
 export type ERCProvider = 'metamask' | 'walletconnect'
-export type ChainType = 'erc20' | 'bep20' | 'other'
+export type ChainType = 'erc20' | 'bep20' | 'ternoa' | 'other'
 
 export interface ErcWallet {
   address: string
-  capsBalance: string
+  capsBalance: number
   chainId: number
   chainType: ChainType
   signer: Signer
@@ -16,7 +16,7 @@ export interface ErcWallet {
 export interface PolkadotWallet {
   address: string
   injector: InjectedExtension
-  capsBalance: string
+  capsBalance: number
 }
 
 export interface User {

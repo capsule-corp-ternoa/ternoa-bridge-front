@@ -6,6 +6,7 @@ import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
 import { PolkadotWallet } from '../interfaces'
 import { clear, get, USER_POLKADOT_ADDRESS } from './storage'
+import { NUMBER_OF_DECIMALS } from './erc'
 
 let api: ApiPromise
 
@@ -30,10 +31,14 @@ export const safeDisconnect = async () => {
   if (api && api.isConnected) await api.disconnect()
 }
 
+export const formatBalance = (balance: string) => {
+  return Number(balance.slice(0, -(NUMBER_OF_DECIMALS - 3))) / 1000
+}
+
 export const getBalance = async (address: string) => {
   const api = await getApi()
   const balance: { free: BN } = ((await api.query.system.account(address)) as any).data
-  return balance.free.toString()
+  return formatBalance(balance.free.toString())
 }
 
 export const reconnect = async (dispatch: (action: AnyAction) => void) => {
@@ -70,23 +75,46 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
   dispatch(actions.loginPolkadot(data))
 }
 
-export const transfer = async (polkadotWallet: PolkadotWallet) => {
+//TODO
+export const getTransferFees = async (polkadotWallet: PolkadotWallet, amount: number) => {
+  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', amount)
+  const info = await tx.paymentInfo(polkadotWallet.address)
+  return formatBalance(info.partialFee.toString()).toString()
+}
+
+//TODO
+export const transfer = async (
+  polkadotWallet: PolkadotWallet,
+  amount: number,
+  setResponse: (response: { message: string; txLink: string; isError: boolean }) => void
+) => {
   const api = await getApi()
   const address = polkadotWallet.address
   const injector = polkadotWallet.injector
-  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', 10)
-  await tx.signAndSend(address, { signer: injector.signer }, (data) => {
-    const { status } = data
+  const bnBase = new BN('1000000000000000000')
+  const bnAmount = new BN(amount)
+  const formattedAmount = bnAmount.mul(bnBase)
+  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', formattedAmount)
+  await tx.signAndSend(address, { signer: injector.signer }, async (data) => {
+    const { status, events } = data
     if (status.isInBlock) {
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`)
+      const blockHash = status.asInBlock
+      const blockNumber = (await api.rpc.chain.getHeader(blockHash)).number.toNumber()
+      const success = events.find((x) => api.events.system.ExtrinsicSuccess.is(x.event))
+      const txLink = `https://explorer.ternoa.com/block/${blockNumber}`
+      let message = 'Extrinsic failed'
+      let isError = true
+      if (success) {
+        message = 'Your balance will be availble in few moment (it can take up to 1 day)'
+        isError = false
+      }
+      setResponse({
+        message,
+        txLink,
+        isError,
+      })
     } else {
       console.log(`Current status: ${status.type}`)
     }
   })
-}
-
-export const getTransferFees = async (polkadotWallet: PolkadotWallet) => {
-  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', 10)
-  const info = await tx.paymentInfo(polkadotWallet.address)
-  return info.partialFee.toString()
 }
