@@ -34,12 +34,12 @@ export default function Test() {
         <div>{`- connectedWith: ${user.ercWallet?.connectedWith}`}</div>
         <div>{`- capsBalance: ${user.ercWallet?.capsBalance}`}</div>
         <div>{`- EstimateFees: ${estimateFees}`}</div>
-        {user.ercWallet?.chainType === 'other' && <div>BAD NETWORK !</div>}
+        {user.ercWallet?.chainType === 'ternoa' && <div>BAD NETWORK !</div>}
         {user.isConnectedErc === false && (
           <button onClick={() => connect('erc20', dispatch, 'metamask')}>Connect ERC Metamask</button>
         )}
         {user.isConnectedErc === false && (
-          <button onClick={() => connect('erc20', dispatch, 'walletconnect')}>Connect ERC WalletConnect</button>
+          <button onClick={() => connect('erc20', dispatch, 'walletConnect')}>Connect ERC WalletConnect</button>
         )}
         {user.isConnectedErc === true && (
           <button

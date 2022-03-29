@@ -7,20 +7,22 @@ import styles from './Modal.module.scss'
 
 export interface ModalProps {
   children: React.ReactElement<any, string | React.JSXElementConstructor<any>> & React.ReactNode
-  setExpanded: (b: boolean) => void
+  setExpanded?: (b: boolean) => void
 }
 
 const Modal: React.FC<ModalProps> = ({ children, setExpanded }) => (
   <div className={styles.root}>
     <ClickAwayListener
       onClickAway={() => {
-        setExpanded(false)
+        if (setExpanded) setExpanded(false)
       }}
     >
       <div className={styles.modalContainer}>
-        <div className={styles.close} onClick={() => setExpanded(false)}>
-          <Close />
-        </div>
+        {setExpanded !== undefined && (
+          <div className={styles.close} onClick={() => setExpanded(false)}>
+            <Close />
+          </div>
+        )}
         {children}
       </div>
     </ClickAwayListener>

@@ -18,40 +18,34 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
       <h4 className={styles.title}>Select the Network</h4>
       <div className={styles.networks}>
         <NetworkInput
-          address="0xC59999999995472"
-          balance="10.000"
           className={styles.networkInput}
-          isConnected={false}
           network="erc20"
           noConnectButton
           onClick={() => {
             handleNetwork(origin, 'erc20')
             setExpanded(false)
           }}
+          variant="input"
         />
         <NetworkInput
-          address="0xC59999999995472"
-          balance="10.000"
           className={styles.networkInput}
-          isConnected={false}
           network="bep20"
           noConnectButton
           onClick={() => {
             handleNetwork(origin, 'bep20')
             setExpanded(false)
           }}
+          variant="input"
         />
         <NetworkInput
-          address="0xC59999999995472"
-          balance="10.000"
           className={styles.networkInput}
-          isConnected={false}
-          network="other"
+          network="ternoa"
           noConnectButton
           onClick={() => {
-            handleNetwork(origin, 'other')
+            handleNetwork(origin, 'ternoa')
             setExpanded(false)
           }}
+          variant="input"
         />
       </div>
     </div>

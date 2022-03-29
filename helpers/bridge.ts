@@ -21,10 +21,10 @@ import {
   approve as approveEthCaps,
 } from './erc'
 
-const minAmount = 200
-const maxAmount = 100000
+export const MIN_AMOUNT = 200
+export const MAX_AMOUNT = 100000
 
-const isConnected = (from: ChainType, user: User) => {
+export const isConnected = (from: ChainType, user: User) => {
   switch (from) {
     case 'ternoa':
       return user.isConnectedPolkadot
@@ -40,11 +40,12 @@ const isConnected = (from: ChainType, user: User) => {
 export const connect = (
   chainType: ChainType,
   dispatch: (action: AnyAction) => void,
-  connectedWith?: string,
+  connectedWith?: 'metamask' | 'walletConnect',
   selectedPolkadotAccount?: InjectedAccountWithMeta
 ) => {
   switch (chainType) {
-    case 'erc20' || 'bep20':
+    case 'erc20':
+    case 'bep20':
       if (!connectedWith) throw new Error('No provider found')
       if (connectedWith === 'metamask') {
         connectMetamask(dispatch)
@@ -72,6 +73,10 @@ export const reconnect = (dispatch: (action: AnyAction) => void) => {
   reconnectPolkadot(dispatch)
 }
 
+export const getAddress = (from: ChainType, user: User) => {
+  return from === 'ternoa' ? user.polkadotWallet?.address : user.ercWallet?.address
+}
+
 export const getBalance = (from: ChainType, user: User) => {
   return from === 'ternoa' ? user.polkadotWallet?.capsBalance : user.ercWallet?.capsBalance
 }
@@ -82,14 +87,15 @@ export const canProceed = (from: ChainType, to: ChainType, amount: number, user:
     const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
     if (!validDirections.includes(key)) throw new Error('Invalid combination')
     if (!isConnected(from, user)) throw new Error('From network is not connected')
-    if (!isConnected(to, user)) throw new Error('To network is not connected')
-    if (amount < minAmount) throw new Error('amount is below minimum amount to swap')
-    if (amount > maxAmount) throw new Error('amount is above maximum amount to swap')
+    if (!(key === 'erc20-bep20' || 'bep20-erc20')) {
+      if (!isConnected(to, user)) throw new Error('To network is not connected')
+    }
+    if (amount < MIN_AMOUNT) throw new Error('amount is below minimum amount to swap')
+    if (amount > MAX_AMOUNT) throw new Error('amount is above maximum amount to swap')
     const balance = getBalance(from, user)
     if (!balance || balance < amount) throw new Error('Insufficient balance')
     return true
   } catch (err) {
-    console.error(err)
     return false
   }
 }
@@ -111,19 +117,6 @@ export const approve = async (from: ChainType, to: ChainType, user: User) => {
     return await approveEthCaps(signer)
   } else {
     throw new Error('Nothing to approve')
-  }
-}
-
-export const getAddressFromChainType = (chainType: ChainType, user: User): string => {
-  switch (chainType) {
-    case 'ternoa':
-      if (!user.polkadotWallet) throw new Error('No address found for polkadot wallet')
-      return user.polkadotWallet.address
-    case 'erc20' || 'bep20':
-      if (!user.ercWallet) throw new Error('No address found for erc wallet')
-      return user.ercWallet.address
-    default:
-      throw new Error('Chaintype not recognized')
   }
 }
 

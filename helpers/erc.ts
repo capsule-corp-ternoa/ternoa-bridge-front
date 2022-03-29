@@ -66,7 +66,7 @@ export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCP
     address: await signer.getAddress(),
     chainId: chainId,
     connectedWith: connectedWith,
-    chainType: ETH_CHAIN_ID === chainId ? 'erc20' : chainId === BSC_CHAIN_ID ? 'bep20' : 'other',
+    chainType: ETH_CHAIN_ID === chainId ? 'erc20' : chainId === BSC_CHAIN_ID ? 'bep20' : 'ternoa',
     capsBalance: await getBalance(signer),
     signer,
   }
@@ -125,8 +125,10 @@ export const transferBscEth = async (signer: Signer, amount: number) => {
 
 // //TODO
 // export const getTransferEthTernoaFees = async (signer: Signer, amount: number): Promise<string> => {
-//   return ''
+//   return '0'
 // }
 
 // //TODO
-// export const transferEthTernoa = async (signer: Signer, amount: number) => {}
+// export const transferEthTernoa = async (signer: Signer, amount: number) => {
+//   return 0
+// }

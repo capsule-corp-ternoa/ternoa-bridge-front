@@ -59,7 +59,10 @@ export const reconnect = async (dispatch: (action: AnyAction) => void) => {
 export const getAccounts = async () => {
   const { web3Accounts, web3Enable } = await import('@polkadot/extension-dapp')
   const extensions = await web3Enable('ternoa-bridge')
-  if (extensions.length === 0) throw new Error('polkadot{.js} extension is not installed')
+  if (extensions.length === 0)
+    throw new Error(
+      'polkadot{.js} extension is not installed.\n\nOtherwise make sure you allowed Ternoa Bridge application in the "Manage Website Access" settings of your wallet.'
+    )
   const allAccounts = await web3Accounts()
   return allAccounts
 }

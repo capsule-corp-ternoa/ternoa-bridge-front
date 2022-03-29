@@ -1,36 +1,69 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Arrow from 'assets/svgComponents/Arrow'
-import Switch from 'assets/svgComponents/Switch'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import Radio from 'components/ui/Radio'
 
+import { getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
 import { ChainType } from 'interfaces'
-import { middleEllipsis } from 'utils/strings'
+import { useAppSelector } from 'redux/hooks'
+import { formatPrice, middleEllipsis } from 'utils/strings'
 
 import transferStyles from '../../Transfer/Transfer.module.scss'
 import styles from './ConfirmModal.module.scss'
 
 export interface ConfirmModalProps {
+  amount: number
   from: ChainType
   to: ChainType
-  handleNetworkSwicth: () => void
   setExpanded: (b: boolean) => void
   setIsNetworkModalOpen: (b: boolean) => void
   setOrigin: (origin: 'from' | 'to') => void
 }
 
-const ConfirmModal = ({
-  from,
-  to,
-  handleNetworkSwicth,
-  setExpanded,
-  setIsNetworkModalOpen,
-  setOrigin,
-}: ConfirmModalProps) => {
+const ConfirmModal = ({ amount, from, to, setExpanded, setIsNetworkModalOpen, setOrigin }: ConfirmModalProps) => {
+  const [fees, setFees] = useState('')
+  const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
+  const { user } = useAppSelector((state) => state.user)
+
+  const toAddress = getAddress(to, user)
+
+  const handleApprove = () => {
+    console.log('Approve')
+  }
+
+  const handleContinue = () => {
+    return
+  }
+
+  useEffect(() => {
+    let shouldUpdate = true
+    const getFees = async () => {
+      const { value, unit } = await getNetworkFees(from, to, amount, user)
+      if (shouldUpdate) setFees(`${Number(value).toFixed(6)} ${unit}`)
+    }
+
+    getFees()
+    return () => {
+      shouldUpdate = false
+    }
+  }, [amount, from, to, user])
+
+  useEffect(() => {
+    let shouldUpdate = true
+    const loadApprove = async () => {
+      const value = await isApprovedHelper(from, to, user)
+      if (shouldUpdate) setIsApproved(value)
+    }
+
+    loadApprove()
+    return () => {
+      shouldUpdate = false
+    }
+  }, [from, to, user])
 
   return (
     <Modal setExpanded={setExpanded}>
@@ -42,24 +75,21 @@ const ConfirmModal = ({
               <span className={transferStyles.label}>From</span>
             </div>
             <NetworkInput
-              address="0xC59999999995472"
-              balance="10.000"
               className={transferStyles.networkInput}
-              isConnected
               network={from}
               onClick={() => {
                 setOrigin('from')
                 setIsNetworkModalOpen(true)
               }}
+              variant="preview"
             />
           </div>
 
           <div className={transferStyles.switch}>
             <div className={transferStyles.separator} />
-            <button className={transferStyles.switchButton} aria-label="Switch Network" onClick={handleNetworkSwicth}>
+            <div className={styles.arrowWrapper}>
               <Arrow className={transferStyles.arrowSvg} />
-              <Switch />
-            </button>
+            </div>
           </div>
 
           <div className={transferStyles.field}>
@@ -67,37 +97,32 @@ const ConfirmModal = ({
               <span className={transferStyles.label}>To</span>
             </div>
             <NetworkInput
-              address="0xC59999999995472"
-              balance="10.000"
               className={transferStyles.networkInput}
               network={to}
               onClick={() => {
                 setOrigin('to')
                 setIsNetworkModalOpen(true)
               }}
+              variant="preview"
             />
           </div>
         </div>
         <div className={styles.resume}>
-          <div className={styles.resumeLine}>
-            <span className={styles.resumeItem}>Amount</span>
-            <span className={styles.resumeItem}>9500</span>
-          </div>
-          <div className={styles.resumeLine}>
-            <span className={styles.resumeItem}>Asset</span>
-            <span className={styles.resumeItem}>CAPS</span>
-          </div>
-          <div className={styles.resumeLine}>
-            <span className={styles.resumeItem}>Destination</span>
-            <span className={styles.resumeItem}>{middleEllipsis('0xC59999999995472')}</span>
-          </div>
-          <div className={styles.resumeLine}>
-            <span className={styles.resumeItem}>*Network Fee</span>
-            <span className={styles.resumeItem}>0.01 ETH</span>
-          </div>
+          {toAddress && (
+            <div className={styles.resumeLine}>
+              <span className={styles.resumeItem}>Destination</span>
+              <span className={styles.resumeItem}>{middleEllipsis(toAddress)}</span>
+            </div>
+          )}
+          {fees && (
+            <div className={styles.resumeLine}>
+              <span className={styles.resumeItem}>Network Fee*</span>
+              <span className={styles.resumeItem}>{fees}</span>
+            </div>
+          )}
           <div className={styles.resumeLine}>
             <span className={styles.resumeItem}>You will receive</span>
-            <span className={styles.resumeBoldItem}>9500 CAPS</span>
+            <span className={styles.resumeBoldItem}>{`${formatPrice(amount, {})} CAPS`}</span>
           </div>
         </div>
         <Radio
@@ -110,9 +135,10 @@ const ConfirmModal = ({
         <Button
           className={styles.button}
           color="primary500"
-          onClick={() => console.log('Confirm')}
+          disabled={!isTermsRadioChecked}
+          onClick={isApproved ? handleContinue : handleApprove}
           size="medium"
-          text="Continue"
+          text={isApproved ? 'Continue' : 'Approved'}
           variant="rectangle"
         />
         <div className={styles.advise}>

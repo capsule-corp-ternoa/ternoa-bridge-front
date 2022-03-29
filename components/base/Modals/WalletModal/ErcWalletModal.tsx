@@ -4,18 +4,22 @@ import Metamask from 'assets/svgComponents/Providers/Metamask'
 import WalletConnect from 'assets/svgComponents/Providers/WalletConnect'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
-import { connect as connectMetamask } from 'helpers/metamask'
-import { connect as connectWalletConnect } from 'helpers/walletconnect'
+import { ChainType } from 'interfaces'
+import { connect } from 'helpers/bridge'
 import { actions } from 'redux/app/actions'
 import { useAppDispatch } from 'redux/hooks'
 
 import styles from './WalletModal.module.scss'
 
-const WalletModal = () => {
+interface Props {
+  chainType: ChainType
+}
+
+const ErcWalletModal = ({ chainType }: Props) => {
   const dispatch = useAppDispatch()
 
   const handleModalExpanded = (value: boolean) => {
-    dispatch(actions.setIsWalletModalOpen(value))
+    dispatch(actions.setIsErcWalletModalOpen(value))
   }
 
   return (
@@ -27,8 +31,12 @@ const WalletModal = () => {
             color="dark"
             icon={<Metamask />}
             onClick={() => {
-              connectMetamask(dispatch)
-              handleModalExpanded(false)
+              try {
+                connect(chainType, dispatch, 'metamask')
+                handleModalExpanded(false)
+              } catch (error) {
+                console.log(error)
+              }
             }}
             size="medium"
             text="Metamask"
@@ -38,8 +46,12 @@ const WalletModal = () => {
             color="dark"
             icon={<WalletConnect />}
             onClick={() => {
-              connectWalletConnect(dispatch)
-              handleModalExpanded(false)
+              try {
+                connect(chainType, dispatch, 'walletConnect')
+                handleModalExpanded(false)
+              } catch (error) {
+                console.log(error)
+              }
             }}
             size="medium"
             text="Wallet Connect"
@@ -51,4 +63,4 @@ const WalletModal = () => {
   )
 }
 
-export default WalletModal
+export default ErcWalletModal

@@ -102,8 +102,12 @@
     border-radius: 6.4rem;
 
     @include lg {
-      top: 23.6rem;
+      top: 26.4rem;
       left: 0;
+    }
+
+    @include xxl {
+      top: 23.6rem;
     }
   }
 

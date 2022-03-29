@@ -1,13 +1,21 @@
-import React from 'react'
-import { useAppSelector } from 'redux/hooks'
+import React, { useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from 'redux/hooks'
 
-import WalletModal from 'components/base/Modals/WalletModal'
+import { ErcWalletModal, PolkadotWalletModal } from 'components/base/Modals/WalletModal'
 import Transfer from 'components/base/Transfer'
+import { reconnect } from 'helpers/bridge'
 
 import styles from './Homepage.module.scss'
 
 const Homepage = () => {
+  const dispatch = useAppDispatch()
   const { app } = useAppSelector((state) => state.app)
+
+  const chainType = app.chainTypeForConnection
+
+  useEffect(() => {
+    reconnect(dispatch)
+  }, [dispatch])
 
   return (
     <main className="container">
@@ -39,7 +47,10 @@ const Homepage = () => {
           </p>
         </div>
       </div>
-      {app.isWalletModalOpen && <WalletModal />}
+      {app.isErcWalletModalOpen && (chainType === 'erc20' || chainType === 'bep20') && (
+        <ErcWalletModal chainType={chainType} />
+      )}
+      {app.isPolkadotWalletModalOpen && chainType === 'ternoa' && <PolkadotWalletModal />}
     </main>
   )
 }
