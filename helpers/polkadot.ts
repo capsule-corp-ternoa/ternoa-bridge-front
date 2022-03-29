@@ -11,6 +11,7 @@ import { NUMBER_OF_DECIMALS } from './erc'
 let api: ApiPromise
 
 const CHAIN_ENDPOINT = 'wss://dev.chaos.ternoa.com'
+const ETH_DEST_ID = 0
 
 const initializeApi = async () => {
   await cryptoWaitReady()
@@ -89,7 +90,7 @@ export const getTransferFees = async (user: User, amount: number) => {
   if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
   if (!user.ercWallet) throw new Error('User ERC account not found')
   const formattedAmount = formatInput(amount)
-  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, 0)
+  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   const info = await tx.paymentInfo(user.polkadotWallet.address)
   return formatBalance(info.partialFee.toString()).toString()
 }
@@ -106,7 +107,7 @@ export const transfer = async (
   const address = user.polkadotWallet.address
   const injector = user.polkadotWallet.injector
   const formattedAmount = formatInput(amount)
-  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, 0)
+  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   await tx.signAndSend(address, { signer: injector.signer }, async (data) => {
     const { status, events } = data
     if (status.isInBlock) {
