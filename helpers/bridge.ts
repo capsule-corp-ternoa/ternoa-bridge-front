@@ -21,7 +21,7 @@ import {
   approve as approveEthCaps,
 } from './erc'
 
-export const MIN_AMOUNT = 200
+export const MIN_AMOUNT = 20 //0 TODO
 export const MAX_AMOUNT = 100000
 
 export const isConnected = (from: ChainType, user: User) => {
@@ -129,7 +129,7 @@ export const getNetworkFees = async (
   switch (from) {
     case 'ternoa':
       if (!user.polkadotWallet) throw new Error('Polkadot wallet not connected')
-      return { value: await getTransferFeesPolkadot(user.polkadotWallet, amount), unit: 'CAPS' }
+      return { value: await getTransferFeesPolkadot(user, amount), unit: 'CAPS' }
     case 'bep20':
       if (!user.ercWallet) throw new Error('Erc wallet not connected')
       return { value: await getTransferBscEthFees(user.ercWallet.signer, amount), unit: 'BNB' }
@@ -150,45 +150,61 @@ export const transfer = async (
   user: User,
   setResponse: (response: { message: string; txLink: string; isError: boolean }) => void
 ) => {
-  switch (from) {
-    case 'ternoa':
-      if (!user.polkadotWallet) throw new Error('Signer not found')
-      await transferTernoaEth(user.polkadotWallet, amount, setResponse)
-      break
-    case 'bep20':
-      if (!user.ercWallet) throw new Error('Signer not found')
-      const tx = await transferBscEth(user.ercWallet?.signer, amount)
-      const receipt = await tx.wait()
-      setResponse({
-        message: 'Please check your wallet balance',
-        txLink: `https://bscscan.com/tx/${receipt.transactionHash}`,
-        isError: false,
-      })
-      break
-    case 'erc20':
-      if (to !== 'bep20' && to !== 'ternoa') throw new Error('Invalid combination')
-      if (to === 'bep20') {
+  try {
+    switch (from) {
+      case 'ternoa':
+        if (!user.polkadotWallet) throw new Error('Signer not found')
+        await transferTernoaEth(user, amount, setResponse)
+        break
+      case 'bep20':
         if (!user.ercWallet) throw new Error('Signer not found')
         const tx = await transferBscEth(user.ercWallet?.signer, amount)
         const receipt = await tx.wait()
         setResponse({
           message: 'Please check your wallet balance',
-          txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+          txLink: `https://bscscan.com/tx/${receipt.transactionHash}`,
           isError: false,
         })
-      }
-      if (to === 'ternoa') {
-        if (!user.ercWallet) throw new Error('Signer not found')
-        const tx: any = await transferEthTernoa(user.ercWallet?.signer, amount)
-        const receipt = await tx.wait()
-        setResponse({
-          message: 'Your balance will be availble in few moment (it can take up to 1 day)',
-          txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
-          isError: false,
-        })
-      }
-      break
-    default:
-      throw new Error('Chaintype not recognized')
+        break
+      case 'erc20':
+        if (to !== 'bep20' && to !== 'ternoa') throw new Error('Invalid combination')
+        if (to === 'bep20') {
+          if (!user.ercWallet) throw new Error('Signer not found')
+          const tx = await transferBscEth(user.ercWallet?.signer, amount)
+          const receipt = await tx.wait()
+          setResponse({
+            message: 'Please check your wallet balance',
+            txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+            isError: false,
+          })
+        }
+        if (to === 'ternoa') {
+          if (!user.ercWallet) throw new Error('Signer not found')
+          const tx: any = await transferEthTernoa(user.ercWallet?.signer, amount)
+          const receipt = await tx.wait()
+          setResponse({
+            message: 'Your balance will be availble in few moment (may take up to 1 day)',
+            txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+            isError: false,
+          })
+        }
+        break
+      default:
+        throw new Error('Chaintype not recognized')
+    }
+  } catch (err: any) {
+    const errorMessage =
+      typeof err === 'string'
+        ? err
+        : typeof err !== 'object'
+        ? 'Unknown error'
+        : err.message
+        ? err.message
+        : JSON.stringify(err)
+    setResponse({
+      message: errorMessage,
+      txLink: '',
+      isError: true,
+    })
   }
 }

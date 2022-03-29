@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useAppSelector } from 'redux/hooks'
 
@@ -11,7 +11,7 @@ import NetworkModal from 'components/base/Modals/NetworkModal'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Input from 'components/ui/Input'
-import { canProceed, getBalance, MAX_AMOUNT, MIN_AMOUNT } from 'helpers/bridge'
+import { canProceed, getBalance, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { AVAILABLE_NETWORKS, ChainType } from 'interfaces'
 import { formatPrice } from 'utils/strings'
 
@@ -21,9 +21,10 @@ const Transfer = () => {
   const [from, setFrom] = useState<ChainType>('erc20')
   const [to, setTo] = useState<ChainType>('ternoa')
   const [amount, setAmount] = useState<number>(0)
+  const [response, setResponse] = useState<{ message: string; txLink: string; isError: boolean }>()
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
-  const [isLoadingModalOpen] = useState(false)
+  const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [origin, setOrigin] = useState<'from' | 'to'>('from')
   const { user } = useAppSelector((state) => state.user)
@@ -55,6 +56,26 @@ const Transfer = () => {
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(Number(e.target.value))
   }
+
+  const handleConfirmTransaction = async () => {
+    setIsConfirmModalOpen(false)
+    setIsLoadingModalOpen(true)
+    await transfer(from, to, amount, user, setResponse)
+  }
+
+  useEffect(() => {
+    let shouldUpdate = true
+
+    if (shouldUpdate && response) {
+      console.log(response)
+      setIsLoadingModalOpen(false)
+      setIsSuccessModalOpen(true)
+    }
+
+    return () => {
+      shouldUpdate = false
+    }
+  }, [response])
 
   return (
     <>
@@ -101,7 +122,10 @@ const Transfer = () => {
           <Input
             className={[`${styles.field}`, `${styles.amountField}`].join(' ')}
             endComponent={
-              <button className={styles.maxButton} onClick={() => balance && setAmount(balance)}>
+              <button
+                className={styles.maxButton}
+                onClick={() => balance && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)}
+              >
                 Max
               </button>
             }
@@ -133,6 +157,7 @@ const Transfer = () => {
           amount={amount}
           from={from}
           to={to}
+          handleContinue={handleConfirmTransaction}
           setExpanded={setIsConfirmModalOpen}
           setIsNetworkModalOpen={setIsNetworkModalOpen}
           setOrigin={setOrigin}
@@ -140,7 +165,11 @@ const Transfer = () => {
       )}
       {isLoadingModalOpen && <LoadingModal />}
       {isSuccessModalOpen && (
-        <SuccessModal body="Please check your wallet balance!" setExpanded={setIsSuccessModalOpen} />
+        <SuccessModal
+          body={!response ? '' : response.message}
+          link={!response ? '' : response.txLink}
+          setExpanded={setIsSuccessModalOpen}
+        />
       )}
       {isNetworkModalOpen && (
         <NetworkModal origin={origin} handleNetwork={handleNetwork} setExpanded={setIsNetworkModalOpen} />

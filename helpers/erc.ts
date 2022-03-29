@@ -6,6 +6,7 @@ import { AnyAction } from 'redux'
 import { clear, get, USER_ERC_CONNECTED_WITH } from './storage'
 import { connect as connectMetamask } from './metamask'
 import { connect as connectWalletConnect } from './walletconnect'
+import { BN } from 'bn.js'
 
 export const NUMBER_OF_DECIMALS = 18
 
@@ -24,7 +25,7 @@ const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
 const PROVIDER_BASE_URL_ETH = `https://rinkeby.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
 const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
 
-const TERNOA_ETH_BRIDGE_CONTRACT = ''
+const TERNOA_ETH_BRIDGE_CONTRACT = '0xdA99829d809CeA08301c7ae09931a1AC8Db027F6' //Random account address for testing purposes
 
 const getTokenContract = async (signer: Signer) => {
   const chainId = await signer.getChainId()
@@ -89,7 +90,7 @@ export const isApproved = async (signer: Signer) => {
   const owner = await signer.getAddress()
   const spender = TERNOA_ETH_BRIDGE_CONTRACT
   const amount = await contract.allowance(owner, spender)
-  return amount > 0
+  return new BN('0').cmp(amount) === -1
 }
 
 export const approve = async (signer: Signer) => {
@@ -123,12 +124,14 @@ export const transferBscEth = async (signer: Signer, amount: number) => {
   return contract.transfer(BSC_ETH_BRIDGE_ADDRESS, numberOfTokens)
 }
 
-// //TODO
-// export const getTransferEthTernoaFees = async (signer: Signer, amount: number): Promise<string> => {
-//   return '0'
-// }
+//TODO
+export const getTransferEthTernoaFees = async (signer: Signer, amount: number): Promise<string> => {
+  console.log(signer, amount)
+  return '0'
+}
 
-// //TODO
-// export const transferEthTernoa = async (signer: Signer, amount: number) => {
-//   return 0
-// }
+//TODO
+export const transferEthTernoa = async (signer: Signer, amount: number) => {
+  console.log(signer, amount)
+  return 0
+}

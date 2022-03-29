@@ -18,15 +18,25 @@ export interface ConfirmModalProps {
   amount: number
   from: ChainType
   to: ChainType
+  handleContinue: () => void
   setExpanded: (b: boolean) => void
   setIsNetworkModalOpen: (b: boolean) => void
   setOrigin: (origin: 'from' | 'to') => void
 }
 
-const ConfirmModal = ({ amount, from, to, setExpanded, setIsNetworkModalOpen, setOrigin }: ConfirmModalProps) => {
+const ConfirmModal = ({
+  amount,
+  from,
+  to,
+  handleContinue,
+  setExpanded,
+  setIsNetworkModalOpen,
+  setOrigin,
+}: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
+  const [isFirstRender, setIsFirstRender] = useState(true)
   const { user } = useAppSelector((state) => state.user)
 
   const toAddress = getAddress(to, user)
@@ -35,9 +45,18 @@ const ConfirmModal = ({ amount, from, to, setExpanded, setIsNetworkModalOpen, se
     console.log('Approve')
   }
 
-  const handleContinue = () => {
-    return
-  }
+  useEffect(() => {
+    let shouldUpdate = true
+
+    if (shouldUpdate && !isFirstRender) setExpanded(false)
+    if (shouldUpdate && isFirstRender) setIsFirstRender(false)
+
+    return () => {
+      shouldUpdate = false
+    }
+    //TODO
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount, from, to, user])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -50,7 +69,9 @@ const ConfirmModal = ({ amount, from, to, setExpanded, setIsNetworkModalOpen, se
     return () => {
       shouldUpdate = false
     }
-  }, [amount, from, to, user])
+    //TODO
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -63,7 +84,9 @@ const ConfirmModal = ({ amount, from, to, setExpanded, setIsNetworkModalOpen, se
     return () => {
       shouldUpdate = false
     }
-  }, [from, to, user])
+    //TODO
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Modal setExpanded={setExpanded}>
@@ -138,7 +161,7 @@ const ConfirmModal = ({ amount, from, to, setExpanded, setIsNetworkModalOpen, se
           disabled={!isTermsRadioChecked}
           onClick={isApproved ? handleContinue : handleApprove}
           size="medium"
-          text={isApproved ? 'Continue' : 'Approved'}
+          text={isApproved ? 'Continue' : 'Approve'}
           variant="rectangle"
         />
         <div className={styles.advise}>
