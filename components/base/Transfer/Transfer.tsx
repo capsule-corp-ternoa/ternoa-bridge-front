@@ -57,6 +57,18 @@ const Transfer = () => {
     setAmount(Number(e.target.value))
   }
 
+  const handleInputError = () => {
+    if (amount !== 0 && amount > Number(balance)) {
+      return `Your funds are insufficient`
+    } else if (amount !== 0 && amount < MIN_AMOUNT) {
+      return `The CAPS amount must be greater than ${MIN_AMOUNT}`
+    } else if (amount !== 0 && amount > MAX_AMOUNT) {
+      return `The CAPS amount must be less than ${MAX_AMOUNT}`
+    }
+
+    return ''
+  }
+
   const handleConfirmTransaction = async () => {
     setIsConfirmModalOpen(false)
     setIsLoadingModalOpen(true)
@@ -124,6 +136,7 @@ const Transfer = () => {
           </div>
 
           <Input
+            advise={`Min: ${formatPrice(MIN_AMOUNT, {})} CAPS / Max: ${formatPrice(MAX_AMOUNT, {})} CAPS`}
             className={[`${styles.field}`, `${styles.amountField}`].join(' ')}
             endComponent={
               <button
@@ -133,6 +146,7 @@ const Transfer = () => {
                 Max
               </button>
             }
+            error={handleInputError()}
             insight={balance !== undefined ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
             isError={amount !== 0 && (amount < MIN_AMOUNT || amount > MAX_AMOUNT || amount > Number(balance))}
             label="Amount"

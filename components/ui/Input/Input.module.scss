@@ -73,3 +73,17 @@
     top: 2.4rem;
   }
 }
+
+.adviseMessage {
+  color: $color-neutral300;
+  font-size: 1.2rem;
+  text-align: left;
+  margin-top: 0.8rem;
+}
+
+.errorMessage {
+  color: $color-danger500;
+  font-size: 1.2rem;
+  text-align: left;
+  margin-top: 0.8rem;
+}
