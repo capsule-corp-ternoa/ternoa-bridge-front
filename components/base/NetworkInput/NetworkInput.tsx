@@ -16,19 +16,27 @@ import styles from './NetworkInput.module.scss'
 
 interface Props {
   className?: string
+  forceIsConnected?: boolean
   network: ChainType
   noConnectButton?: boolean
   onClick: React.MouseEventHandler<HTMLDivElement>
   variant: 'input' | 'preview'
 }
 
-const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, onClick, variant }: Props) => {
+const NetworkInput = ({
+  className,
+  forceIsConnected = false,
+  network = 'ternoa',
+  noConnectButton = false,
+  onClick,
+  variant,
+}: Props) => {
   const dispatch = useAppDispatch()
   const [isConnectButtonHovering, setIsConnectButtonHovering] = useState(false)
 
   const { user } = useAppSelector((state) => state.user)
 
-  const isConnected = isConnectedHelper(network, user)
+  const isConnected = isConnectedHelper(network, user) || forceIsConnected
   const isBadNetwork = !isConnected && user.isConnectedErc && (network === 'erc20' || network === 'bep20')
 
   const getButtonColor = () => {

@@ -11,7 +11,7 @@ import NetworkModal from 'components/base/Modals/NetworkModal'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Input from 'components/ui/Input'
-import { canProceed, getBalance, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
+import { canProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { AVAILABLE_NETWORKS, ChainType } from 'interfaces'
 import { formatPrice } from 'utils/strings'
 
@@ -110,6 +110,10 @@ const Transfer = () => {
             </div>
             <NetworkInput
               className={styles.networkInput}
+              forceIsConnected={
+                ((from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')) &&
+                isConnected(from, user)
+              }
               network={to}
               onClick={() => {
                 setOrigin('to')
