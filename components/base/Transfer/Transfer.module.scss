@@ -85,7 +85,7 @@
   }
 
   @include lg {
-    min-width: 4rem;
+    min-width: 32rem;
   }
 
   @include xl {
@@ -132,7 +132,7 @@
       }
     }
 
-    @include lg {
+    @media (hover: hover) and (pointer: fine) {
       &:hover {
         background: $color-primary500;
 

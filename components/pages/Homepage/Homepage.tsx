@@ -12,10 +12,20 @@ const Homepage = () => {
   const { app } = useAppSelector((state) => state.app)
 
   const chainType = app.chainTypeForConnection
+  const isErcWalletModalOpen = app.isErcWalletModalOpen && (chainType === 'erc20' || chainType === 'bep20')
+  const isPolkadotWalletModalOpen = app.isPolkadotWalletModalOpen && chainType === 'ternoa'
 
   useEffect(() => {
     reconnect(dispatch)
   }, [dispatch])
+
+  useEffect(() => {
+    const body = document.querySelector('body')
+    if (body) {
+      if (isErcWalletModalOpen || isPolkadotWalletModalOpen) body.style.overflow = 'hidden'
+      else body.style.overflow = 'auto'
+    }
+  }, [isErcWalletModalOpen, isPolkadotWalletModalOpen])
 
   return (
     <main className="container">
@@ -47,10 +57,8 @@ const Homepage = () => {
           </p>
         </div>
       </div>
-      {app.isErcWalletModalOpen && (chainType === 'erc20' || chainType === 'bep20') && (
-        <ErcWalletModal chainType={chainType} />
-      )}
-      {app.isPolkadotWalletModalOpen && chainType === 'ternoa' && <PolkadotWalletModal />}
+      {isErcWalletModalOpen && <ErcWalletModal chainType={chainType} />}
+      {isPolkadotWalletModalOpen && <PolkadotWalletModal />}
     </main>
   )
 }

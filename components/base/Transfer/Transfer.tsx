@@ -89,6 +89,15 @@ const Transfer = () => {
     }
   }, [response])
 
+  useEffect(() => {
+    const body = document.querySelector('body')
+    if (body) {
+      if (isConfirmModalOpen || isNetworkModalOpen || isLoadingModalOpen || isResultModalOpen)
+        body.style.overflow = 'hidden'
+      else body.style.overflow = 'auto'
+    }
+  }, [isConfirmModalOpen, isNetworkModalOpen, isLoadingModalOpen, isResultModalOpen])
+
   return (
     <>
       <div className={styles.outterContainer}>

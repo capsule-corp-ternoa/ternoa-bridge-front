@@ -36,6 +36,13 @@
   outline: none;
   padding: 1.6rem;
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
   @include xl {
     padding: 2.4rem;
