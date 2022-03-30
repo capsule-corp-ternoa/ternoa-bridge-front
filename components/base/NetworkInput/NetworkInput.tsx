@@ -69,6 +69,7 @@ const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, 
         return '#352b60'
       case 'bep20':
         return '#45393c'
+      case 'ternoa':
       default:
         return '#471e40'
     }
@@ -109,6 +110,7 @@ const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, 
               erc20: <Erc20 className={styles.networkIcon} />,
               bep20: <Bep20 className={styles.networkIcon} />,
               ternoa: <TernoaChain className={styles.networkIcon} />,
+              other: undefined,
             }[network]
           }
         </div>
@@ -119,6 +121,7 @@ const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, 
                 erc20: 'Ethereum Network',
                 bep20: 'Binance Smart Chain',
                 ternoa: 'Ternoa Chain',
+                other: undefined,
               }[network]
             }
           </div>
