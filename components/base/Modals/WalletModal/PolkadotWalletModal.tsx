@@ -45,7 +45,8 @@ const PolkadotWalletModal = () => {
   return (
     <Modal setExpanded={handleModalExpanded}>
       <div className={styles.root}>
-        <h4 className={styles.title}>{error !== '' ? '⚠️ Something went wrong !' : 'Select your account'}</h4>
+        {error !== '' && <div className={styles.warningEmoji}>⚠️</div>}
+        <h4 className={styles.title}>{error !== '' ? 'Something went wrong !' : 'Select your account'}</h4>
         {error !== '' ? (
           <div className={styles.errorMessage}>{error}</div>
         ) : (

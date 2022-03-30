@@ -8,8 +8,8 @@ import styles from './LoadingModal.module.scss'
 const LoadingModal = () => (
   <Modal>
     <div className={styles.root}>
-      <Loader />
-      <div className={styles.body}>The transfer is in progress</div>
+      <Loader useLottie />
+      <div className={styles.body}>Transfer in progress...</div>
     </div>
   </Modal>
 )
