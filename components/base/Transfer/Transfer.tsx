@@ -6,7 +6,7 @@ import Arrow from 'assets/svgComponents/Arrow'
 import Switch from 'assets/svgComponents/Switch'
 import ConfirmModal from 'components/base/Modals/ConfirmModal'
 import LoadingModal from 'components/base/Modals/LoadingModal'
-import SuccessModal from 'components/base/Modals/SuccessModal'
+import ResultModal from 'components/base/Modals/ResultModal'
 import NetworkModal from 'components/base/Modals/NetworkModal'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
@@ -25,7 +25,7 @@ const Transfer = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false)
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false)
   const [origin, setOrigin] = useState<'from' | 'to'>('from')
   const { user } = useAppSelector((state) => state.user)
 
@@ -81,7 +81,7 @@ const Transfer = () => {
     if (shouldUpdate && response) {
       console.log(response)
       setIsLoadingModalOpen(false)
-      setIsSuccessModalOpen(true)
+      setIsResultModalOpen(true)
     }
 
     return () => {
@@ -182,11 +182,11 @@ const Transfer = () => {
         />
       )}
       {isLoadingModalOpen && <LoadingModal />}
-      {isSuccessModalOpen && (
-        <SuccessModal
+      {isResultModalOpen && (
+        <ResultModal
           body={!response ? '' : response.message}
           link={!response ? '' : response.txLink}
-          setExpanded={setIsSuccessModalOpen}
+          setExpanded={setIsResultModalOpen}
         />
       )}
       {isNetworkModalOpen && (
