@@ -136,6 +136,7 @@ const Transfer = () => {
                 isConnected(from, user)
               }
               network={to}
+              noNetworkData={(from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')}
               onClick={() => {
                 setOrigin('to')
                 setIsNetworkModalOpen(true)

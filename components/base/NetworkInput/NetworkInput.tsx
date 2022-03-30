@@ -19,6 +19,7 @@ interface Props {
   forceIsConnected?: boolean
   network: ChainType
   noConnectButton?: boolean
+  noNetworkData?: boolean
   onClick: React.MouseEventHandler<HTMLDivElement>
   variant: 'input' | 'preview'
 }
@@ -28,6 +29,7 @@ const NetworkInput = ({
   forceIsConnected = false,
   network = 'ternoa',
   noConnectButton = false,
+  noNetworkData = false,
   onClick,
   variant,
 }: Props) => {
@@ -133,7 +135,7 @@ const NetworkInput = ({
               }[network]
             }
           </div>
-          {isConnected && variant === 'input' && (
+          {isConnected && !noNetworkData && variant === 'input' && (
             <div className={styles.networkData}>
               {balance !== undefined && <span className={styles.balance}>{`${formatPrice(balance, {})} CAPS`}</span>}
               {address && <span className={styles.address}>{middleEllipsis(address)}</span>}

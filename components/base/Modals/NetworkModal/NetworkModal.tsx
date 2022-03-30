@@ -48,6 +48,7 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             className={styles.networkInput}
             network="erc20"
             noConnectButton
+            noNetworkData
             onClick={() => {
               if (user.isConnectedErc) handleNetworkSwitch('erc20')
               handleNetwork(origin, 'erc20')
@@ -59,6 +60,7 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             className={styles.networkInput}
             network="bep20"
             noConnectButton
+            noNetworkData
             onClick={() => {
               if (user.isConnectedErc) handleNetworkSwitch('bep20')
               handleNetwork(origin, 'bep20')
@@ -70,6 +72,7 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             className={styles.networkInput}
             network="ternoa"
             noConnectButton
+            noNetworkData
             onClick={() => {
               handleNetwork(origin, 'ternoa')
               setExpanded(false)
