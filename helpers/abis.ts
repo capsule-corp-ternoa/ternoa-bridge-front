@@ -37,6 +37,28 @@ export const CAPS_CONTRACT_ABI = [
     outputs: [],
     payable: false,
   },
+  {
+    constant: true,
+    inputs: [
+      { internalType: 'address', name: 'owner', type: 'address' },
+      { internalType: 'address', name: 'spender', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ internalType: 'uint256', name: 'allowance', type: 'uint256' }],
+    stateMutability: 'view',
+    payable: false,
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'spender', type: 'address' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ internalType: 'bool', name: 'success', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
 ]
 
 //TODO

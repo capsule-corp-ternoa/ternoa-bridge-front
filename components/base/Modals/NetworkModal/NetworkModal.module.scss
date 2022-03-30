@@ -1,0 +1,35 @@
+@import 'style/base.scss';
+
+.root {
+  width: 100%;
+}
+
+.title {
+  color: $color-contrast;
+  font-family: $font-bold;
+  font-size: 1.6rem;
+  margin: 0;
+  text-align: center;
+
+  @include lg {
+    font-size: 2.4rem;
+  }
+}
+
+.networks {
+  width: 100%;
+  margin-top: 3.2rem;
+
+  .networkInput {
+    width: 100%;
+    margin-top: 1.2rem;
+
+    @include lg {
+      margin-top: 2.4rem;
+    }
+  }
+
+  @include lg {
+    margin-top: 5.6rem;
+  }
+}

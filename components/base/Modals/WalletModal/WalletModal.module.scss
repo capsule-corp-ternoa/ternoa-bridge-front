@@ -1,0 +1,125 @@
+@import 'style/base.scss';
+
+.root {
+  width: 100%;
+}
+
+.title {
+  color: $color-contrast;
+  font-family: $font-bold;
+  font-size: 1.6rem;
+  margin: 0;
+  text-align: center;
+
+  @include lg {
+    font-size: 2.4rem;
+  }
+}
+
+.wallets {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3.2rem;
+
+  > * {
+    width: 100%;
+
+    &:not(&:first-child) {
+      margin-top: 1.6rem;
+    }
+
+    @include lg {
+      width: 50%;
+    }
+  }
+}
+
+.networks {
+  width: 100%;
+  margin-top: 3.2rem;
+
+  .networkInput {
+    width: 100%;
+    margin-top: 1.2rem;
+
+    @include lg {
+      margin-top: 2.4rem;
+    }
+  }
+
+  @include lg {
+    margin-top: 5.6rem;
+  }
+}
+
+.errorMessage {
+  color: $color-contrast;
+  font-family: $font-bold;
+  font-size: 1.6rem;
+  margin-top: 3.2rem;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.accounts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3.2rem;
+
+  > * {
+    &:not(&:first-child) {
+      margin-top: 1.6rem;
+    }
+  }
+
+  .account {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background: rgba(12, 12, 24, 1);
+    color: $color-contrast;
+    cursor: pointer;
+    border-color: $color-neutral900;
+    border: 2px solid;
+    border-radius: 1.2rem;
+    padding: 1.2rem 2rem;
+
+    .accountIdentIcon {
+      background: $color-contrast;
+      border-radius: 50%;
+
+      > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .accountData {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      margin-left: 1.6rem;
+      text-align: left;
+
+      .accountName {
+        font-family: $font-bold;
+        font-size: 1.6rem;
+      }
+
+      .accountAddress {
+        font-size: 1.6rem;
+      }
+
+      > * {
+        &:not(&:first-child) {
+          margin-top: 0.8rem;
+        }
+      }
+    }
+  }
+}

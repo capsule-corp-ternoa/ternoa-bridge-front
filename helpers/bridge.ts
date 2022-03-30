@@ -21,10 +21,10 @@ import {
   approve as approveEthCaps,
 } from './erc'
 
-const minAmount = 200
-const maxAmount = 100000
+export const MIN_AMOUNT = 20 //0 TODO
+export const MAX_AMOUNT = 100000
 
-const isConnected = (from: ChainType, user: User) => {
+export const isConnected = (from: ChainType, user: User) => {
   switch (from) {
     case 'ternoa':
       return user.isConnectedPolkadot
@@ -40,11 +40,12 @@ const isConnected = (from: ChainType, user: User) => {
 export const connect = (
   chainType: ChainType,
   dispatch: (action: AnyAction) => void,
-  connectedWith?: string,
+  connectedWith?: 'metamask' | 'walletConnect',
   selectedPolkadotAccount?: InjectedAccountWithMeta
 ) => {
   switch (chainType) {
-    case 'erc20' || 'bep20':
+    case 'erc20':
+    case 'bep20':
       if (!connectedWith) throw new Error('No provider found')
       if (connectedWith === 'metamask') {
         connectMetamask(dispatch)
@@ -72,6 +73,10 @@ export const reconnect = (dispatch: (action: AnyAction) => void) => {
   reconnectPolkadot(dispatch)
 }
 
+export const getAddress = (from: ChainType, user: User) => {
+  return from === 'ternoa' ? user.polkadotWallet?.address : user.ercWallet?.address
+}
+
 export const getBalance = (from: ChainType, user: User) => {
   return from === 'ternoa' ? user.polkadotWallet?.capsBalance : user.ercWallet?.capsBalance
 }
@@ -82,14 +87,15 @@ export const canProceed = (from: ChainType, to: ChainType, amount: number, user:
     const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
     if (!validDirections.includes(key)) throw new Error('Invalid combination')
     if (!isConnected(from, user)) throw new Error('From network is not connected')
-    if (!isConnected(to, user)) throw new Error('To network is not connected')
-    if (amount < minAmount) throw new Error('amount is below minimum amount to swap')
-    if (amount > maxAmount) throw new Error('amount is above maximum amount to swap')
+    if (!(key === 'erc20-bep20' || 'bep20-erc20')) {
+      if (!isConnected(to, user)) throw new Error('To network is not connected')
+    }
+    if (amount < MIN_AMOUNT) throw new Error('amount is below minimum amount to swap')
+    if (amount > MAX_AMOUNT) throw new Error('amount is above maximum amount to swap')
     const balance = getBalance(from, user)
     if (!balance || balance < amount) throw new Error('Insufficient balance')
     return true
   } catch (err) {
-    console.error(err)
     return false
   }
 }
@@ -114,19 +120,6 @@ export const approve = async (from: ChainType, to: ChainType, user: User) => {
   }
 }
 
-export const getAddressFromChainType = (chainType: ChainType, user: User): string => {
-  switch (chainType) {
-    case 'ternoa':
-      if (!user.polkadotWallet) throw new Error('No address found for polkadot wallet')
-      return user.polkadotWallet.address
-    case 'erc20' || 'bep20':
-      if (!user.ercWallet) throw new Error('No address found for erc wallet')
-      return user.ercWallet.address
-    default:
-      throw new Error('Chaintype not recognized')
-  }
-}
-
 export const getNetworkFees = async (
   from: ChainType,
   to: ChainType,
@@ -136,7 +129,7 @@ export const getNetworkFees = async (
   switch (from) {
     case 'ternoa':
       if (!user.polkadotWallet) throw new Error('Polkadot wallet not connected')
-      return { value: await getTransferFeesPolkadot(user.polkadotWallet, amount), unit: 'CAPS' }
+      return { value: await getTransferFeesPolkadot(user, amount), unit: 'CAPS' }
     case 'bep20':
       if (!user.ercWallet) throw new Error('Erc wallet not connected')
       return { value: await getTransferBscEthFees(user.ercWallet.signer, amount), unit: 'BNB' }
@@ -157,45 +150,61 @@ export const transfer = async (
   user: User,
   setResponse: (response: { message: string; txLink: string; isError: boolean }) => void
 ) => {
-  switch (from) {
-    case 'ternoa':
-      if (!user.polkadotWallet) throw new Error('Signer not found')
-      await transferTernoaEth(user.polkadotWallet, amount, setResponse)
-      break
-    case 'bep20':
-      if (!user.ercWallet) throw new Error('Signer not found')
-      const tx = await transferBscEth(user.ercWallet?.signer, amount)
-      const receipt = await tx.wait()
-      setResponse({
-        message: 'Please check your wallet balance',
-        txLink: `https://bscscan.com/tx/${receipt.transactionHash}`,
-        isError: false,
-      })
-      break
-    case 'erc20':
-      if (to !== 'bep20' && to !== 'ternoa') throw new Error('Invalid combination')
-      if (to === 'bep20') {
+  try {
+    switch (from) {
+      case 'ternoa':
+        if (!user.polkadotWallet) throw new Error('Signer not found')
+        await transferTernoaEth(user, amount, setResponse)
+        break
+      case 'bep20':
         if (!user.ercWallet) throw new Error('Signer not found')
         const tx = await transferBscEth(user.ercWallet?.signer, amount)
         const receipt = await tx.wait()
         setResponse({
           message: 'Please check your wallet balance',
-          txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+          txLink: `https://bscscan.com/tx/${receipt.transactionHash}`,
           isError: false,
         })
-      }
-      if (to === 'ternoa') {
-        if (!user.ercWallet) throw new Error('Signer not found')
-        const tx: any = await transferEthTernoa(user.ercWallet?.signer, amount)
-        const receipt = await tx.wait()
-        setResponse({
-          message: 'Your balance will be availble in few moment (it can take up to 1 day)',
-          txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
-          isError: false,
-        })
-      }
-      break
-    default:
-      throw new Error('Chaintype not recognized')
+        break
+      case 'erc20':
+        if (to !== 'bep20' && to !== 'ternoa') throw new Error('Invalid combination')
+        if (to === 'bep20') {
+          if (!user.ercWallet) throw new Error('Signer not found')
+          const tx = await transferBscEth(user.ercWallet?.signer, amount)
+          const receipt = await tx.wait()
+          setResponse({
+            message: 'Please check your wallet balance',
+            txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+            isError: false,
+          })
+        }
+        if (to === 'ternoa') {
+          if (!user.ercWallet) throw new Error('Signer not found')
+          const tx: any = await transferEthTernoa(user.ercWallet?.signer, amount)
+          const receipt = await tx.wait()
+          setResponse({
+            message: 'Your balance will be availble in few moment (may take up to 1 day)',
+            txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+            isError: false,
+          })
+        }
+        break
+      default:
+        throw new Error('Chaintype not recognized')
+    }
+  } catch (err: any) {
+    const errorMessage =
+      typeof err === 'string'
+        ? err
+        : typeof err !== 'object'
+        ? 'Unknown error'
+        : err.message
+        ? err.message
+        : JSON.stringify(err)
+    setResponse({
+      message: errorMessage,
+      txLink: '',
+      isError: true,
+    })
   }
 }

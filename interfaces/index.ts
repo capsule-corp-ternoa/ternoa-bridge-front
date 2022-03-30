@@ -2,7 +2,8 @@ import { Signer } from 'ethers'
 import type { InjectedExtension } from '@polkadot/extension-inject/types'
 
 export type ERCProvider = 'metamask' | 'walletconnect'
-export type ChainType = 'erc20' | 'bep20' | 'ternoa' | 'other'
+export const AVAILABLE_NETWORKS = ['erc20', 'bep20', 'ternoa'] as const
+export type ChainType = typeof AVAILABLE_NETWORKS[number]
 
 export interface ErcWallet {
   address: string

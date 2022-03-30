@@ -1,0 +1,100 @@
+@import 'style/base.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 4rem;
+
+  @include lg {
+    display: block;
+    padding-bottom: 3.2rem;
+  }
+}
+
+.laptopFooter {
+  display: none;
+
+  @include lg {
+    display: block;
+  }
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4rem;
+  border-bottom: 1px solid $color-neutral100;
+
+  .socials {
+    display: flex;
+    justify-content: center;
+
+    > * {
+      &:not(&:first-child) {
+        margin-left: 2.4rem;
+      }
+    }
+
+    .socialLogo {
+      width: 2.4rem;
+      cursor: pointer;
+      fill: $color-contrast;
+    }
+  }
+
+  .link {
+    display: flex;
+    align-items: center;
+    color: $color-contrast;
+    cursor: pointer;
+    font-family: $font-bold;
+    font-size: 1.6rem;
+
+    > * {
+      margin: 0.8rem;
+    }
+  }
+}
+
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4rem;
+
+  .laptopCredentials {
+    color: $color-contrast;
+    font-size: 1.2rem;
+  }
+
+  .linksWrapper {
+    display: flex;
+    align-items: center;
+
+    .footerLink {
+      color: $color-contrast;
+      font-size: 1.2rem;
+    }
+
+    > * {
+      &:not(&:first-child) {
+        margin-left: 2.4rem;
+      }
+    }
+  }
+}
+
+.mobileCredentials {
+  color: $color-contrast;
+  font-family: $font-bold;
+  font-size: 1.2rem;
+  margin-top: 3.2rem;
+  text-align: center;
+  width: 100%;
+
+  @include lg {
+    display: none;
+  }
+}

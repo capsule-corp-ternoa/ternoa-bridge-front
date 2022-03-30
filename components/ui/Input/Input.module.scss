@@ -1,0 +1,75 @@
+@import 'style/base.scss';
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.8rem;
+
+  .label {
+    color: $color-contrast;
+    font-family: $font-bold;
+    font-size: 1.6rem;
+  }
+
+  .insight {
+    color: $color-neutral300;
+    font-size: 1.2rem;
+    text-align: right;
+  }
+}
+
+.inputLabel {
+  position: relative;
+  display: flex;
+  margin-top: 1.2rem;
+}
+
+.input {
+  width: 100%;
+  background: $color-invertedContrast;
+  border: 0.2rem solid;
+  border-color: $color-neutral900;
+  border-radius: 1.2rem;
+  color: $color-contrast;
+  font-size: 1.6rem;
+  outline: none;
+  padding: 1.6rem;
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+
+  @include xl {
+    padding: 2.4rem;
+  }
+
+  &:hover,
+  &:focus {
+    border-color: $color-primary500;
+  }
+
+  &::placeholder {
+    color: $color-neutral300;
+  }
+
+  &.error {
+    border-color: $color-danger500;
+  }
+
+  &.isEndComponent {
+    padding: 1.6rem 10rem 1.6rem 1.6rem;
+
+    @include xl {
+      padding: 2.4rem 10rem 2.4rem 2.4rem;
+    }
+  }
+}
+
+.endComponent {
+  position: absolute;
+  right: 1.6rem;
+  top: 1.6rem;
+
+  @include xl {
+    right: 2.4rem;
+    top: 2.4rem;
+  }
+}

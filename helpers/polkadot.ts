@@ -4,13 +4,14 @@ import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
 import { AnyAction } from 'redux'
 import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
-import { PolkadotWallet } from '../interfaces'
+import { User } from '../interfaces'
 import { clear, get, USER_POLKADOT_ADDRESS } from './storage'
 import { NUMBER_OF_DECIMALS } from './erc'
 
 let api: ApiPromise
 
-const CHAIN_ENDPOINT = 'wss://chain-dev-latest.ternoa.dev'
+const CHAIN_ENDPOINT = 'wss://dev.chaos.ternoa.com'
+const ETH_DEST_ID = 0
 
 const initializeApi = async () => {
   await cryptoWaitReady()
@@ -33,6 +34,12 @@ export const safeDisconnect = async () => {
 
 export const formatBalance = (balance: string) => {
   return Number(balance.slice(0, -(NUMBER_OF_DECIMALS - 3))) / 1000
+}
+
+export const formatInput = (input: number) => {
+  const bnBase = new BN('1000000000000000000')
+  const bnAmount = new BN(input)
+  return bnAmount.mul(bnBase)
 }
 
 export const getBalance = async (address: string) => {
@@ -59,7 +66,10 @@ export const reconnect = async (dispatch: (action: AnyAction) => void) => {
 export const getAccounts = async () => {
   const { web3Accounts, web3Enable } = await import('@polkadot/extension-dapp')
   const extensions = await web3Enable('ternoa-bridge')
-  if (extensions.length === 0) throw new Error('polkadot{.js} extension is not installed')
+  if (extensions.length === 0)
+    throw new Error(
+      'polkadot{.js} extension is not installed.\n\nOtherwise make sure you allowed Ternoa Bridge application in the "Manage Website Access" settings of your wallet.'
+    )
   const allAccounts = await web3Accounts()
   return allAccounts
 }
@@ -75,26 +85,29 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
   dispatch(actions.loginPolkadot(data))
 }
 
-//TODO
-export const getTransferFees = async (polkadotWallet: PolkadotWallet, amount: number) => {
-  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', amount)
-  const info = await tx.paymentInfo(polkadotWallet.address)
+export const getTransferFees = async (user: User, amount: number) => {
+  if (!user) throw new Error('User not found')
+  if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
+  if (!user.ercWallet) throw new Error('User ERC account not found')
+  const formattedAmount = formatInput(amount)
+  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
+  const info = await tx.paymentInfo(user.polkadotWallet.address)
   return formatBalance(info.partialFee.toString()).toString()
 }
 
-//TODO
 export const transfer = async (
-  polkadotWallet: PolkadotWallet,
+  user: User,
   amount: number,
   setResponse: (response: { message: string; txLink: string; isError: boolean }) => void
 ) => {
+  if (!user) throw new Error('User not found')
+  if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
+  if (!user.ercWallet) throw new Error('User ERC account not found')
   const api = await getApi()
-  const address = polkadotWallet.address
-  const injector = polkadotWallet.injector
-  const bnBase = new BN('1000000000000000000')
-  const bnAmount = new BN(amount)
-  const formattedAmount = bnAmount.mul(bnBase)
-  const tx = api.tx.balances.transfer('5H6ShEfbS85NP23ZyHCBTgJnLaRAA3KrYyNgZDxTNssXrGnA', formattedAmount)
+  const address = user.polkadotWallet.address
+  const injector = user.polkadotWallet.injector
+  const formattedAmount = formatInput(amount)
+  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   await tx.signAndSend(address, { signer: injector.signer }, async (data) => {
     const { status, events } = data
     if (status.isInBlock) {
@@ -105,7 +118,7 @@ export const transfer = async (
       let message = 'Extrinsic failed'
       let isError = true
       if (success) {
-        message = 'Your balance will be availble in few moment (it can take up to 1 day)'
+        message = 'Your balance will be availble in few moment (may take up to 1 day)'
         isError = false
       }
       setResponse({

@@ -14,7 +14,8 @@
     "noEmit": true,
     "incremental": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "baseUrl": "."
   },
   "exclude": ["node_modules", ".next"],
   "include": ["**/*.ts", "**/*.tsx"]

@@ -1,0 +1,132 @@
+@import 'style/base.scss';
+
+.root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: $color-neutral900;
+  border-radius: 1.2rem;
+  padding: 1.6rem;
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+
+  @include xl {
+    padding: 2rem;
+  }
+
+  &.rootInput {
+    cursor: pointer;
+  }
+}
+
+.network {
+  display: flex;
+  align-items: center;
+
+  .icon {
+    height: 2.4rem;
+    width: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    .networkIcon {
+      height: 1.4rem;
+      width: 1.4rem;
+
+      @include xl {
+        height: 2rem;
+        width: 2rem;
+      }
+    }
+
+    @include xl {
+      height: 4rem;
+      width: 4rem;
+    }
+  }
+
+  .data {
+    color: $color-contrast;
+    margin-left: 0.8rem;
+    text-align: left;
+
+    .networkName {
+      font-family: $font-bold;
+      font-size: 1.2rem;
+
+      @include xl {
+        font-size: 1.6rem;
+      }
+    }
+
+    .networkData {
+      color: $color-neutral300;
+      font-size: 1rem;
+
+      .balance {
+        font-family: $font-bold;
+      }
+
+      > * {
+        &:not(:first-child) {
+          margin-left: 0.4rem;
+        }
+      }
+
+      @include xl {
+        font-size: 1.4rem;
+
+        > * {
+          &:not(:first-child) {
+            margin-left: 0.8rem;
+          }
+        }
+      }
+    }
+
+    @include xl {
+      margin-left: 1.6rem;
+    }
+  }
+}
+
+.connectButton {
+  margin-left: 1.6rem;
+}
+
+.walletData {
+  display: flex;
+  align-items: center;
+  margin-left: 1.6rem;
+
+  .address {
+    color: $color-neutral300;
+    font-family: $font-bold;
+    font-size: 1.6rem;
+  }
+
+  .connectChip {
+    margin-left: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    .outterChip {
+      position: absolute;
+      width: 1.2rem;
+      height: 1.2rem;
+      background: $color-success300;
+      border-radius: 50%;
+    }
+
+    .innerChip {
+      position: absolute;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 50%;
+      background: $color-success500;
+    }
+  }
+}
