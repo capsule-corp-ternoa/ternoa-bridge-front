@@ -12,6 +12,7 @@ import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Input from 'components/ui/Input'
 import { canProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
+import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
 import { AVAILABLE_NETWORKS, ChainType } from 'interfaces'
 import { formatPrice } from 'utils/strings'
 
@@ -45,10 +46,30 @@ const Transfer = () => {
     }
   }
 
-  const handleNetworkSwicth = () => {
-    setAmount(0)
+  const handleNetworkSwicth = async () => {
     const newFrom = to
     const newTo = from
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+      if (!accounts || accounts.length === 0)
+        throw new Error('User is not logged in with Metamask, network switch is not available')
+
+      switch (newFrom) {
+        case 'erc20':
+          switchETHNetwork()
+          break
+        case 'bep20':
+          switchBSCNetwork()
+          break
+        default:
+          break
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
+    setAmount(0)
     setFrom(newFrom)
     setTo(newTo)
   }
