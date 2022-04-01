@@ -54,9 +54,8 @@ const ConfirmModal = ({
     return () => {
       shouldUpdate = false
     }
-    //TODO
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, from, to, user])
+  }, [amount, from, setExpanded, to, user])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -80,9 +79,7 @@ const ConfirmModal = ({
     return () => {
       shouldUpdate = false
     }
-    //TODO
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [amount, from, to, user])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -95,9 +92,7 @@ const ConfirmModal = ({
     return () => {
       shouldUpdate = false
     }
-    //TODO
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [from, to, user])
 
   return (
     <Modal setExpanded={setExpanded}>
