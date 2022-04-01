@@ -32,8 +32,8 @@ export const safeDisconnect = async () => {
   if (api && api.isConnected) await api.disconnect()
 }
 
-export const formatBalance = (balance: string) => {
-  return Number(balance.slice(0, -(NUMBER_OF_DECIMALS - 3))) / 1000
+export const formatBalance = (balance: string, decimals = 3) => {
+  return Number(balance.slice(0, -(NUMBER_OF_DECIMALS - decimals))) / Math.pow(10, decimals)
 }
 
 export const formatInput = (input: number) => {
@@ -85,6 +85,7 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
   dispatch(actions.loginPolkadot(data))
 }
 
+//TODO
 export const getTransferFees = async (user: User, amount: number) => {
   if (!user) throw new Error('User not found')
   if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
@@ -92,9 +93,10 @@ export const getTransferFees = async (user: User, amount: number) => {
   const formattedAmount = formatInput(amount)
   const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   const info = await tx.paymentInfo(user.polkadotWallet.address)
-  return formatBalance(info.partialFee.toString()).toString()
+  return formatBalance(info.partialFee.toString(), 6).toString()
 }
 
+//TODO
 export const transfer = async (
   user: User,
   amount: number,

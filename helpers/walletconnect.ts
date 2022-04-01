@@ -3,7 +3,7 @@ import { AnyAction } from 'redux'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
 import { actions } from '../redux/user/actions'
-import { getErcWalletFromSigner } from './erc'
+import { getErcWalletFromSigner, PROVIDER_BASE_URL_BSC, PROVIDER_BASE_URL_ETH } from './erc'
 
 const WALLETCONNECT_BRIDGE = 'https://uniswap.bridge.walletconnect.org'
 
@@ -13,6 +13,10 @@ let isListening = false
 const initWalletConnectProvider = async () => {
   if (!walletConnectProvider || !walletConnectProvider.connected) {
     walletConnectProvider = new WalletConnectProvider({
+      rpc: {
+        1: PROVIDER_BASE_URL_ETH,
+        56: PROVIDER_BASE_URL_BSC,
+      },
       infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
       bridge: WALLETCONNECT_BRIDGE,
     })

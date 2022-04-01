@@ -228,6 +228,7 @@ const Transfer = () => {
         <ResultModal
           body={!response ? '' : response.message}
           link={!response ? '' : response.txLink}
+          isError={!response ? false : response.isError}
           setExpanded={setIsResultModalOpen}
         />
       )}

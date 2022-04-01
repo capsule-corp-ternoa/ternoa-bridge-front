@@ -22,8 +22,8 @@ const CAPS_TOKEN_ADDRESS_ETH = '0xcE9D9Db4264a50aEF8B5627E882Ed71dF66d2105' // T
 const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
 
 // export const PROVIDER_BASE_URL_ETH = `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}` // REAL VALUE
-const PROVIDER_BASE_URL_ETH = `https://rinkeby.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
-const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
+export const PROVIDER_BASE_URL_ETH = `https://rinkeby.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
+export const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
 
 const TERNOA_ETH_BRIDGE_CONTRACT = '0xdA99829d809CeA08301c7ae09931a1AC8Db027F6' //Random account address for testing purposes
 
