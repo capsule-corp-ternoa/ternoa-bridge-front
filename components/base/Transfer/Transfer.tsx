@@ -13,10 +13,17 @@ import Button from 'components/ui/Button'
 import Input from 'components/ui/Input'
 import { canProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
-import { AVAILABLE_NETWORKS, ChainType } from 'interfaces'
+import { ChainType } from 'interfaces'
 import { formatPrice } from 'utils/strings'
 
 import styles from './Transfer.module.scss'
+
+const ALLOWED_TRANSFERS = {
+  erc20: ['bep20', 'ternoa'],
+  bep20: ['erc20'],
+  ternoa: ['erc20'],
+  other: undefined,
+}
 
 const Transfer = () => {
   const [from, setFrom] = useState<ChainType>('erc20')
@@ -33,15 +40,19 @@ const Transfer = () => {
   const balance = getBalance(from, user)
 
   const handleNetwork = (origin: 'from' | 'to', network: ChainType) => {
+    setAmount(0)
+    const newAutoAssignedNetwork: ChainType | undefined =
+      network === 'other' ? undefined : (ALLOWED_TRANSFERS[network][0] as ChainType)
+
     if (origin === 'from') {
       setFrom(network)
-      if (to === network) {
-        setTo(AVAILABLE_NETWORKS.filter((item) => item !== network)[0])
+      if ((to === network || !ALLOWED_TRANSFERS[to]?.some((item) => item === network)) && newAutoAssignedNetwork) {
+        setTo(newAutoAssignedNetwork)
       }
     } else {
       setTo(network)
-      if (from === network) {
-        setFrom(AVAILABLE_NETWORKS.filter((item) => item !== network)[0])
+      if ((from === network || !ALLOWED_TRANSFERS[from]?.some((item) => item === network)) && newAutoAssignedNetwork) {
+        setFrom(newAutoAssignedNetwork)
       }
     }
   }
@@ -57,10 +68,10 @@ const Transfer = () => {
 
       switch (newFrom) {
         case 'erc20':
-          switchETHNetwork()
+          if (user.ercWallet?.chainType !== 'erc20') switchETHNetwork()
           break
         case 'bep20':
-          switchBSCNetwork()
+          if (user.ercWallet?.chainType !== 'bep20') switchBSCNetwork()
           break
         default:
           break

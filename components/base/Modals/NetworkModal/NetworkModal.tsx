@@ -50,7 +50,7 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
-              if (user.isConnectedErc) handleNetworkSwitch('erc20')
+              if (user.isConnectedErc && origin === 'from') handleNetworkSwitch('erc20')
               handleNetwork(origin, 'erc20')
               setExpanded(false)
             }}
@@ -62,7 +62,7 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
-              if (user.isConnectedErc) handleNetworkSwitch('bep20')
+              if (user.isConnectedErc && origin === 'from') handleNetworkSwitch('bep20')
               handleNetwork(origin, 'bep20')
               setExpanded(false)
             }}
