@@ -67,7 +67,7 @@ export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCP
     address: await signer.getAddress(),
     chainId: chainId,
     connectedWith: connectedWith,
-    chainType: ETH_CHAIN_ID === chainId ? 'erc20' : chainId === BSC_CHAIN_ID ? 'bep20' : 'ternoa',
+    chainType: ETH_CHAIN_ID === chainId ? 'erc20' : chainId === BSC_CHAIN_ID ? 'bep20' : 'other',
     capsBalance: await getBalance(signer),
     signer,
   }

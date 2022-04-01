@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
 
+import Warning from 'assets/svgComponents/Warning'
 import Modal from 'components/ui/Modal'
 import { connect } from 'helpers/bridge'
 import { getAccounts } from 'helpers/polkadot'
@@ -45,7 +46,12 @@ const PolkadotWalletModal = () => {
   return (
     <Modal setExpanded={handleModalExpanded}>
       <div className={styles.root}>
-        <h4 className={styles.title}>{error !== '' ? '⚠️ Something went wrong !' : 'Select your account'}</h4>
+        {error !== '' && (
+          <div className={styles.warning}>
+            <Warning />
+          </div>
+        )}
+        <h4 className={styles.title}>{error !== '' ? 'Something went wrong !' : 'Select your account'}</h4>
         {error !== '' ? (
           <div className={styles.errorMessage}>{error}</div>
         ) : (

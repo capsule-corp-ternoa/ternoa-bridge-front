@@ -3,9 +3,11 @@ import React from 'react'
 import styles from './Input.module.scss'
 
 interface Props {
+  advise?: string
   className?: string
   disabled?: boolean
   endComponent?: React.ReactNode
+  error?: string
   insight?: string
   isError?: boolean
   label?: string | React.ReactNode
@@ -20,9 +22,11 @@ interface Props {
 }
 
 const TextInput = ({
+  advise,
   className,
   disabled,
   endComponent,
+  error,
   insight,
   isError,
   label,
@@ -62,6 +66,11 @@ const TextInput = ({
         />
         <div className={styles.endComponent}>{endComponent}</div>
       </label>
+      {error ? (
+        <div className={styles.errorMessage}>{error}</div>
+      ) : (
+        <div className={styles.adviseMessage}>{advise}</div>
+      )}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Metamask from 'assets/svgComponents/Providers/Metamask'
 import WalletConnect from 'assets/svgComponents/Providers/WalletConnect'
@@ -16,32 +16,39 @@ interface Props {
 }
 
 const ErcWalletModal = ({ chainType }: Props) => {
+  const [isWindowEthAvailable, setIsWindowEthAvailable] = useState(false)
   const dispatch = useAppDispatch()
 
   const handleModalExpanded = (value: boolean) => {
     dispatch(actions.setIsErcWalletModalOpen(value))
   }
 
+  useEffect(() => {
+    setIsWindowEthAvailable(typeof window !== 'undefined' && window.ethereum ? true : false)
+  }, [])
+
   return (
     <Modal setExpanded={handleModalExpanded}>
       <div className={styles.root}>
         <h4 className={styles.title}>Connect your wallet</h4>
         <div className={styles.wallets}>
-          <Button
-            color="dark"
-            icon={<Metamask />}
-            onClick={() => {
-              try {
-                connect(chainType, dispatch, 'metamask')
-                handleModalExpanded(false)
-              } catch (error) {
-                console.log(error)
-              }
-            }}
-            size="medium"
-            text="Metamask"
-            variant="rounded"
-          />
+          {isWindowEthAvailable && (
+            <Button
+              color="dark"
+              icon={<Metamask />}
+              onClick={() => {
+                try {
+                  connect(chainType, dispatch, 'metamask')
+                  handleModalExpanded(false)
+                } catch (error) {
+                  console.log(error)
+                }
+              }}
+              size="medium"
+              text="Metamask"
+              variant="rounded"
+            />
+          )}
           <Button
             color="dark"
             icon={<WalletConnect />}

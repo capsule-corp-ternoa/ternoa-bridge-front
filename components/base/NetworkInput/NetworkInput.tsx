@@ -16,19 +16,29 @@ import styles from './NetworkInput.module.scss'
 
 interface Props {
   className?: string
+  forceIsConnected?: boolean
   network: ChainType
   noConnectButton?: boolean
+  noNetworkData?: boolean
   onClick: React.MouseEventHandler<HTMLDivElement>
   variant: 'input' | 'preview'
 }
 
-const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, onClick, variant }: Props) => {
+const NetworkInput = ({
+  className,
+  forceIsConnected = false,
+  network = 'ternoa',
+  noConnectButton = false,
+  noNetworkData = false,
+  onClick,
+  variant,
+}: Props) => {
   const dispatch = useAppDispatch()
   const [isConnectButtonHovering, setIsConnectButtonHovering] = useState(false)
 
   const { user } = useAppSelector((state) => state.user)
 
-  const isConnected = isConnectedHelper(network, user)
+  const isConnected = isConnectedHelper(network, user) || forceIsConnected
   const isBadNetwork = !isConnected && user.isConnectedErc && (network === 'erc20' || network === 'bep20')
 
   const getButtonColor = () => {
@@ -69,6 +79,7 @@ const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, 
         return '#352b60'
       case 'bep20':
         return '#45393c'
+      case 'ternoa':
       default:
         return '#471e40'
     }
@@ -109,6 +120,7 @@ const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, 
               erc20: <Erc20 className={styles.networkIcon} />,
               bep20: <Bep20 className={styles.networkIcon} />,
               ternoa: <TernoaChain className={styles.networkIcon} />,
+              other: undefined,
             }[network]
           }
         </div>
@@ -119,13 +131,14 @@ const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, 
                 erc20: 'Ethereum Network',
                 bep20: 'Binance Smart Chain',
                 ternoa: 'Ternoa Chain',
+                other: undefined,
               }[network]
             }
           </div>
-          {isConnected && variant === 'input' && (
+          {isConnected && !noNetworkData && variant === 'input' && (
             <div className={styles.networkData}>
-              {balance !== undefined && <span className={styles.balance}>{`${formatPrice(balance, {})} CAPS`}</span>}
-              {address && <span className={styles.address}>{middleEllipsis(address)}</span>}
+              {balance !== undefined && <div className={styles.balance}>{`${formatPrice(balance, {})} CAPS`}</div>}
+              {address && <div className={styles.address}>{middleEllipsis(address)}</div>}
             </div>
           )}
         </div>
@@ -148,9 +161,9 @@ const NetworkInput = ({ className, network = 'ternoa', noConnectButton = false, 
       {variant === 'preview' && (
         <div className={styles.walletData}>
           {address && <div className={styles.address}>{middleEllipsis(address)}</div>}
-          <div className={styles.connectChip}>
-            <div className={styles.outterChip} />
-            <div className={styles.innerChip} />
+          <div className={styles.connectIndicator}>
+            <div className={styles.outterIndicator} />
+            <div className={styles.innerIndicator} />
           </div>
         </div>
       )}

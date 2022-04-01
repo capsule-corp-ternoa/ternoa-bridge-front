@@ -54,24 +54,32 @@ const ConfirmModal = ({
     return () => {
       shouldUpdate = false
     }
-    //TODO
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, from, to, user])
+  }, [amount, from, setExpanded, to, user])
 
   useEffect(() => {
     let shouldUpdate = true
     const getFees = async () => {
-      const { value, unit } = await getNetworkFees(from, to, amount, user)
-      if (shouldUpdate) setFees(`${Number(value).toFixed(6)} ${unit}`)
+      try {
+        const { value, unit } = await getNetworkFees(from, to, amount, user)
+        if (shouldUpdate) setFees(`${Number(value).toFixed(6)} ${unit}`)
+      } catch (error) {
+        console.error(error)
+        if (shouldUpdate) {
+          if (error instanceof Error) {
+            setFees(error.message)
+          } else {
+            setFees(error as string)
+          }
+        }
+      }
     }
 
     getFees()
     return () => {
       shouldUpdate = false
     }
-    //TODO
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [amount, from, to, user])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -84,9 +92,7 @@ const ConfirmModal = ({
     return () => {
       shouldUpdate = false
     }
-    //TODO
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [from, to, user])
 
   return (
     <Modal setExpanded={setExpanded}>
@@ -137,12 +143,10 @@ const ConfirmModal = ({
               <span className={styles.resumeItem}>{middleEllipsis(toAddress)}</span>
             </div>
           )}
-          {fees && (
-            <div className={styles.resumeLine}>
-              <span className={styles.resumeItem}>Network Fee*</span>
-              <span className={styles.resumeItem}>{fees}</span>
-            </div>
-          )}
+          <div className={styles.resumeLine}>
+            <span className={styles.resumeItem}>Network Fee*</span>
+            {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
+          </div>
           <div className={styles.resumeLine}>
             <span className={styles.resumeItem}>You will receive</span>
             <span className={styles.resumeBoldItem}>{`${formatPrice(amount, {})} CAPS`}</span>

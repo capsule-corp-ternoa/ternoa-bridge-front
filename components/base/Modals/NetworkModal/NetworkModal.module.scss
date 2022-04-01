@@ -19,6 +19,8 @@
 .networks {
   width: 100%;
   margin-top: 3.2rem;
+  max-height: 28rem;
+  overflow-y: auto;
 
   .networkInput {
     width: 100%;
@@ -30,6 +32,7 @@
   }
 
   @include lg {
+    max-height: 40rem;
     margin-top: 5.6rem;
   }
 }

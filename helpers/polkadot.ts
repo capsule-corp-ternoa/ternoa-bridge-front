@@ -10,7 +10,7 @@ import { NUMBER_OF_DECIMALS } from './erc'
 
 let api: ApiPromise
 
-const CHAIN_ENDPOINT = 'wss://dev.chaos.ternoa.com'
+const CHAIN_ENDPOINT = process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT || 'wss://dev.chaos.ternoa.com'
 const ETH_DEST_ID = 0
 
 const initializeApi = async () => {

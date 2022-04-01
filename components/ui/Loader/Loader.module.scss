@@ -67,3 +67,20 @@
     }
   }
 }
+
+.rootLottie {
+  align-self: center;
+  margin: 0 auto;
+  width: 6.4rem;
+  height: 6.4rem;
+
+  &.small {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  &.medium {
+    width: 3.2rem;
+    height: 3.2rem;
+  }
+}

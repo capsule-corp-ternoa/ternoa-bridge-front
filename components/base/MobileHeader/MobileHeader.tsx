@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 import Hamburger from 'assets/svgComponents/Hamburger'
@@ -10,6 +10,14 @@ import styles from './MobileHeader.module.scss'
 
 const MobileHeader = () => {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false)
+
+  useEffect(() => {
+    const body = document.querySelector('body')
+    if (body) {
+      if (isMenuExpanded) body.style.overflow = 'hidden'
+      else body.style.overflow = 'auto'
+    }
+  }, [isMenuExpanded])
 
   return (
     <>
