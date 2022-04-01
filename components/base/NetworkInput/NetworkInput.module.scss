@@ -64,27 +64,17 @@
     .networkData {
       color: $color-neutral300;
       font-size: 1rem;
+      display: flex;
+      column-gap: 0.6rem;
+      flex-wrap: wrap;
 
       .balance {
         font-family: $font-bold;
       }
 
-      > * {
-        white-space: nowrap;
-
-        &:not(:first-child) {
-          margin-left: 0.4rem;
-        }
-      }
-
       @include xl {
         font-size: 1.4rem;
-
-        > * {
-          &:not(:first-child) {
-            margin-left: 0.8rem;
-          }
-        }
+        column-gap: 1.2rem;
       }
     }
 

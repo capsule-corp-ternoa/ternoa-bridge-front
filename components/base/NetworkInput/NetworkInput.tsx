@@ -137,8 +137,8 @@ const NetworkInput = ({
           </div>
           {isConnected && !noNetworkData && variant === 'input' && (
             <div className={styles.networkData}>
-              {balance !== undefined && <span className={styles.balance}>{`${formatPrice(balance, {})} CAPS`}</span>}
-              {address && <span className={styles.address}>{middleEllipsis(address)}</span>}
+              {balance !== undefined && <div className={styles.balance}>{`${formatPrice(balance, {})} CAPS`}</div>}
+              {address && <div className={styles.address}>{middleEllipsis(address)}</div>}
             </div>
           )}
         </div>
