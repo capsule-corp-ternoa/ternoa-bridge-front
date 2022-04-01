@@ -113,26 +113,39 @@
     font-size: 1.6rem;
   }
 
-  .connectChip {
+  .connectIndicator {
     margin-left: 1.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
 
-    .outterChip {
+    .outterIndicator {
+      @keyframes indicatorScale {
+        0%,
+        100% {
+          transform: scale(0.8);
+          opacity: 0.2;
+        }
+        50% {
+          transform: scale(0.9);
+          opacity: 0.3;
+        }
+      }
+
       position: absolute;
-      width: 1.2rem;
-      height: 1.2rem;
+      width: 1.4rem;
+      height: 1.4rem;
       background: $color-success300;
-      border-radius: 50%;
+      border-radius: 100%;
+      animation: 1.6s ease-in-out 0s infinite normal none running indicatorScale;
     }
 
-    .innerChip {
+    .innerIndicator {
       position: absolute;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 100%;
       background: $color-success500;
     }
   }

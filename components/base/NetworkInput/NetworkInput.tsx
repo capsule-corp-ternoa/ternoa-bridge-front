@@ -161,9 +161,9 @@ const NetworkInput = ({
       {variant === 'preview' && (
         <div className={styles.walletData}>
           {address && <div className={styles.address}>{middleEllipsis(address)}</div>}
-          <div className={styles.connectChip}>
-            <div className={styles.outterChip} />
-            <div className={styles.innerChip} />
+          <div className={styles.connectIndicator}>
+            <div className={styles.outterIndicator} />
+            <div className={styles.innerIndicator} />
           </div>
         </div>
       )}
