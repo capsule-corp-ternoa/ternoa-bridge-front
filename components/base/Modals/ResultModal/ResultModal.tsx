@@ -1,6 +1,7 @@
 import React from 'react'
 
 import Coin from 'assets/svgComponents/Coin'
+import Warning from 'assets/svgComponents/Warning'
 import Modal from 'components/ui/Modal'
 
 import styles from './ResultModal.module.scss'
@@ -16,7 +17,7 @@ const ResultModal = ({ body, isError, link, setExpanded }: ResultModalProps) => 
   <Modal setExpanded={setExpanded}>
     <div className={styles.root}>
       {isError ? (
-        <div className={styles.warningEmoji}>⚠️</div>
+        <Warning className={styles.warning} />
       ) : (
         <div className={styles.coinIcon}>
           <Coin />
