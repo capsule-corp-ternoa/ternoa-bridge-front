@@ -26,12 +26,9 @@ const ResultModal = ({ body, isError, link, setExpanded }: ResultModalProps) => 
       <div className={styles.title}>{isError ? 'Transaction rejected' : 'Transaction successful'}</div>
       <div className={styles.body}>{body}</div>
       {link && link.length > 0 && (
-        <>
-          <div className={styles.linkLabel}>View transaction on :</div>
-          <a className={styles.link} href={link} target="_blank" rel="noreferrer">
-            {link}
-          </a>
-        </>
+        <a className={styles.link} href={link} target="_blank" rel="noreferrer">
+          View transaction
+        </a>
       )}
     </div>
   </Modal>
