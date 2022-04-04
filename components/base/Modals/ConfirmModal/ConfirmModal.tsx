@@ -6,7 +6,7 @@ import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import Radio from 'components/ui/Radio'
 
-import { getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
+import { approve, getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
 import { ChainType } from 'interfaces'
 import { useAppSelector } from 'redux/hooks'
 import { formatPrice, middleEllipsis } from 'utils/strings'
@@ -41,8 +41,12 @@ const ConfirmModal = ({
 
   const toAddress = getAddress(to, user)
 
-  const handleApprove = () => {
+  //TODO
+  const handleApprove = async () => {
     console.log('Approve')
+    const tx = await approve(from, to, user)
+    const receipt = await tx.wait()
+    console.log(receipt)
   }
 
   useEffect(() => {
