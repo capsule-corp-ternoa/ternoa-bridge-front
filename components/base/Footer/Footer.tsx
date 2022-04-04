@@ -47,7 +47,7 @@ const Footer = () => (
         <div className={styles.linksWrapper}>
           <a
             className={styles.footerLink}
-            href="https://intercom.help/ternoa/fr/collections/2774679-legal"
+            href="https://ternoahelp.zendesk.com/hc/fr/articles/360019045538-Terms-of-Use"
             target="_blank"
             rel="noopener noreferrer"
             title="Terms"
@@ -56,7 +56,7 @@ const Footer = () => (
           </a>
           <a
             className={styles.footerLink}
-            href="https://intercom.help/ternoa/fr/collections/2774679-legal"
+            href="https://ternoahelp.zendesk.com/hc/fr/articles/360018925097-Privacy-Policy"
             target="_blank"
             rel="noopener noreferrer"
             title="Privacy"
