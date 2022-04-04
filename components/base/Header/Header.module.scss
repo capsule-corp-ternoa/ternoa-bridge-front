@@ -4,9 +4,14 @@
   display: none;
 
   @include lg {
+    padding: 6.4rem 4rem 3.2rem !important;
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  @include xl {
+    padding: 6.4rem 6.4rem 6.4rem !important;
   }
 }
 
