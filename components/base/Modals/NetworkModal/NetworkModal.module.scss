@@ -21,6 +21,25 @@
   margin-top: 3.2rem;
   max-height: 28rem;
   overflow-y: auto;
+  padding-right: 1.6rem;
+  scrollbar-color: $color-primary300 $color-neutral100;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 1.2rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-neutral100;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-primary400;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $color-primary300;
+  }
 
   .networkInput {
     width: 100%;
