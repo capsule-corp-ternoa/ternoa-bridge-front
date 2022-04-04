@@ -133,3 +133,9 @@ export const transfer = async (
     }
   })
 }
+
+//TODO
+// export const getNativeTokenId = async () => {
+//   const api = await getApi()
+//   return api.consts.erc20Bridge.nativeTokenId.toString()
+// }
