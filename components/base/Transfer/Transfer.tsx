@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useAppSelector } from 'redux/hooks'
+import { useAppDispatch, useAppSelector } from 'redux/hooks'
 
 import Arrow from 'assets/svgComponents/Arrow'
 import Switch from 'assets/svgComponents/Switch'
@@ -14,6 +14,7 @@ import Input from 'components/ui/Input'
 import { canProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
 import { ChainType } from 'interfaces'
+import { actions as appActions } from 'redux/app/actions'
 import { formatPrice } from 'utils/strings'
 
 import styles from './Transfer.module.scss'
@@ -26,34 +27,46 @@ const ALLOWED_TRANSFERS = {
 }
 
 const Transfer = () => {
-  const [from, setFrom] = useState<ChainType>('erc20')
-  const [to, setTo] = useState<ChainType>('ternoa')
   const [amount, setAmount] = useState<number>(0)
+  const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
   const [response, setResponse] = useState<{ message: string; txLink: string; isError: boolean }>()
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false)
   const [isResultModalOpen, setIsResultModalOpen] = useState(false)
-  const [origin, setOrigin] = useState<'from' | 'to'>('from')
+
+  const dispatch = useAppDispatch()
+  const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
+  const { fromNetwork: from, toNetwork: to } = app
   const balance = getBalance(from, user)
 
-  const handleNetwork = (origin: 'from' | 'to', network: ChainType) => {
+  const handleNetwork = (rawOrigin: 'from' | 'to' | undefined, network: ChainType) => {
     setAmount(0)
     const newAutoAssignedNetwork: ChainType | undefined =
       network === 'other' ? undefined : (ALLOWED_TRANSFERS[network][0] as ChainType)
 
-    if (origin === 'from') {
-      setFrom(network)
-      if ((to === network || !ALLOWED_TRANSFERS[to]?.some((item) => item === network)) && newAutoAssignedNetwork) {
-        setTo(newAutoAssignedNetwork)
+    switch (rawOrigin) {
+      case 'from': {
+        dispatch(appActions.setFromNetwork(network))
+        if ((to === network || !ALLOWED_TRANSFERS[to]?.some((item) => item === network)) && newAutoAssignedNetwork) {
+          dispatch(appActions.setToNetwork(newAutoAssignedNetwork))
+        }
+        break
       }
-    } else {
-      setTo(network)
-      if ((from === network || !ALLOWED_TRANSFERS[from]?.some((item) => item === network)) && newAutoAssignedNetwork) {
-        setFrom(newAutoAssignedNetwork)
+      case 'to': {
+        dispatch(appActions.setToNetwork(network))
+        if (
+          (from === network || !ALLOWED_TRANSFERS[from]?.some((item) => item === network)) &&
+          newAutoAssignedNetwork
+        ) {
+          dispatch(appActions.setFromNetwork(newAutoAssignedNetwork))
+        }
+        break
       }
+      default:
+        break
     }
   }
 
@@ -79,8 +92,8 @@ const Transfer = () => {
     }
 
     setAmount(0)
-    setFrom(newFrom)
-    setTo(newTo)
+    dispatch(appActions.setFromNetwork(newFrom))
+    dispatch(appActions.setToNetwork(newTo))
   }
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +156,7 @@ const Transfer = () => {
                 setOrigin('from')
                 setIsNetworkModalOpen(true)
               }}
+              origin="from"
               variant="input"
             />
           </div>
@@ -171,6 +185,7 @@ const Transfer = () => {
                 setOrigin('to')
                 setIsNetworkModalOpen(true)
               }}
+              origin="to"
               variant="input"
             />
           </div>
@@ -217,8 +232,6 @@ const Transfer = () => {
           to={to}
           handleContinue={handleConfirmTransaction}
           setExpanded={setIsConfirmModalOpen}
-          setIsNetworkModalOpen={setIsNetworkModalOpen}
-          setOrigin={setOrigin}
         />
       )}
       {isLoadingModalOpen && <LoadingModal />}

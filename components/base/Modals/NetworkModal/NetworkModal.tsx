@@ -10,12 +10,13 @@ import { useAppSelector } from 'redux/hooks'
 import styles from './NetworkModal.module.scss'
 
 export interface NetworkModalProps {
-  handleNetwork: (origin: 'from' | 'to', network: ChainType) => void
-  origin: 'from' | 'to'
+  handleNetwork: (origin: 'from' | 'to' | undefined, network: ChainType) => void
+  origin: 'from' | 'to' | undefined
   setExpanded: (b: boolean) => void
 }
 
-const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps) => {
+const NetworkModal = ({ origin, handleNetwork, setExpanded }: NetworkModalProps) => {
+  const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
   const handleNetworkSwitch = async (network: 'erc20' | 'bep20') => {
@@ -48,7 +49,12 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
-              if (user.isConnectedErc && origin === 'from') handleNetworkSwitch('erc20')
+              if (
+                user.ercWallet?.connectedWith === 'metamask' &&
+                (origin === 'from' || (origin === 'to' && app.fromNetwork === 'ternoa'))
+              ) {
+                handleNetworkSwitch('erc20')
+              }
               handleNetwork(origin, 'erc20')
               setExpanded(false)
             }}
@@ -60,7 +66,7 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
-              if (user.isConnectedErc && origin === 'from') handleNetworkSwitch('bep20')
+              if (user.ercWallet?.connectedWith === 'metamask' && origin === 'from') handleNetworkSwitch('bep20')
               handleNetwork(origin, 'bep20')
               setExpanded(false)
             }}
@@ -72,6 +78,9 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
+              if (user.ercWallet?.connectedWith === 'metamask') {
+                handleNetworkSwitch('erc20')
+              }
               handleNetwork(origin, 'ternoa')
               setExpanded(false)
             }}

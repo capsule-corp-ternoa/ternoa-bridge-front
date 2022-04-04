@@ -41,7 +41,8 @@ export const connect = (
   chainType: ChainType,
   dispatch: (action: AnyAction) => void,
   connectedWith?: 'metamask' | 'walletConnect',
-  selectedPolkadotAccount?: InjectedAccountWithMeta
+  selectedPolkadotAccount?: InjectedAccountWithMeta,
+  isNetworkSwitchAllowed = true
 ) => {
   switch (chainType) {
     case 'erc20':
@@ -49,10 +50,12 @@ export const connect = (
       if (!connectedWith) throw new Error('No provider found')
       if (connectedWith === 'metamask') {
         connectMetamask(dispatch)
-        if (chainType === 'erc20') {
-          switchETHNetwork()
-        } else {
-          switchBSCNetwork()
+        if (isNetworkSwitchAllowed) {
+          if (chainType === 'erc20') {
+            switchETHNetwork()
+          } else {
+            switchBSCNetwork()
+          }
         }
       } else {
         connectWalletConnect(dispatch)

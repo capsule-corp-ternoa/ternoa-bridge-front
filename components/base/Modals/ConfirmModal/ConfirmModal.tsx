@@ -20,19 +20,9 @@ export interface ConfirmModalProps {
   to: ChainType
   handleContinue: () => void
   setExpanded: (b: boolean) => void
-  setIsNetworkModalOpen: (b: boolean) => void
-  setOrigin: (origin: 'from' | 'to') => void
 }
 
-const ConfirmModal = ({
-  amount,
-  from,
-  to,
-  handleContinue,
-  setExpanded,
-  setIsNetworkModalOpen,
-  setOrigin,
-}: ConfirmModalProps) => {
+const ConfirmModal = ({ amount, from, to, handleContinue, setExpanded }: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
@@ -107,15 +97,7 @@ const ConfirmModal = ({
             <div className={transferStyles.top}>
               <span className={transferStyles.label}>From</span>
             </div>
-            <NetworkInput
-              className={transferStyles.networkInput}
-              network={from}
-              onClick={() => {
-                setOrigin('from')
-                setIsNetworkModalOpen(true)
-              }}
-              variant="preview"
-            />
+            <NetworkInput className={transferStyles.networkInput} network={from} variant="preview" />
           </div>
 
           <div className={transferStyles.switch}>
@@ -129,15 +111,7 @@ const ConfirmModal = ({
             <div className={transferStyles.top}>
               <span className={transferStyles.label}>To</span>
             </div>
-            <NetworkInput
-              className={transferStyles.networkInput}
-              network={to}
-              onClick={() => {
-                setOrigin('to')
-                setIsNetworkModalOpen(true)
-              }}
-              variant="preview"
-            />
+            <NetworkInput className={transferStyles.networkInput} network={to} variant="preview" />
           </div>
         </div>
         <div className={styles.resume}>
