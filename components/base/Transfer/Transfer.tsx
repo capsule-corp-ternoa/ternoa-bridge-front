@@ -62,19 +62,17 @@ const Transfer = () => {
     const newTo = from
 
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-      if (!accounts || accounts.length === 0)
-        throw new Error('User is not logged in with Metamask, network switch is not available')
-
-      switch (newFrom) {
-        case 'erc20':
-          if (user.ercWallet?.chainType !== 'erc20') switchETHNetwork()
-          break
-        case 'bep20':
-          if (user.ercWallet?.chainType !== 'bep20') switchBSCNetwork()
-          break
-        default:
-          break
+      if (user.ercWallet?.connectedWith === 'metamask') {
+        switch (newFrom) {
+          case 'erc20':
+            if (user.ercWallet?.chainType !== 'erc20') switchETHNetwork()
+            break
+          case 'bep20':
+            if (user.ercWallet?.chainType !== 'bep20') switchBSCNetwork()
+            break
+          default:
+            break
+        }
       }
     } catch (error) {
       console.log(error)

@@ -20,19 +20,17 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
 
   const handleNetworkSwitch = async (network: 'erc20' | 'bep20') => {
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-      if (!accounts || accounts.length === 0)
-        throw new Error('User is not logged in with Metamask, network switch is not available')
-
-      switch (network) {
-        case 'erc20':
-          switchETHNetwork()
-          break
-        case 'bep20':
-          switchBSCNetwork()
-          break
-        default:
-          break
+      if (user.ercWallet?.connectedWith === 'metamask') {
+        switch (network) {
+          case 'erc20':
+            switchETHNetwork()
+            break
+          case 'bep20':
+            switchBSCNetwork()
+            break
+          default:
+            break
+        }
       }
     } catch (error) {
       console.log(error)
