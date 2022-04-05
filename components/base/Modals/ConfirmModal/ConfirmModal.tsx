@@ -7,7 +7,7 @@ import Modal from 'components/ui/Modal'
 import Radio from 'components/ui/Radio'
 
 import { approve, getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
-import { ChainType } from 'interfaces'
+import { getBridgeFees } from 'helpers/polkadot'
 import { useAppSelector } from 'redux/hooks'
 import { formatPrice, middleEllipsis } from 'utils/strings'
 
@@ -16,18 +16,19 @@ import styles from './ConfirmModal.module.scss'
 
 export interface ConfirmModalProps {
   amount: number
-  from: ChainType
-  to: ChainType
   handleContinue: () => void
   setExpanded: (b: boolean) => void
 }
 
-const ConfirmModal = ({ amount, from, to, handleContinue, setExpanded }: ConfirmModalProps) => {
+const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
   const [isFirstRender, setIsFirstRender] = useState(true)
+  const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
+
+  const { fromNetwork: from, toNetwork: to } = app
 
   const toAddress = getAddress(to, user)
 
@@ -125,6 +126,12 @@ const ConfirmModal = ({ amount, from, to, handleContinue, setExpanded }: Confirm
             <span className={styles.resumeItem}>Network Fee*</span>
             {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
           </div>
+          {from === 'ternoa' && to === 'erc20' && (
+            <div className={styles.resumeLine}>
+              <span className={styles.resumeItem}>Bridge Fee*</span>
+              <span className={styles.resumeItem}>{`${getBridgeFees()} CAPS`}</span>
+            </div>
+          )}
           <div className={styles.resumeLine}>
             <span className={styles.resumeItem}>You will receive</span>
             <span className={styles.resumeBoldItem}>{`${formatPrice(amount, {})} CAPS`}</span>

@@ -12,6 +12,7 @@ let api: ApiPromise
 
 const CHAIN_ENDPOINT = process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT || 'wss://dev.chaos.ternoa.com'
 const ETH_DEST_ID = 0
+const BRIDGE_FEES = 50
 
 const initializeApi = async () => {
   await cryptoWaitReady()
@@ -139,3 +140,7 @@ export const transfer = async (
 //   const api = await getApi()
 //   return api.consts.erc20Bridge.nativeTokenId.toString()
 // }
+
+export const getBridgeFees = () => {
+  return BRIDGE_FEES
+}
