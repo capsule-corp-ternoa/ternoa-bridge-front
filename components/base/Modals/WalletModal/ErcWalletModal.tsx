@@ -7,7 +7,7 @@ import Modal from 'components/ui/Modal'
 import { ChainType } from 'interfaces'
 import { connect } from 'helpers/bridge'
 import { actions } from 'redux/app/actions'
-import { useAppDispatch } from 'redux/hooks'
+import { useAppDispatch, useAppSelector } from 'redux/hooks'
 
 import styles from './WalletModal.module.scss'
 
@@ -18,6 +18,13 @@ interface Props {
 const ErcWalletModal = ({ chainType }: Props) => {
   const [isWindowEthAvailable, setIsWindowEthAvailable] = useState(false)
   const dispatch = useAppDispatch()
+  const { app } = useAppSelector((state) => state.app)
+  const { fromNetwork, toNetwork, originForConnection } = app
+
+  const isNetworkSwitchAllowed =
+    (originForConnection === 'from' &&
+      ((fromNetwork === 'erc20' && toNetwork !== 'bep20') || (fromNetwork === 'bep20' && toNetwork !== 'erc20'))) ||
+    (originForConnection === 'to' && fromNetwork === 'ternoa')
 
   const handleModalExpanded = (value: boolean) => {
     dispatch(actions.setIsErcWalletModalOpen(value))
@@ -38,10 +45,10 @@ const ErcWalletModal = ({ chainType }: Props) => {
               icon={<Metamask />}
               onClick={() => {
                 try {
-                  connect(chainType, dispatch, 'metamask')
+                  connect(chainType, dispatch, 'metamask', undefined, isNetworkSwitchAllowed)
                   handleModalExpanded(false)
                 } catch (error) {
-                  console.log(error)
+                  console.error(error)
                 }
               }}
               size="medium"
@@ -57,7 +64,7 @@ const ErcWalletModal = ({ chainType }: Props) => {
                 connect(chainType, dispatch, 'walletConnect')
                 handleModalExpanded(false)
               } catch (error) {
-                console.log(error)
+                console.error(error)
               }
             }}
             size="medium"

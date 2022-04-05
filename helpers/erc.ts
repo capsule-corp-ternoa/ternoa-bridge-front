@@ -6,26 +6,26 @@ import { AnyAction } from 'redux'
 import { clear, get, USER_ERC_CONNECTED_WITH } from './storage'
 import { connect as connectMetamask } from './metamask'
 import { connect as connectWalletConnect } from './walletconnect'
-import { BN } from 'bn.js'
+// import { formatInput } from './polkadot'
 
 export const NUMBER_OF_DECIMALS = 18
 
 // export const ETH_CHAIN_ID = 1 // REAL VALUE
-export const ETH_CHAIN_ID = 4 // TEST VALUE
+export const ETH_CHAIN_ID = 5 // TEST VALUE
 export const BSC_CHAIN_ID = 56
 
 const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
+const TERNOA_ETH_BRIDGE_CONTRACT = '0x84B04d5D1EA64787c662cb825a41Fc2a46fbAE8b' //TEST VALUE GOERLI
 
 //TODO
 // export const CAPS_TOKEN_ADDRESS_ETH = '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2' // REAL VALUE
-const CAPS_TOKEN_ADDRESS_ETH = '0xcE9D9Db4264a50aEF8B5627E882Ed71dF66d2105' // TEST VALUE
+// const CAPS_TOKEN_ADDRESS_ETH = '0xcE9D9Db4264a50aEF8B5627E882Ed71dF66d2105' // TEST VALUE RINKEBY
+const CAPS_TOKEN_ADDRESS_ETH = '0x704792C9fb9c432bEB4144c44BDbcc303Ac628dF' // TEST VALUE GOERLI
 const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
 
 // export const PROVIDER_BASE_URL_ETH = `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}` // REAL VALUE
-const PROVIDER_BASE_URL_ETH = `https://rinkeby.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
-const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
-
-const TERNOA_ETH_BRIDGE_CONTRACT = '0xdA99829d809CeA08301c7ae09931a1AC8Db027F6' //Random account address for testing purposes
+export const PROVIDER_BASE_URL_ETH = `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
+export const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
 
 const getTokenContract = async (signer: Signer) => {
   const chainId = await signer.getChainId()
@@ -90,7 +90,7 @@ export const isApproved = async (signer: Signer) => {
   const owner = await signer.getAddress()
   const spender = TERNOA_ETH_BRIDGE_CONTRACT
   const amount = await contract.allowance(owner, spender)
-  return new BN('0').cmp(amount) === -1
+  return amount > 0
 }
 
 export const approve = async (signer: Signer) => {
@@ -126,12 +126,21 @@ export const transferBscEth = async (signer: Signer, amount: number) => {
 
 //TODO
 export const getTransferEthTernoaFees = async (signer: Signer, amount: number): Promise<string> => {
-  console.log(signer, amount)
+  console.log('get transfer Fee', signer, amount)
   return '0'
 }
 
 //TODO
 export const transferEthTernoa = async (signer: Signer, amount: number) => {
-  console.log(signer, amount)
-  return 0
+  console.log('transfer', signer, amount)
+  return '0'
 }
+
+//TODO
+// const formatData = (address: string, amount: number) => {
+//   const bnAmount = formatInput(amount).toJSON()
+//   return '0x' +
+//     ethers.utils.hexZeroPad(bnAmount, 32).substring(2) +
+//     ethers.utils.hexZeroPad(ethers.utils.hexlify((address.length - 2) / 2), 32).substring(2) +
+//     address.substring(2)
+// }

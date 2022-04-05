@@ -6,8 +6,8 @@ import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import Radio from 'components/ui/Radio'
 
-import { getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
-import { ChainType } from 'interfaces'
+import { approve, getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
+import { getBridgeFees } from 'helpers/polkadot'
 import { useAppSelector } from 'redux/hooks'
 import { formatPrice, middleEllipsis } from 'utils/strings'
 
@@ -16,33 +16,36 @@ import styles from './ConfirmModal.module.scss'
 
 export interface ConfirmModalProps {
   amount: number
-  from: ChainType
-  to: ChainType
   handleContinue: () => void
   setExpanded: (b: boolean) => void
-  setIsNetworkModalOpen: (b: boolean) => void
-  setOrigin: (origin: 'from' | 'to') => void
 }
 
-const ConfirmModal = ({
-  amount,
-  from,
-  to,
-  handleContinue,
-  setExpanded,
-  setIsNetworkModalOpen,
-  setOrigin,
-}: ConfirmModalProps) => {
+const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
+  const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
   const [isFirstRender, setIsFirstRender] = useState(true)
+  const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
+
+  const { fromNetwork: from, toNetwork: to } = app
 
   const toAddress = getAddress(to, user)
 
-  const handleApprove = () => {
-    console.log('Approve')
+  const handleApprove = async () => {
+    setIsApprovalLoading(true)
+    try {
+      const tx = await approve(from, to, user)
+      const receipt = await tx.wait()
+      if (receipt && receipt.status === 1) {
+        setIsApproved(true)
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsApprovalLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -103,15 +106,7 @@ const ConfirmModal = ({
             <div className={transferStyles.top}>
               <span className={transferStyles.label}>From</span>
             </div>
-            <NetworkInput
-              className={transferStyles.networkInput}
-              network={from}
-              onClick={() => {
-                setOrigin('from')
-                setIsNetworkModalOpen(true)
-              }}
-              variant="preview"
-            />
+            <NetworkInput className={transferStyles.networkInput} network={from} variant="preview" />
           </div>
 
           <div className={transferStyles.switch}>
@@ -125,15 +120,7 @@ const ConfirmModal = ({
             <div className={transferStyles.top}>
               <span className={transferStyles.label}>To</span>
             </div>
-            <NetworkInput
-              className={transferStyles.networkInput}
-              network={to}
-              onClick={() => {
-                setOrigin('to')
-                setIsNetworkModalOpen(true)
-              }}
-              variant="preview"
-            />
+            <NetworkInput className={transferStyles.networkInput} network={to} variant="preview" />
           </div>
         </div>
         <div className={styles.resume}>
@@ -147,6 +134,12 @@ const ConfirmModal = ({
             <span className={styles.resumeItem}>Network Fee*</span>
             {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
           </div>
+          {from === 'ternoa' && to === 'erc20' && (
+            <div className={styles.resumeLine}>
+              <span className={styles.resumeItem}>Bridge Fee*</span>
+              <span className={styles.resumeItem}>{`${getBridgeFees()} CAPS`}</span>
+            </div>
+          )}
           <div className={styles.resumeLine}>
             <span className={styles.resumeItem}>You will receive</span>
             <span className={styles.resumeBoldItem}>{`${formatPrice(amount, {})} CAPS`}</span>
@@ -162,7 +155,8 @@ const ConfirmModal = ({
         <Button
           className={styles.button}
           color="primary500"
-          disabled={!isTermsRadioChecked}
+          disabled={isApprovalLoading || !isTermsRadioChecked}
+          isLoading={isApprovalLoading}
           onClick={isApproved ? handleContinue : handleApprove}
           size="medium"
           text={isApproved ? 'Continue' : 'Approve'}

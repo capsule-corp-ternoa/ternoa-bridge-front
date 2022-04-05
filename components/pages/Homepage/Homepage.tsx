@@ -1,23 +1,55 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'redux/hooks'
 
 import { ErcWalletModal, PolkadotWalletModal } from 'components/base/Modals/WalletModal'
 import Transfer from 'components/base/Transfer'
 import { reconnect } from 'helpers/bridge'
+import { switchETHNetwork } from 'helpers/metamask'
+import { get, USER_ERC_CONNECTED_WITH } from 'helpers/storage'
+import { handleNetworkPair } from 'utils/networks'
 
 import styles from './Homepage.module.scss'
 
 const Homepage = () => {
+  const [isMetamaskAutoReconnected, setIsMetamaskAutoReconnected] = useState(false)
   const dispatch = useAppDispatch()
   const { app } = useAppSelector((state) => state.app)
+  const { user } = useAppSelector((state) => state.user)
 
-  const chainType = app.chainTypeForConnection
+  const { fromNetwork: from, toNetwork: to, chainTypeForConnection: chainType } = app
+
   const isErcWalletModalOpen = app.isErcWalletModalOpen && (chainType === 'erc20' || chainType === 'bep20')
   const isPolkadotWalletModalOpen = app.isPolkadotWalletModalOpen && chainType === 'ternoa'
 
   useEffect(() => {
     reconnect(dispatch)
+    const ercConnectedWith = get(USER_ERC_CONNECTED_WITH)
+    if (ercConnectedWith === 'metamask') {
+      setIsMetamaskAutoReconnected(true)
+    }
   }, [dispatch])
+
+  useEffect(() => {
+    const handleErc20NetworkSwitch = async () => {
+      try {
+        await switchETHNetwork()
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    if (isMetamaskAutoReconnected && user.ercWallet?.connectedWith === 'metamask') {
+      const metamaskChainType = user.ercWallet.chainType
+      if (metamaskChainType === 'bep20') handleNetworkPair(from, to, 'from', metamaskChainType, dispatch)
+      else {
+        if (metamaskChainType !== 'erc20') {
+          handleErc20NetworkSwitch()
+        }
+        handleNetworkPair('erc20', to, 'from', 'erc20', dispatch)
+      }
+      setIsMetamaskAutoReconnected(false)
+    }
+  }, [dispatch, from, isMetamaskAutoReconnected, to, user.ercWallet])
 
   useEffect(() => {
     const body = document.querySelector('body')

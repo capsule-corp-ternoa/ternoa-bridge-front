@@ -10,29 +10,38 @@ import { useAppSelector } from 'redux/hooks'
 import styles from './NetworkModal.module.scss'
 
 export interface NetworkModalProps {
-  handleNetwork: (origin: 'from' | 'to', network: ChainType) => void
-  origin: 'from' | 'to'
+  handleNetworkPair: (origin: 'from' | 'to' | undefined, network: ChainType) => void
+  origin: 'from' | 'to' | undefined
   setExpanded: (b: boolean) => void
 }
 
-const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps) => {
+const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalProps) => {
+  const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
   const handleNetworkSwitch = async (network: 'erc20' | 'bep20') => {
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-      if (!accounts || accounts.length === 0)
-        throw new Error('User is not logged in with Metamask, network switch is not available')
-
-      switch (network) {
-        case 'erc20':
-          switchETHNetwork()
-          break
-        case 'bep20':
-          switchBSCNetwork()
-          break
-        default:
-          break
+      if (user.ercWallet?.connectedWith === 'metamask') {
+        switch (network) {
+          case 'erc20': {
+            try {
+              await switchETHNetwork()
+            } catch (error) {
+              console.error(error)
+            }
+            break
+          }
+          case 'bep20': {
+            try {
+              await switchBSCNetwork()
+            } catch (error) {
+              console.error(error)
+            }
+            break
+          }
+          default:
+            break
+        }
       }
     } catch (error) {
       console.log(error)
@@ -50,8 +59,13 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
-              if (user.isConnectedErc && origin === 'from') handleNetworkSwitch('erc20')
-              handleNetwork(origin, 'erc20')
+              if (
+                user.ercWallet?.connectedWith === 'metamask' &&
+                (origin === 'from' || (origin === 'to' && app.fromNetwork === 'ternoa'))
+              ) {
+                handleNetworkSwitch('erc20')
+              }
+              handleNetworkPair(origin, 'erc20')
               setExpanded(false)
             }}
             variant="input"
@@ -62,8 +76,8 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
-              if (user.isConnectedErc && origin === 'from') handleNetworkSwitch('bep20')
-              handleNetwork(origin, 'bep20')
+              if (user.ercWallet?.connectedWith === 'metamask' && origin === 'from') handleNetworkSwitch('bep20')
+              handleNetworkPair(origin, 'bep20')
               setExpanded(false)
             }}
             variant="input"
@@ -74,7 +88,10 @@ const NetworkModal = ({ handleNetwork, origin, setExpanded }: NetworkModalProps)
             noConnectButton
             noNetworkData
             onClick={() => {
-              handleNetwork(origin, 'ternoa')
+              if (user.ercWallet?.connectedWith === 'metamask') {
+                handleNetworkSwitch('erc20')
+              }
+              handleNetworkPair(origin, 'ternoa')
               setExpanded(false)
             }}
             variant="input"

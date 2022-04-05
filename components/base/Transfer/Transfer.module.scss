@@ -15,10 +15,6 @@
   @include lg {
     padding: 3.2rem 4rem;
   }
-
-  @include xxl {
-    padding: 4.8rem 8rem;
-  }
 }
 
 .field {
@@ -77,6 +73,14 @@
 
     &:hover {
       border-color: $color-contrast;
+    }
+
+    &:disabled {
+      cursor: auto;
+
+      &:hover {
+        border-color: $color-neutral900;
+      }
     }
 
     @include xl {

@@ -37,25 +37,36 @@ export const isConnected = (from: ChainType, user: User) => {
   }
 }
 
-export const connect = (
+export const connect = async (
   chainType: ChainType,
   dispatch: (action: AnyAction) => void,
   connectedWith?: 'metamask' | 'walletConnect',
-  selectedPolkadotAccount?: InjectedAccountWithMeta
+  selectedPolkadotAccount?: InjectedAccountWithMeta,
+  isNetworkSwitchAllowed = true
 ) => {
   switch (chainType) {
     case 'erc20':
     case 'bep20':
       if (!connectedWith) throw new Error('No provider found')
       if (connectedWith === 'metamask') {
-        connectMetamask(dispatch)
-        if (chainType === 'erc20') {
-          switchETHNetwork()
-        } else {
-          switchBSCNetwork()
+        try {
+          await connectMetamask(dispatch)
+          if (isNetworkSwitchAllowed) {
+            if (chainType === 'erc20') {
+              await switchETHNetwork()
+            } else {
+              await switchBSCNetwork()
+            }
+          }
+        } catch (error) {
+          console.error(error)
         }
       } else {
-        connectWalletConnect(dispatch)
+        try {
+          connectWalletConnect(dispatch)
+        } catch (error) {
+          console.error(error)
+        }
       }
       break
     case 'ternoa':

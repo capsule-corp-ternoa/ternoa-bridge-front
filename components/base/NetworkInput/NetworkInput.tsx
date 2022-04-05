@@ -20,7 +20,8 @@ interface Props {
   network: ChainType
   noConnectButton?: boolean
   noNetworkData?: boolean
-  onClick: React.MouseEventHandler<HTMLDivElement>
+  onClick?: React.MouseEventHandler<HTMLDivElement>
+  origin?: 'from' | 'to'
   variant: 'input' | 'preview'
 }
 
@@ -31,6 +32,7 @@ const NetworkInput = ({
   noConnectButton = false,
   noNetworkData = false,
   onClick,
+  origin,
   variant,
 }: Props) => {
   const dispatch = useAppDispatch()
@@ -93,6 +95,7 @@ const NetworkInput = ({
     } else if (isConnected && network === 'ternoa') {
       dispatch(userActions.logoutPolkadot())
     } else {
+      dispatch(appActions.setOriginForConnection(origin))
       dispatch(appActions.setChainTypeForConnection(network))
       switch (network) {
         case 'erc20':

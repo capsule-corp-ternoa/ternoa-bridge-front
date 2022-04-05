@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useAppSelector } from 'redux/hooks'
+import { useAppDispatch, useAppSelector } from 'redux/hooks'
 
 import Arrow from 'assets/svgComponents/Arrow'
 import Switch from 'assets/svgComponents/Switch'
@@ -14,75 +14,57 @@ import Input from 'components/ui/Input'
 import { canProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
 import { ChainType } from 'interfaces'
+import { actions as appActions } from 'redux/app/actions'
+import { handleNetworkPair } from 'utils/networks'
 import { formatPrice } from 'utils/strings'
 
 import styles from './Transfer.module.scss'
 
-const ALLOWED_TRANSFERS = {
-  erc20: ['bep20', 'ternoa'],
-  bep20: ['erc20'],
-  ternoa: ['erc20'],
-  other: undefined,
-}
-
 const Transfer = () => {
-  const [from, setFrom] = useState<ChainType>('erc20')
-  const [to, setTo] = useState<ChainType>('ternoa')
   const [amount, setAmount] = useState<number>(0)
+  const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
   const [response, setResponse] = useState<{ message: string; txLink: string; isError: boolean }>()
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false)
   const [isResultModalOpen, setIsResultModalOpen] = useState(false)
-  const [origin, setOrigin] = useState<'from' | 'to'>('from')
+
+  const dispatch = useAppDispatch()
+  const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
-  const balance = getBalance(from, user)
+  const { fromNetwork: from, toNetwork: to } = app
+  const balance = isConnected(from, user) ? getBalance(from, user) : undefined
 
-  const handleNetwork = (origin: 'from' | 'to', network: ChainType) => {
+  const handleNetworkChange = (rawOrigin: 'from' | 'to' | undefined, network: ChainType) => {
     setAmount(0)
-    const newAutoAssignedNetwork: ChainType | undefined =
-      network === 'other' ? undefined : (ALLOWED_TRANSFERS[network][0] as ChainType)
-
-    if (origin === 'from') {
-      setFrom(network)
-      if ((to === network || !ALLOWED_TRANSFERS[to]?.some((item) => item === network)) && newAutoAssignedNetwork) {
-        setTo(newAutoAssignedNetwork)
-      }
-    } else {
-      setTo(network)
-      if ((from === network || !ALLOWED_TRANSFERS[from]?.some((item) => item === network)) && newAutoAssignedNetwork) {
-        setFrom(newAutoAssignedNetwork)
-      }
-    }
+    handleNetworkPair(from, to, rawOrigin, network, dispatch)
   }
 
-  const handleNetworkSwicth = async () => {
+  const handleNetworkInputSwicth = async () => {
     const newFrom = to
     const newTo = from
 
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-      if (!accounts || accounts.length === 0)
-        throw new Error('User is not logged in with Metamask, network switch is not available')
-
-      switch (newFrom) {
-        case 'erc20':
-          if (user.ercWallet?.chainType !== 'erc20') switchETHNetwork()
-          break
-        case 'bep20':
-          if (user.ercWallet?.chainType !== 'bep20') switchBSCNetwork()
-          break
-        default:
-          break
+      if (user.ercWallet?.connectedWith === 'metamask') {
+        switch (newFrom) {
+          case 'erc20':
+            if (user.ercWallet?.chainType !== 'erc20') await switchETHNetwork()
+            break
+          case 'bep20':
+            if (user.ercWallet?.chainType !== 'bep20') await switchBSCNetwork()
+            break
+          default:
+            break
+        }
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
 
     setAmount(0)
-    setFrom(newFrom)
-    setTo(newTo)
+    dispatch(appActions.setFromNetwork(newFrom))
+    dispatch(appActions.setToNetwork(newTo))
   }
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,13 +127,14 @@ const Transfer = () => {
                 setOrigin('from')
                 setIsNetworkModalOpen(true)
               }}
+              origin="from"
               variant="input"
             />
           </div>
 
           <div className={styles.switch}>
             <div className={styles.separator} />
-            <button className={styles.switchButton} aria-label="Switch Network" onClick={handleNetworkSwicth}>
+            <button className={styles.switchButton} aria-label="Switch Network" onClick={handleNetworkInputSwicth}>
               <Arrow className={styles.arrowSvg} />
               <Switch />
             </button>
@@ -173,6 +156,7 @@ const Transfer = () => {
                 setOrigin('to')
                 setIsNetworkModalOpen(true)
               }}
+              origin="to"
               variant="input"
             />
           </div>
@@ -183,13 +167,16 @@ const Transfer = () => {
             endComponent={
               <button
                 className={styles.maxButton}
-                onClick={() => balance && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)}
+                disabled={balance === undefined}
+                onClick={() =>
+                  balance !== undefined && balance >= 0 && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)
+                }
               >
                 Max
               </button>
             }
             error={handleInputError()}
-            insight={balance !== undefined ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
+            insight={balance !== undefined && balance >= 0 ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
             isError={amount !== 0 && (amount < MIN_AMOUNT || amount > MAX_AMOUNT || amount > Number(balance))}
             label="Amount"
             max={MAX_AMOUNT}
@@ -213,26 +200,19 @@ const Transfer = () => {
         </div>
       </div>
       {isConfirmModalOpen && (
-        <ConfirmModal
-          amount={amount}
-          from={from}
-          to={to}
-          handleContinue={handleConfirmTransaction}
-          setExpanded={setIsConfirmModalOpen}
-          setIsNetworkModalOpen={setIsNetworkModalOpen}
-          setOrigin={setOrigin}
-        />
+        <ConfirmModal amount={amount} handleContinue={handleConfirmTransaction} setExpanded={setIsConfirmModalOpen} />
       )}
       {isLoadingModalOpen && <LoadingModal />}
       {isResultModalOpen && (
         <ResultModal
           body={!response ? '' : response.message}
           link={!response ? '' : response.txLink}
+          isError={!response ? false : response.isError}
           setExpanded={setIsResultModalOpen}
         />
       )}
       {isNetworkModalOpen && (
-        <NetworkModal origin={origin} handleNetwork={handleNetwork} setExpanded={setIsNetworkModalOpen} />
+        <NetworkModal origin={origin} handleNetworkPair={handleNetworkChange} setExpanded={setIsNetworkModalOpen} />
       )}
     </>
   )
