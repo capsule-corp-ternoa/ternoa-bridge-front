@@ -30,11 +30,21 @@ const Homepage = () => {
   }, [dispatch])
 
   useEffect(() => {
+    const handleErc20NetworkSwitch = async () => {
+      try {
+        await switchETHNetwork()
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     if (isMetamaskAutoReconnected && user.ercWallet?.connectedWith === 'metamask') {
       const metamaskChainType = user.ercWallet.chainType
       if (metamaskChainType === 'bep20') handleNetworkPair(from, to, 'from', metamaskChainType, dispatch)
       else {
-        if (metamaskChainType !== 'erc20') switchETHNetwork()
+        if (metamaskChainType !== 'erc20') {
+          handleErc20NetworkSwitch()
+        }
         handleNetworkPair('erc20', to, 'from', 'erc20', dispatch)
       }
       setIsMetamaskAutoReconnected(false)

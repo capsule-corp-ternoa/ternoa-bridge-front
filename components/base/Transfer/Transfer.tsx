@@ -41,7 +41,7 @@ const Transfer = () => {
     handleNetworkPair(from, to, rawOrigin, network, dispatch)
   }
 
-  const handleNetworkSwicth = async () => {
+  const handleNetworkInputSwicth = async () => {
     const newFrom = to
     const newTo = from
 
@@ -49,17 +49,17 @@ const Transfer = () => {
       if (user.ercWallet?.connectedWith === 'metamask') {
         switch (newFrom) {
           case 'erc20':
-            if (user.ercWallet?.chainType !== 'erc20') switchETHNetwork()
+            if (user.ercWallet?.chainType !== 'erc20') await switchETHNetwork()
             break
           case 'bep20':
-            if (user.ercWallet?.chainType !== 'bep20') switchBSCNetwork()
+            if (user.ercWallet?.chainType !== 'bep20') await switchBSCNetwork()
             break
           default:
             break
         }
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
 
     setAmount(0)
@@ -134,7 +134,7 @@ const Transfer = () => {
 
           <div className={styles.switch}>
             <div className={styles.separator} />
-            <button className={styles.switchButton} aria-label="Switch Network" onClick={handleNetworkSwicth}>
+            <button className={styles.switchButton} aria-label="Switch Network" onClick={handleNetworkInputSwicth}>
               <Arrow className={styles.arrowSvg} />
               <Switch />
             </button>

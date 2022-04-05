@@ -48,7 +48,7 @@ const ErcWalletModal = ({ chainType }: Props) => {
                   connect(chainType, dispatch, 'metamask', undefined, isNetworkSwitchAllowed)
                   handleModalExpanded(false)
                 } catch (error) {
-                  console.log(error)
+                  console.error(error)
                 }
               }}
               size="medium"
@@ -64,7 +64,7 @@ const ErcWalletModal = ({ chainType }: Props) => {
                 connect(chainType, dispatch, 'walletConnect')
                 handleModalExpanded(false)
               } catch (error) {
-                console.log(error)
+                console.error(error)
               }
             }}
             size="medium"

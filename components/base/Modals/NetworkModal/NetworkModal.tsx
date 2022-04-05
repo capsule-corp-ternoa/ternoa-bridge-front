@@ -23,12 +23,22 @@ const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalPr
     try {
       if (user.ercWallet?.connectedWith === 'metamask') {
         switch (network) {
-          case 'erc20':
-            switchETHNetwork()
+          case 'erc20': {
+            try {
+              await switchETHNetwork()
+            } catch (error) {
+              console.error(error)
+            }
             break
-          case 'bep20':
-            switchBSCNetwork()
+          }
+          case 'bep20': {
+            try {
+              await switchBSCNetwork()
+            } catch (error) {
+              console.error(error)
+            }
             break
+          }
           default:
             break
         }

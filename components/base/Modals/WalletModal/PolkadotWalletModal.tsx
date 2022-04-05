@@ -61,8 +61,12 @@ const PolkadotWalletModal = () => {
                 className={styles.account}
                 key={address}
                 onClick={() => {
-                  connect('ternoa', dispatch, undefined, accounts[idx])
-                  dispatch(actions.setIsPolkadotWalletModalOpen(false))
+                  try {
+                    connect('ternoa', dispatch, undefined, accounts[idx])
+                    dispatch(actions.setIsPolkadotWalletModalOpen(false))
+                  } catch (error) {
+                    console.log(error)
+                  }
                 }}
               >
                 <div className={styles.accountData}>
