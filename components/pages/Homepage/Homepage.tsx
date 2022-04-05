@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks'
 import { ErcWalletModal, PolkadotWalletModal } from 'components/base/Modals/WalletModal'
 import Transfer from 'components/base/Transfer'
 import { reconnect } from 'helpers/bridge'
+import { switchETHNetwork } from 'helpers/metamask'
 import { get, USER_ERC_CONNECTED_WITH } from 'helpers/storage'
 import { handleNetworkPair } from 'utils/networks'
 
@@ -30,8 +31,12 @@ const Homepage = () => {
 
   useEffect(() => {
     if (isMetamaskAutoReconnected && user.ercWallet?.connectedWith === 'metamask') {
-      const chainType = user.ercWallet.chainType
-      if (chainType === 'bep20') handleNetworkPair(from, to, 'from', chainType, dispatch)
+      const metamaskChainType = user.ercWallet.chainType
+      if (metamaskChainType === 'bep20') handleNetworkPair(from, to, 'from', metamaskChainType, dispatch)
+      else {
+        if (metamaskChainType !== 'erc20') switchETHNetwork()
+        handleNetworkPair('erc20', to, 'from', 'erc20', dispatch)
+      }
       setIsMetamaskAutoReconnected(false)
     }
   }, [dispatch, from, isMetamaskAutoReconnected, to, user.ercWallet])

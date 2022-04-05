@@ -4,7 +4,7 @@ import { ChainType } from 'interfaces'
 import { actions as appActions } from 'redux/app/actions'
 
 const ALLOWED_TRANSFERS = {
-  erc20: ['bep20', 'ternoa'],
+  erc20: ['ternoa', 'bep20'],
   bep20: ['erc20'],
   ternoa: ['erc20'],
   other: undefined,
