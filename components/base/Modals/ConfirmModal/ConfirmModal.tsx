@@ -22,6 +22,7 @@ export interface ConfirmModalProps {
 
 const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
+  const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
   const [isFirstRender, setIsFirstRender] = useState(true)
@@ -33,13 +34,17 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
   const toAddress = getAddress(to, user)
 
   const handleApprove = async () => {
-    console.log('Approval start')
+    setIsApprovalLoading(true)
     try {
       const tx = await approve(from, to, user)
       const receipt = await tx.wait()
-      console.log('receipt', receipt)
+      if (receipt && receipt.status === 1) {
+        setIsApproved(true)
+      }
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsApprovalLoading(false)
     }
   }
 
@@ -150,7 +155,8 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
         <Button
           className={styles.button}
           color="primary500"
-          disabled={!isTermsRadioChecked}
+          disabled={isApprovalLoading || !isTermsRadioChecked}
+          isLoading={isApprovalLoading}
           onClick={isApproved ? handleContinue : handleApprove}
           size="medium"
           text={isApproved ? 'Continue' : 'Approve'}
