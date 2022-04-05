@@ -75,6 +75,14 @@
       border-color: $color-contrast;
     }
 
+    &:disabled {
+      cursor: auto;
+
+      &:hover {
+        border-color: $color-neutral900;
+      }
+    }
+
     @include xl {
       font-size: 1.4rem;
     }

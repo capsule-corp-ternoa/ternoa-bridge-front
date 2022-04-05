@@ -34,7 +34,7 @@ const Transfer = () => {
   const { user } = useAppSelector((state) => state.user)
 
   const { fromNetwork: from, toNetwork: to } = app
-  const balance = getBalance(from, user)
+  const balance = isConnected(from, user) ? getBalance(from, user) : undefined
 
   const handleNetworkChange = (rawOrigin: 'from' | 'to' | undefined, network: ChainType) => {
     setAmount(0)
@@ -167,13 +167,16 @@ const Transfer = () => {
             endComponent={
               <button
                 className={styles.maxButton}
-                onClick={() => balance && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)}
+                disabled={balance === undefined}
+                onClick={() =>
+                  balance !== undefined && balance >= 0 && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)
+                }
               >
                 Max
               </button>
             }
             error={handleInputError()}
-            insight={balance !== undefined ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
+            insight={balance !== undefined && balance >= 0 ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
             isError={amount !== 0 && (amount < MIN_AMOUNT || amount > MAX_AMOUNT || amount > Number(balance))}
             label="Amount"
             max={MAX_AMOUNT}
