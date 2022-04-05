@@ -32,12 +32,15 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
 
   const toAddress = getAddress(to, user)
 
-  //TODO
   const handleApprove = async () => {
-    console.log('Approve')
-    const tx = await approve(from, to, user)
-    const receipt = await tx.wait()
-    console.log(receipt)
+    console.log('Approval start')
+    try {
+      const tx = await approve(from, to, user)
+      const receipt = await tx.wait()
+      console.log('receipt', receipt)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   useEffect(() => {
