@@ -1,23 +1,40 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'redux/hooks'
 
 import { ErcWalletModal, PolkadotWalletModal } from 'components/base/Modals/WalletModal'
 import Transfer from 'components/base/Transfer'
 import { reconnect } from 'helpers/bridge'
+import { get, USER_ERC_CONNECTED_WITH } from 'helpers/storage'
+import { handleNetworkPair } from 'utils/networks'
 
 import styles from './Homepage.module.scss'
 
 const Homepage = () => {
+  const [isMetamaskAutoReconnected, setIsMetamaskAutoReconnected] = useState(false)
   const dispatch = useAppDispatch()
   const { app } = useAppSelector((state) => state.app)
+  const { user } = useAppSelector((state) => state.user)
 
-  const chainType = app.chainTypeForConnection
+  const { fromNetwork: from, toNetwork: to, chainTypeForConnection: chainType } = app
+
   const isErcWalletModalOpen = app.isErcWalletModalOpen && (chainType === 'erc20' || chainType === 'bep20')
   const isPolkadotWalletModalOpen = app.isPolkadotWalletModalOpen && chainType === 'ternoa'
 
   useEffect(() => {
     reconnect(dispatch)
+    const ercConnectedWith = get(USER_ERC_CONNECTED_WITH)
+    if (ercConnectedWith === 'metamask') {
+      setIsMetamaskAutoReconnected(true)
+    }
   }, [dispatch])
+
+  useEffect(() => {
+    if (isMetamaskAutoReconnected && user.ercWallet?.connectedWith === 'metamask') {
+      const chainType = user.ercWallet.chainType
+      if (chainType === 'bep20') handleNetworkPair(from, to, 'from', chainType, dispatch)
+      setIsMetamaskAutoReconnected(false)
+    }
+  }, [dispatch, from, isMetamaskAutoReconnected, to, user.ercWallet])
 
   useEffect(() => {
     const body = document.querySelector('body')

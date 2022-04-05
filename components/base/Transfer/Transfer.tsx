@@ -15,16 +15,10 @@ import { canProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer }
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
 import { ChainType } from 'interfaces'
 import { actions as appActions } from 'redux/app/actions'
+import { handleNetworkPair } from 'utils/networks'
 import { formatPrice } from 'utils/strings'
 
 import styles from './Transfer.module.scss'
-
-const ALLOWED_TRANSFERS = {
-  erc20: ['bep20', 'ternoa'],
-  bep20: ['erc20'],
-  ternoa: ['erc20'],
-  other: undefined,
-}
 
 const Transfer = () => {
   const [amount, setAmount] = useState<number>(0)
@@ -42,32 +36,9 @@ const Transfer = () => {
   const { fromNetwork: from, toNetwork: to } = app
   const balance = getBalance(from, user)
 
-  const handleNetwork = (rawOrigin: 'from' | 'to' | undefined, network: ChainType) => {
+  const handleNetworkChange = (rawOrigin: 'from' | 'to' | undefined, network: ChainType) => {
     setAmount(0)
-    const newAutoAssignedNetwork: ChainType | undefined =
-      network === 'other' ? undefined : (ALLOWED_TRANSFERS[network][0] as ChainType)
-
-    switch (rawOrigin) {
-      case 'from': {
-        dispatch(appActions.setFromNetwork(network))
-        if ((to === network || !ALLOWED_TRANSFERS[to]?.some((item) => item === network)) && newAutoAssignedNetwork) {
-          dispatch(appActions.setToNetwork(newAutoAssignedNetwork))
-        }
-        break
-      }
-      case 'to': {
-        dispatch(appActions.setToNetwork(network))
-        if (
-          (from === network || !ALLOWED_TRANSFERS[from]?.some((item) => item === network)) &&
-          newAutoAssignedNetwork
-        ) {
-          dispatch(appActions.setFromNetwork(newAutoAssignedNetwork))
-        }
-        break
-      }
-      default:
-        break
-    }
+    handleNetworkPair(from, to, rawOrigin, network, dispatch)
   }
 
   const handleNetworkSwicth = async () => {
@@ -244,7 +215,7 @@ const Transfer = () => {
         />
       )}
       {isNetworkModalOpen && (
-        <NetworkModal origin={origin} handleNetwork={handleNetwork} setExpanded={setIsNetworkModalOpen} />
+        <NetworkModal origin={origin} handleNetworkPair={handleNetworkChange} setExpanded={setIsNetworkModalOpen} />
       )}
     </>
   )

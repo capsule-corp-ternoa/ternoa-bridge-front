@@ -10,12 +10,12 @@ import { useAppSelector } from 'redux/hooks'
 import styles from './NetworkModal.module.scss'
 
 export interface NetworkModalProps {
-  handleNetwork: (origin: 'from' | 'to' | undefined, network: ChainType) => void
+  handleNetworkPair: (origin: 'from' | 'to' | undefined, network: ChainType) => void
   origin: 'from' | 'to' | undefined
   setExpanded: (b: boolean) => void
 }
 
-const NetworkModal = ({ origin, handleNetwork, setExpanded }: NetworkModalProps) => {
+const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalProps) => {
   const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
@@ -55,7 +55,7 @@ const NetworkModal = ({ origin, handleNetwork, setExpanded }: NetworkModalProps)
               ) {
                 handleNetworkSwitch('erc20')
               }
-              handleNetwork(origin, 'erc20')
+              handleNetworkPair(origin, 'erc20')
               setExpanded(false)
             }}
             variant="input"
@@ -67,7 +67,7 @@ const NetworkModal = ({ origin, handleNetwork, setExpanded }: NetworkModalProps)
             noNetworkData
             onClick={() => {
               if (user.ercWallet?.connectedWith === 'metamask' && origin === 'from') handleNetworkSwitch('bep20')
-              handleNetwork(origin, 'bep20')
+              handleNetworkPair(origin, 'bep20')
               setExpanded(false)
             }}
             variant="input"
@@ -81,7 +81,7 @@ const NetworkModal = ({ origin, handleNetwork, setExpanded }: NetworkModalProps)
               if (user.ercWallet?.connectedWith === 'metamask') {
                 handleNetworkSwitch('erc20')
               }
-              handleNetwork(origin, 'ternoa')
+              handleNetworkPair(origin, 'ternoa')
               setExpanded(false)
             }}
             variant="input"
