@@ -11,7 +11,7 @@ import NetworkModal from 'components/base/Modals/NetworkModal'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Input from 'components/ui/Input'
-import { canProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
+import { checkProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
 import { ChainType } from 'interfaces'
 import { actions as appActions } from 'redux/app/actions'
@@ -22,6 +22,8 @@ import styles from './Transfer.module.scss'
 
 const Transfer = () => {
   const [amount, setAmount] = useState<number>(0)
+  const [amountError, setAmountError] = useState<string | undefined>(undefined)
+  const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
   const [response, setResponse] = useState<{ message: string; txLink: string; isError: boolean }>()
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
@@ -71,18 +73,6 @@ const Transfer = () => {
     setAmount(Number(e.target.value))
   }
 
-  const handleInputError = () => {
-    if (amount !== 0 && amount > Number(balance)) {
-      return `Your funds are insufficient`
-    } else if (amount !== 0 && amount < MIN_AMOUNT) {
-      return `The CAPS amount must be greater than ${MIN_AMOUNT}`
-    } else if (amount !== 0 && amount > MAX_AMOUNT) {
-      return `The CAPS amount must be less than ${MAX_AMOUNT}`
-    }
-
-    return ''
-  }
-
   const handleConfirmTransaction = async () => {
     setIsConfirmModalOpen(false)
     setIsLoadingModalOpen(true)
@@ -102,6 +92,27 @@ const Transfer = () => {
       shouldUpdate = false
     }
   }, [response])
+
+  useEffect(() => {
+    try {
+      checkProceed(from, to, amount, user)
+      setTransferButtonLabel('Continue')
+      setAmountError(undefined)
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.cause?.message === 'Incorrect amount') {
+          setAmountError(error.message)
+          setTransferButtonLabel('Continue')
+        } else if (error.cause?.message === 'Incorrect network') {
+          setTransferButtonLabel(error.message)
+        } else {
+          console.error(error)
+        }
+      } else {
+        console.error(error)
+      }
+    }
+  }, [amount, from, to, user])
 
   useEffect(() => {
     const body = document.querySelector('body')
@@ -175,9 +186,9 @@ const Transfer = () => {
                 Max
               </button>
             }
-            error={handleInputError()}
+            error={amount !== 0 ? amountError : undefined}
             insight={balance !== undefined && balance >= 0 ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
-            isError={amount !== 0 && (amount < MIN_AMOUNT || amount > MAX_AMOUNT || amount > Number(balance))}
+            isError={amount !== 0 && amountError !== undefined}
             label="Amount"
             max={MAX_AMOUNT}
             min={MIN_AMOUNT}
@@ -191,10 +202,10 @@ const Transfer = () => {
           <Button
             className={styles.button}
             color="primary500"
-            disabled={!canProceed(from, to, amount, user)}
+            disabled={transferButtonLabel !== 'Continue' || amountError !== undefined}
             onClick={() => setIsConfirmModalOpen(true)}
             size="medium"
-            text="Continue"
+            text={transferButtonLabel}
             variant="rectangle"
           />
         </div>
