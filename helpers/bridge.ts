@@ -147,7 +147,7 @@ export const getNetworkFees = async (
     case 'erc20':
       if (!user.ercWallet) throw new Error('Erc wallet not connected')
       if (to === 'bep20') return { value: await getTransferBscEthFees(user.ercWallet.signer, amount), unit: 'ETH' }
-      if (to === 'ternoa') return { value: await getTransferEthTernoaFees(user.ercWallet.signer, amount), unit: 'ETH' }
+      if (to === 'ternoa') return { value: await getTransferEthTernoaFees(user, amount), unit: 'ETH' }
       throw new Error('Invalid combination')
     default:
       throw new Error('Chaintype not recognized')
@@ -191,7 +191,7 @@ export const transfer = async (
         }
         if (to === 'ternoa') {
           if (!user.ercWallet) throw new Error('Signer not found')
-          const tx: any = await transferEthTernoa(user.ercWallet?.signer, amount)
+          const tx: any = await transferEthTernoa(user, amount)
           const receipt = await tx.wait()
           setResponse({
             message: 'Your balance will be availble in few moment (may take up to 1 day)',
