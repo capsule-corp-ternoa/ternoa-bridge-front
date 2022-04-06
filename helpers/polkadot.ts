@@ -97,6 +97,7 @@ export const ss58ToHex = (address: string) => {
   return u8aToHex(decodeAddress(address))
 }
 
+//TODO
 export const getBridgeFees = () => {
   return BRIDGE_FEES
 }
