@@ -69,11 +69,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
       } catch (error) {
         console.error(error)
         if (shouldUpdate) {
-          if (error instanceof Error) {
-            setFees(error.message)
-          } else {
-            setFees(error as string)
-          }
+          setFees('Unable to estimate fees')
         }
       }
     }
