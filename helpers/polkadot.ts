@@ -102,7 +102,6 @@ export const getBridgeFees = () => {
   return BRIDGE_FEES
 }
 
-//TODO
 export const getTransferFees = async (user: User, amount: number) => {
   if (!user) throw new Error('User not found')
   if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
@@ -113,7 +112,6 @@ export const getTransferFees = async (user: User, amount: number) => {
   return formatBalance(info.partialFee.toString(), 6).toString()
 }
 
-//TODO
 export const transfer = async (
   user: User,
   amount: number,

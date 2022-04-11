@@ -14,6 +14,7 @@ export const NUMBER_OF_DECIMALS = 18
 export const ETH_CHAIN_ID = 5 // TEST VALUE
 export const BSC_CHAIN_ID = 56
 
+//TODO
 const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
 const TERNOA_ETH_BRIDGE_CONTRACT = '0x84B04d5D1EA64787c662cb825a41Fc2a46fbAE8b' //TEST VALUE GOERLI
 const TERNOA_ETH_BRIDGE_HANDLER_CONTRACT = '0xe33e8F25174EA5505dfaDd94bA106dF6052cC6D4' //TEST VALUE GOERLI
@@ -136,7 +137,6 @@ export const transferBscEth = async (signer: Signer, amount: number) => {
 
 /* ETH -> TERNOA */
 
-//TODO
 const formatData = (address: string, amount: number) => {
   const bnAmount = ethers.BigNumber.from(formatInput(amount).toString())
   const convertedAddress = ss58ToHex(address)
@@ -158,7 +158,6 @@ const getTransferEthTernoaParams = async (user: User, amount: number) => {
   return [destChainId, ressourceId, data]
 }
 
-//TODO
 export const getTransferEthTernoaFees = async (user: User, amount: number): Promise<string> => {
   if (!user) throw new Error('User not found')
   if (!user.ercWallet?.signer) throw new Error('Signer not found')
@@ -168,7 +167,6 @@ export const getTransferEthTernoaFees = async (user: User, amount: number): Prom
   return fees
 }
 
-//TODO
 export const transferEthTernoa = async (user: User, amount: number) => {
   if (!user) throw new Error('User not found')
   if (!user.ercWallet?.signer) throw new Error('Signer not found')
