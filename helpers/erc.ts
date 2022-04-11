@@ -16,6 +16,7 @@ export const BSC_CHAIN_ID = 56
 
 const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
 const TERNOA_ETH_BRIDGE_CONTRACT = '0x84B04d5D1EA64787c662cb825a41Fc2a46fbAE8b' //TEST VALUE GOERLI
+const TERNOA_ETH_BRIDGE_HANDLER_CONTRACT = '0xe33e8F25174EA5505dfaDd94bA106dF6052cC6D4' //TEST VALUE GOERLI
 
 //TODO
 // export const CAPS_TOKEN_ADDRESS_ETH = '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2' // REAL VALUE
@@ -90,14 +91,14 @@ export const getBalance = async (signer: Signer) => {
 export const isApproved = async (signer: Signer) => {
   const contract = await getTokenContract(signer)
   const owner = await signer.getAddress()
-  const spender = TERNOA_ETH_BRIDGE_CONTRACT
+  const spender = TERNOA_ETH_BRIDGE_HANDLER_CONTRACT
   const amount = await contract.allowance(owner, spender)
   return amount > 0
 }
 
 export const approve = async (signer: Signer) => {
   const contract = await getTokenContract(signer)
-  const spender = TERNOA_ETH_BRIDGE_CONTRACT
+  const spender = TERNOA_ETH_BRIDGE_HANDLER_CONTRACT
   return contract.approve(spender, MaxUint256)
 }
 
