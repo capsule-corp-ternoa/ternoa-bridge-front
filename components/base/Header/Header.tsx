@@ -13,6 +13,13 @@ const Header = () => (
         <div className={styles.logoTitle}>Ternoa Bridge</div>
       </a>
     </Link>
+    <div className={styles.networkPill}>
+      <div className={styles.connectIndicator}>
+        <div className={styles.outterIndicator} />
+        <div className={styles.innerIndicator} />
+      </div>
+      <small className={styles.networkEnv}>Mainnet</small>
+    </div>
   </nav>
 )
 
