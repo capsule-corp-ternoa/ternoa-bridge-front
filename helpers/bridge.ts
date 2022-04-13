@@ -98,7 +98,7 @@ export const getBalance = (from: ChainType, user: User) => {
 export const checkProceed = async (from: ChainType, to: ChainType, amount: number, user: User) => {
   const key = `${from}-${to}`
   const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
-  const bridgeFee = `${from}-${to}` === 'ternoa-erc20' ? (await getBridgeFees()).toNumber() : 0
+  const bridgeFee = `${from}-${to}` === 'ternoa-erc20' ? await getBridgeFees() : 0
   if (!validDirections.includes(key))
     throw new Error('Invalid combination', {
       cause: new Error('Incorrect network'),

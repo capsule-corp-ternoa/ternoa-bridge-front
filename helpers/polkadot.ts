@@ -99,7 +99,7 @@ export const ss58ToHex = (address: string) => {
 export const getBridgeFees = async () => {
   const api = await getApi()
   const fee = await api.query.erc20Bridge.bridgeFee()
-  return new BN(fee.toString())
+  return formatBalance(new BN(fee.toString()).toString())
 }
 
 export const getTransferFees = async (user: User, amount: number) => {

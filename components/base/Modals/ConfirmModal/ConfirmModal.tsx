@@ -91,7 +91,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
     const setBridgeFees = async () => {
       try {
         const fee = await getBridgeFees()
-        if (shouldUpdate) setBridgeFee(fee.toNumber())
+        if (shouldUpdate) setBridgeFee(fee)
       } catch (err) {
         console.error(err)
       }
