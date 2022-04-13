@@ -95,9 +95,10 @@ export const getBalance = (from: ChainType, user: User) => {
   return from === 'ternoa' ? user.polkadotWallet?.capsBalance : user.ercWallet?.capsBalance
 }
 
-export const checkProceed = (from: ChainType, to: ChainType, amount: number, user: User) => {
+export const checkProceed = async (from: ChainType, to: ChainType, amount: number, user: User) => {
   const key = `${from}-${to}`
   const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
+  const bridgeFee = `${from}-${to}` === 'ternoa-erc20' ? (await getBridgeFees()).toNumber() : 0
   if (!validDirections.includes(key))
     throw new Error('Invalid combination', {
       cause: new Error('Incorrect network'),
@@ -125,8 +126,8 @@ export const checkProceed = (from: ChainType, to: ChainType, amount: number, use
     throw new Error('Insufficient balance', {
       cause: new Error('Incorrect amount'),
     })
-  if (key === 'ternoa-erc20' && balance < amount + getBridgeFees())
-    throw new Error(`Insufficient funds to pay ${formatPrice(getBridgeFees(), {})} CAPS of bridge fee`, {
+  if (key === 'ternoa-erc20' && balance < amount + bridgeFee)
+    throw new Error(`Insufficient funds to pay ${formatPrice(bridgeFee, {})} CAPS of bridge fee`, {
       cause: new Error('Incorrect amount'),
     })
 }

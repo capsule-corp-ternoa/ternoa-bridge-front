@@ -26,6 +26,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
   const [isFirstRender, setIsFirstRender] = useState(true)
+  const [bridgeFee, setBridgeFee] = useState(0)
   const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
@@ -87,6 +88,22 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
 
   useEffect(() => {
     let shouldUpdate = true
+    const setBridgeFees = async () => {
+      try {
+        const fee = await getBridgeFees()
+        if (shouldUpdate) setBridgeFee(fee.toNumber())
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    setBridgeFees()
+    return () => {
+      shouldUpdate = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let shouldUpdate = true
     const loadApprove = async () => {
       const value = await isApprovedHelper(from, to, user)
       if (shouldUpdate) setIsApproved(value)
@@ -138,7 +155,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
           {from === 'ternoa' && to === 'erc20' && (
             <div className={styles.resumeLine}>
               <span className={styles.resumeItem}>Bridge Fee*</span>
-              <span className={styles.resumeItem}>{`${getBridgeFees()} CAPS`}</span>
+              <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
             </div>
           )}
           <div className={styles.resumeLine}>

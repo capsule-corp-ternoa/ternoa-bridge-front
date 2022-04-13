@@ -14,7 +14,6 @@ let api: ApiPromise
 
 const CHAIN_ENDPOINT = process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT || 'wss://dev.chaos.ternoa.com'
 const ETH_DEST_ID = 0
-const BRIDGE_FEES = 50
 
 const initializeApi = async () => {
   await cryptoWaitReady()
@@ -97,15 +96,17 @@ export const ss58ToHex = (address: string) => {
   return u8aToHex(decodeAddress(address))
 }
 
-//TODO
-export const getBridgeFees = () => {
-  return BRIDGE_FEES
+export const getBridgeFees = async () => {
+  const api = await getApi()
+  const fee = await api.query.erc20Bridge.bridgeFee()
+  return new BN(fee.toString())
 }
 
 export const getTransferFees = async (user: User, amount: number) => {
   if (!user) throw new Error('User not found')
   if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
   if (!user.ercWallet) throw new Error('User ERC account not found')
+  const api = await getApi()
   const formattedAmount = formatInput(amount)
   const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   const info = await tx.paymentInfo(user.polkadotWallet.address)
