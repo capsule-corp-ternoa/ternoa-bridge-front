@@ -1,12 +1,12 @@
 import { ethers, Contract, Signer } from 'ethers'
 import { MaxUint256 } from '@ethersproject/constants'
-import { /*BRIDGE_CONTRACT_ABI,*/ CAPS_CONTRACT_ABI } from './abis'
-import { ERCProvider, ErcWallet } from '../interfaces'
+import { BRIDGE_CONTRACT_ABI, CAPS_CONTRACT_ABI } from './abis'
+import { ERCProvider, ErcWallet, User } from '../interfaces'
 import { AnyAction } from 'redux'
 import { clear, get, USER_ERC_CONNECTED_WITH } from './storage'
 import { connect as connectMetamask } from './metamask'
 import { connect as connectWalletConnect } from './walletconnect'
-// import { formatInput } from './polkadot'
+import { formatInput, getNativeTokenId, ss58ToHex } from './polkadot'
 
 export const NUMBER_OF_DECIMALS = 18
 
@@ -14,8 +14,10 @@ export const NUMBER_OF_DECIMALS = 18
 export const ETH_CHAIN_ID = 5 // TEST VALUE
 export const BSC_CHAIN_ID = 56
 
+//TODO
 const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
 const TERNOA_ETH_BRIDGE_CONTRACT = '0x84B04d5D1EA64787c662cb825a41Fc2a46fbAE8b' //TEST VALUE GOERLI
+const TERNOA_ETH_BRIDGE_HANDLER_CONTRACT = '0xe33e8F25174EA5505dfaDd94bA106dF6052cC6D4' //TEST VALUE GOERLI
 
 //TODO
 // export const CAPS_TOKEN_ADDRESS_ETH = '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2' // REAL VALUE
@@ -27,6 +29,8 @@ const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
 export const PROVIDER_BASE_URL_ETH = `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
 export const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
 
+const TERNOA_DEST_ID = 1
+
 const getTokenContract = async (signer: Signer) => {
   const chainId = await signer.getChainId()
   const tokenContractAddress = chainId === ETH_CHAIN_ID ? CAPS_TOKEN_ADDRESS_ETH : CAPS_TOKEN_ADDRESS_BSC
@@ -34,10 +38,10 @@ const getTokenContract = async (signer: Signer) => {
   return contract
 }
 
-// const getBridgeContract = async (signer: Signer) => {
-//   const contract = new Contract(TERNOA_ETH_BRIDGE_CONTRACT, BRIDGE_CONTRACT_ABI, signer)
-//   return contract
-// }
+const getBridgeContract = async (signer: Signer) => {
+  const contract = new Contract(TERNOA_ETH_BRIDGE_CONTRACT, BRIDGE_CONTRACT_ABI, signer)
+  return contract
+}
 
 const getDefaultProvider = async (chainId: number) => {
   const providerUrl = chainId === ETH_CHAIN_ID ? PROVIDER_BASE_URL_ETH : PROVIDER_BASE_URL_BSC
@@ -88,21 +92,25 @@ export const getBalance = async (signer: Signer) => {
 export const isApproved = async (signer: Signer) => {
   const contract = await getTokenContract(signer)
   const owner = await signer.getAddress()
-  const spender = TERNOA_ETH_BRIDGE_CONTRACT
+  const spender = TERNOA_ETH_BRIDGE_HANDLER_CONTRACT
   const amount = await contract.allowance(owner, spender)
   return amount > 0
 }
 
 export const approve = async (signer: Signer) => {
   const contract = await getTokenContract(signer)
-  const spender = TERNOA_ETH_BRIDGE_CONTRACT
+  const spender = TERNOA_ETH_BRIDGE_HANDLER_CONTRACT
   return contract.approve(spender, MaxUint256)
 }
 
-export const getEstimateFees = async (signer: Signer, functionName: string, args: any[] = []) => {
+export const getEstimateFees = async (
+  contract: ethers.Contract,
+  signer: Signer,
+  functionName: string,
+  args: any[] = []
+) => {
   const chainId = await signer.getChainId()
   if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) throw new Error('Invalid chain id for gas estimation')
-  const contract = await getTokenContract(signer)
   const gasLimit = await contract.estimateGas[functionName](...args)
   const defaultProvider = await getDefaultProvider(chainId)
   const gasPrice = await defaultProvider.getGasPrice()
@@ -110,9 +118,12 @@ export const getEstimateFees = async (signer: Signer, functionName: string, args
   return fees
 }
 
+/* ETH <-> BSC */
+
 export const getTransferBscEthFees = async (signer: Signer, amount: number) => {
   const numberOfTokens = ethers.utils.parseUnits(amount.toString(), NUMBER_OF_DECIMALS)
-  const fees = await getEstimateFees(signer, 'transfer', [BSC_ETH_BRIDGE_ADDRESS, numberOfTokens])
+  const contract = await getTokenContract(signer)
+  const fees = await getEstimateFees(contract, signer, 'transfer', [BSC_ETH_BRIDGE_ADDRESS, numberOfTokens])
   return fees
 }
 
@@ -124,23 +135,42 @@ export const transferBscEth = async (signer: Signer, amount: number) => {
   return contract.transfer(BSC_ETH_BRIDGE_ADDRESS, numberOfTokens)
 }
 
-//TODO
-export const getTransferEthTernoaFees = async (signer: Signer, amount: number): Promise<string> => {
-  console.log('get transfer Fee', signer, amount)
-  return '0'
+/* ETH -> TERNOA */
+
+const formatData = (address: string, amount: number) => {
+  const bnAmount = ethers.BigNumber.from(formatInput(amount).toString())
+  const convertedAddress = ss58ToHex(address)
+  return (
+    '0x' +
+    ethers.utils.hexZeroPad(bnAmount.toHexString(), 32).substring(2) +
+    ethers.utils.hexZeroPad(ethers.utils.hexlify((convertedAddress.length - 2) / 2), 32).substring(2) +
+    convertedAddress.substring(2)
+  )
 }
 
-//TODO
-export const transferEthTernoa = async (signer: Signer, amount: number) => {
-  console.log('transfer', signer, amount)
-  return '0'
+const getTransferEthTernoaParams = async (user: User, amount: number) => {
+  if (!user) throw new Error('User not found')
+  if (!user.ercWallet?.signer) throw new Error('Signer not found')
+  if (!user.polkadotWallet?.address) throw new Error('Polkadot address not found')
+  const destChainId = TERNOA_DEST_ID
+  const ressourceId = await getNativeTokenId()
+  const data = formatData(user.polkadotWallet.address, amount)
+  return [destChainId, ressourceId, data]
 }
 
-//TODO
-// const formatData = (address: string, amount: number) => {
-//   const bnAmount = formatInput(amount).toJSON()
-//   return '0x' +
-//     ethers.utils.hexZeroPad(bnAmount, 32).substring(2) +
-//     ethers.utils.hexZeroPad(ethers.utils.hexlify((address.length - 2) / 2), 32).substring(2) +
-//     address.substring(2)
-// }
+export const getTransferEthTernoaFees = async (user: User, amount: number): Promise<string> => {
+  if (!user) throw new Error('User not found')
+  if (!user.ercWallet?.signer) throw new Error('Signer not found')
+  const [destChainId, ressourceId, data] = await getTransferEthTernoaParams(user, amount)
+  const contract = await getBridgeContract(user.ercWallet.signer)
+  const fees = await getEstimateFees(contract, user.ercWallet.signer, 'deposit', [destChainId, ressourceId, data])
+  return fees
+}
+
+export const transferEthTernoa = async (user: User, amount: number) => {
+  if (!user) throw new Error('User not found')
+  if (!user.ercWallet?.signer) throw new Error('Signer not found')
+  const [destChainId, ressourceId, data] = await getTransferEthTernoaParams(user, amount)
+  const contract = await getBridgeContract(user.ercWallet.signer)
+  return contract.deposit(destChainId, ressourceId, data)
+}

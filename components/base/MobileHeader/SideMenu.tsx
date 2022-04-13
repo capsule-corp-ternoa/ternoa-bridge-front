@@ -7,7 +7,7 @@ import Twitter from 'assets/svgComponents/SocialMedias/Twitter'
 import Instagram from 'assets/svgComponents/SocialMedias/Instagram'
 import Close from 'assets/svgComponents/Close'
 import TernoaIcon from 'assets/svgComponents/TernoaIcon'
-import Button, { AnchorButton } from 'components/ui/Button'
+import { AnchorButton } from 'components/ui/Button'
 
 import navStyles from './MobileHeader.module.scss'
 import styles from './SideMenu.module.scss'
@@ -66,14 +66,6 @@ const SideMenu = ({ isExpanded, setIsExpanded }: Props) => (
         </div>
       </div>
       <div className="wrapper">
-        <Button
-          className={styles.claimButton}
-          color="gradient700"
-          onClick={() => console.log('Check claim')}
-          size="medium"
-          variant="rectangle"
-          text="Check Claim"
-        />
         <div className={styles.footer}>
           <div className={styles.socials}>
             <a href="https://discord.gg/cNZTGtGJNR" target="_blank" rel="noopener noreferrer" title="Ternoa Discord">

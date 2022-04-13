@@ -1,5 +1,7 @@
 import { AnyAction } from 'redux'
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
+
+import { formatPrice } from 'utils/strings'
 import { ChainType, User } from '../interfaces'
 import { connect as connectMetamask, switchBSCNetwork, switchETHNetwork } from './metamask'
 import { connect as connectWalletConnect } from './walletconnect'
@@ -7,6 +9,7 @@ import {
   connect as connectPolkadot,
   reconnect as reconnectPolkadot,
   getTransferFees as getTransferFeesPolkadot,
+  getBridgeFees,
   transfer as transferTernoaEth,
 } from './polkadot'
 import {
@@ -92,23 +95,40 @@ export const getBalance = (from: ChainType, user: User) => {
   return from === 'ternoa' ? user.polkadotWallet?.capsBalance : user.ercWallet?.capsBalance
 }
 
-export const canProceed = (from: ChainType, to: ChainType, amount: number, user: User): boolean => {
-  try {
-    const key = `${from}-${to}`
-    const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
-    if (!validDirections.includes(key)) throw new Error('Invalid combination')
-    if (!isConnected(from, user)) throw new Error('From network is not connected')
-    if (!(key === 'erc20-bep20' || 'bep20-erc20')) {
-      if (!isConnected(to, user)) throw new Error('To network is not connected')
-    }
-    if (amount < MIN_AMOUNT) throw new Error('amount is below minimum amount to swap')
-    if (amount > MAX_AMOUNT) throw new Error('amount is above maximum amount to swap')
-    const balance = getBalance(from, user)
-    if (!balance || balance < amount) throw new Error('Insufficient balance')
-    return true
-  } catch (err) {
-    return false
+export const checkProceed = (from: ChainType, to: ChainType, amount: number, user: User) => {
+  const key = `${from}-${to}`
+  const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
+  if (!validDirections.includes(key))
+    throw new Error('Invalid combination', {
+      cause: new Error('Incorrect network'),
+    })
+  if (!isConnected(from, user))
+    throw new Error('From network is not connected', {
+      cause: new Error('Incorrect network'),
+    })
+  if (!(key === 'erc20-bep20' || key === 'bep20-erc20')) {
+    if (!isConnected(to, user))
+      throw new Error('To network is not connected', {
+        cause: new Error('Incorrect network'),
+      })
   }
+  if (amount < MIN_AMOUNT)
+    throw new Error(`Amount must be greater than ${MIN_AMOUNT} CAPS`, {
+      cause: new Error('Incorrect amount'),
+    })
+  if (amount > MAX_AMOUNT)
+    throw new Error(`Amount must be less than ${MAX_AMOUNT} CAPS`, {
+      cause: new Error('Incorrect amount'),
+    })
+  const balance = getBalance(from, user)
+  if (!balance || balance < amount)
+    throw new Error('Insufficient balance', {
+      cause: new Error('Incorrect amount'),
+    })
+  if (key === 'ternoa-erc20' && balance < amount + getBridgeFees())
+    throw new Error(`Insufficient funds to pay ${formatPrice(getBridgeFees(), {})} CAPS of bridge fee`, {
+      cause: new Error('Incorrect amount'),
+    })
 }
 
 export const isApproved = (from: ChainType, to: ChainType, user: User) => {
@@ -147,7 +167,7 @@ export const getNetworkFees = async (
     case 'erc20':
       if (!user.ercWallet) throw new Error('Erc wallet not connected')
       if (to === 'bep20') return { value: await getTransferBscEthFees(user.ercWallet.signer, amount), unit: 'ETH' }
-      if (to === 'ternoa') return { value: await getTransferEthTernoaFees(user.ercWallet.signer, amount), unit: 'ETH' }
+      if (to === 'ternoa') return { value: await getTransferEthTernoaFees(user, amount), unit: 'ETH' }
       throw new Error('Invalid combination')
     default:
       throw new Error('Chaintype not recognized')
@@ -191,7 +211,7 @@ export const transfer = async (
         }
         if (to === 'ternoa') {
           if (!user.ercWallet) throw new Error('Signer not found')
-          const tx: any = await transferEthTernoa(user.ercWallet?.signer, amount)
+          const tx: any = await transferEthTernoa(user, amount)
           const receipt = await tx.wait()
           setResponse({
             message: 'Your balance will be availble in few moment (may take up to 1 day)',

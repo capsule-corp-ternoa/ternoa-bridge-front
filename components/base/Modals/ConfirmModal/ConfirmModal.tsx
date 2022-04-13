@@ -39,7 +39,10 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
       const tx = await approve(from, to, user)
       const receipt = await tx.wait()
       if (receipt && receipt.status === 1) {
-        setIsApproved(true)
+        //Set timeout in case fees estimation triggers too quickly
+        setTimeout(() => {
+          setIsApproved(true)
+        }, 2000)
       }
     } catch (error) {
       console.log(error)
@@ -64,16 +67,14 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
     let shouldUpdate = true
     const getFees = async () => {
       try {
-        const { value, unit } = await getNetworkFees(from, to, amount, user)
-        if (shouldUpdate) setFees(`${Number(value).toFixed(6)} ${unit}`)
+        if (isApproved) {
+          const { value, unit } = await getNetworkFees(from, to, amount, user)
+          if (shouldUpdate) setFees(`${Number(value).toFixed(6)} ${unit}`)
+        }
       } catch (error) {
         console.error(error)
         if (shouldUpdate) {
-          if (error instanceof Error) {
-            setFees(error.message)
-          } else {
-            setFees(error as string)
-          }
+          setFees('Unable to estimate fees')
         }
       }
     }
@@ -82,7 +83,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
     return () => {
       shouldUpdate = false
     }
-  }, [amount, from, to, user])
+  }, [amount, from, to, user, isApproved])
 
   useEffect(() => {
     let shouldUpdate = true

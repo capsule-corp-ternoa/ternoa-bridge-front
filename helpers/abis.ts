@@ -61,5 +61,16 @@ export const CAPS_CONTRACT_ABI = [
   },
 ]
 
-//TODO
-export const BRIDGE_CONTRACT_ABI = []
+export const BRIDGE_CONTRACT_ABI = [
+  {
+    inputs: [
+      { internalType: 'uint8', name: 'destinationChainID', type: 'uint8' },
+      { internalType: 'bytes32', name: 'resourceID', type: 'bytes32' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+    ],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+]

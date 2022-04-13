@@ -1,6 +1,8 @@
 import { cryptoWaitReady } from '@polkadot/util-crypto'
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
+import { decodeAddress } from '@polkadot/util-crypto'
+import { u8aToHex } from '@polkadot/util'
 import { AnyAction } from 'redux'
 import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
@@ -86,7 +88,20 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
   dispatch(actions.loginPolkadot(data))
 }
 
+export const getNativeTokenId = async () => {
+  const api = await getApi()
+  return api.consts.erc20Bridge.nativeTokenId.toString()
+}
+
+export const ss58ToHex = (address: string) => {
+  return u8aToHex(decodeAddress(address))
+}
+
 //TODO
+export const getBridgeFees = () => {
+  return BRIDGE_FEES
+}
+
 export const getTransferFees = async (user: User, amount: number) => {
   if (!user) throw new Error('User not found')
   if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
@@ -97,7 +112,6 @@ export const getTransferFees = async (user: User, amount: number) => {
   return formatBalance(info.partialFee.toString(), 6).toString()
 }
 
-//TODO
 export const transfer = async (
   user: User,
   amount: number,
@@ -133,14 +147,4 @@ export const transfer = async (
       console.log(`Current status: ${status.type}`)
     }
   })
-}
-
-//TODO
-// export const getNativeTokenId = async () => {
-//   const api = await getApi()
-//   return api.consts.erc20Bridge.nativeTokenId.toString()
-// }
-
-export const getBridgeFees = () => {
-  return BRIDGE_FEES
 }
