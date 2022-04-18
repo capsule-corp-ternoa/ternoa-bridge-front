@@ -239,6 +239,7 @@ const Transfer = () => {
           link={!response ? '' : response.txLink}
           isError={!response ? false : response.isError}
           setExpanded={setIsResultModalOpen}
+          setResponse={setResponse}
         />
       )}
       {isNetworkModalOpen && (
