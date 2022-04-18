@@ -57,6 +57,13 @@ const ConfirmModal = ({
       }
     } catch (error) {
       console.log(error)
+      setExpanded(false)
+      setIsResultModalOpen(true)
+      setResponse({
+        message: 'Contract approval can not be set',
+        txLink: '',
+        isError: true,
+      })
     } finally {
       setIsApprovalLoading(false)
     }
