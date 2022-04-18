@@ -172,11 +172,13 @@ const ConfirmModal = ({
               <span className={styles.resumeItem}>{middleEllipsis(toAddress)}</span>
             </div>
           )}
-          <div className={styles.resumeLine}>
-            <span className={styles.resumeItem}>Network Fee*</span>
-            {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
-          </div>
-          {from === 'ternoa' && to === 'erc20' && (
+          {isApproved && (
+            <div className={styles.resumeLine}>
+              <span className={styles.resumeItem}>Network Fee*</span>
+              {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
+            </div>
+          )}
+          {isApproved && from === 'ternoa' && to === 'erc20' && (
             <div className={styles.resumeLine}>
               <span className={styles.resumeItem}>Bridge Fee*</span>
               <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
