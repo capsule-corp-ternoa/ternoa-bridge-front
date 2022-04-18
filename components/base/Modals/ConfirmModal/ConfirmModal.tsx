@@ -18,9 +18,19 @@ export interface ConfirmModalProps {
   amount: number
   handleContinue: () => void
   setExpanded: (b: boolean) => void
+  setResponse: (
+    response: { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
+  ) => void
+  setIsResultModalOpen: (b: boolean) => void
 }
 
-const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps) => {
+const ConfirmModal = ({
+  amount,
+  handleContinue,
+  setExpanded,
+  setResponse,
+  setIsResultModalOpen,
+}: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
   const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
@@ -76,6 +86,13 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
         console.error(error)
         if (shouldUpdate) {
           setFees('Unable to estimate fees')
+          setExpanded(false)
+          setIsResultModalOpen(true)
+          setResponse({
+            message: 'Unable to estimate fees',
+            txLink: '',
+            isError: true,
+          })
         }
       }
     }
@@ -84,7 +101,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
     return () => {
       shouldUpdate = false
     }
-  }, [amount, from, to, user, isApproved])
+  }, [amount, from, to, user, isApproved, setExpanded, setResponse, setIsResultModalOpen])
 
   useEffect(() => {
     let shouldUpdate = true

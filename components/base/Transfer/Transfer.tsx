@@ -230,7 +230,13 @@ const Transfer = () => {
         </div>
       </div>
       {isConfirmModalOpen && (
-        <ConfirmModal amount={amount} handleContinue={handleConfirmTransaction} setExpanded={setIsConfirmModalOpen} />
+        <ConfirmModal
+          amount={amount}
+          handleContinue={handleConfirmTransaction}
+          setExpanded={setIsConfirmModalOpen}
+          setResponse={setResponse}
+          setIsResultModalOpen={setIsResultModalOpen}
+        />
       )}
       {isLoadingModalOpen && <LoadingModal />}
       {isResultModalOpen && (
