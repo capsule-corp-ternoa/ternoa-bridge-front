@@ -15,6 +15,7 @@ import { checkProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
 import { ChainType } from 'interfaces'
 import { actions as appActions } from 'redux/app/actions'
+import { actions as userActions } from 'redux/user/actions'
 import { handleNetworkPair } from 'utils/networks'
 import { formatPrice } from 'utils/strings'
 
@@ -25,7 +26,9 @@ const Transfer = () => {
   const [amountError, setAmountError] = useState<string | undefined>(undefined)
   const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
-  const [response, setResponse] = useState<{ message: string; txLink: string; isError: boolean }>()
+  const [response, setResponse] = useState<
+    { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
+  >(undefined)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false)
@@ -83,15 +86,26 @@ const Transfer = () => {
     let shouldUpdate = true
 
     if (shouldUpdate && response) {
-      console.log(response)
+      const { isError, newBalance } = response
       setIsLoadingModalOpen(false)
       setIsResultModalOpen(true)
+
+      if (!isError) {
+        if (newBalance !== undefined) {
+          if (from === 'ternoa') {
+            dispatch(userActions.setCapsBalancePolkadot(newBalance))
+          } else {
+            dispatch(userActions.setCapsBalanceErc(newBalance))
+          }
+        }
+        setAmount(0)
+      }
     }
 
     return () => {
       shouldUpdate = false
     }
-  }, [response])
+  }, [dispatch, from, response])
 
   const handleCheckProceed = async () => {
     try {

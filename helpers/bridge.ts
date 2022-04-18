@@ -17,6 +17,7 @@ import {
   ETH_CHAIN_ID,
   reconnect as reconnectErc,
   isApproved as isApprovedErc,
+  getBalance as getErcBalance,
   getTransferBscEthFees,
   getTransferEthTernoaFees,
   transferBscEth,
@@ -180,7 +181,7 @@ export const transfer = async (
   to: ChainType,
   amount: number,
   user: User,
-  setResponse: (response: { message: string; txLink: string; isError: boolean }) => void
+  setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean }) => void
 ) => {
   try {
     switch (from) {
@@ -192,8 +193,10 @@ export const transfer = async (
         if (!user.ercWallet) throw new Error('Signer not found')
         const tx = await transferBscEth(user.ercWallet?.signer, amount)
         const receipt = await tx.wait()
+        const newBalance = await getErcBalance(user.ercWallet.signer)
         setResponse({
           message: 'Please check your wallet balance',
+          newBalance,
           txLink: `https://bscscan.com/tx/${receipt.transactionHash}`,
           isError: false,
         })
@@ -204,8 +207,10 @@ export const transfer = async (
           if (!user.ercWallet) throw new Error('Signer not found')
           const tx = await transferBscEth(user.ercWallet?.signer, amount)
           const receipt = await tx.wait()
+          const newBalance = await getErcBalance(user.ercWallet.signer)
           setResponse({
             message: 'Please check your wallet balance',
+            newBalance,
             txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
             isError: false,
           })
@@ -214,8 +219,10 @@ export const transfer = async (
           if (!user.ercWallet) throw new Error('Signer not found')
           const tx: any = await transferEthTernoa(user, amount)
           const receipt = await tx.wait()
+          const newBalance = await getErcBalance(user.ercWallet.signer)
           setResponse({
-            message: 'Your balance will be availble in few moment (may take up to 1 day)',
+            message: 'Your balance will be available in few moment (may take up to 1 day)',
+            newBalance,
             txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
             isError: false,
           })
