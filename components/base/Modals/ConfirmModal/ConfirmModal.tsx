@@ -16,8 +16,9 @@ import styles from './ConfirmModal.module.scss'
 
 export interface ConfirmModalProps {
   amount: number
+  handleClose: () => void
   handleContinue: () => void
-  setExpanded: (b: boolean) => void
+  isOpen: boolean
   setResponse: (
     response: { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
   ) => void
@@ -26,8 +27,9 @@ export interface ConfirmModalProps {
 
 const ConfirmModal = ({
   amount,
+  handleClose,
   handleContinue,
-  setExpanded,
+  isOpen,
   setResponse,
   setIsResultModalOpen,
 }: ConfirmModalProps) => {
@@ -57,7 +59,7 @@ const ConfirmModal = ({
       }
     } catch (error) {
       console.log(error)
-      setExpanded(false)
+      handleClose()
       setIsResultModalOpen(true)
       setResponse({
         message: 'Contract approval can not be set',
@@ -72,14 +74,14 @@ const ConfirmModal = ({
   useEffect(() => {
     let shouldUpdate = true
 
-    if (shouldUpdate && !isFirstRender) setExpanded(false)
+    if (shouldUpdate && !isFirstRender) handleClose()
     if (shouldUpdate && isFirstRender) setIsFirstRender(false)
 
     return () => {
       shouldUpdate = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, from, setExpanded, to, user])
+  }, [amount, from, to, user])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -93,7 +95,7 @@ const ConfirmModal = ({
         console.error(error)
         if (shouldUpdate) {
           setFees('Unable to estimate fees')
-          setExpanded(false)
+          handleClose()
           setIsResultModalOpen(true)
           setResponse({
             message: 'Unable to estimate fees',
@@ -108,7 +110,7 @@ const ConfirmModal = ({
     return () => {
       shouldUpdate = false
     }
-  }, [amount, from, to, user, isApproved, setExpanded, setResponse, setIsResultModalOpen])
+  }, [amount, from, to, user, isApproved, setResponse, setIsResultModalOpen, handleClose])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -140,7 +142,7 @@ const ConfirmModal = ({
   }, [from, to, user])
 
   return (
-    <Modal setExpanded={setExpanded}>
+    <Modal handleClose={handleClose} isOpen={isOpen}>
       <div className={styles.root}>
         <h4 className={styles.title}>Confirmation</h4>
         <div className={styles.inputs}>

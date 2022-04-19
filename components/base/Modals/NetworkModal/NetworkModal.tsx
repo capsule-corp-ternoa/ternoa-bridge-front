@@ -10,12 +10,13 @@ import { useAppSelector } from 'redux/hooks'
 import styles from './NetworkModal.module.scss'
 
 export interface NetworkModalProps {
+  handleClose: () => void
   handleNetworkPair: (origin: 'from' | 'to' | undefined, network: ChainType) => void
+  isOpen: boolean
   origin: 'from' | 'to' | undefined
-  setExpanded: (b: boolean) => void
 }
 
-const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalProps) => {
+const NetworkModal = ({ handleClose, handleNetworkPair, isOpen, origin }: NetworkModalProps) => {
   const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
@@ -49,7 +50,7 @@ const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalPr
   }
 
   return (
-    <Modal setExpanded={setExpanded}>
+    <Modal handleClose={handleClose} isOpen={isOpen}>
       <div className={styles.root}>
         <h4 className={styles.title}>Select the Network</h4>
         <div className={styles.networks}>
@@ -66,7 +67,7 @@ const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalPr
                 handleNetworkSwitch('erc20')
               }
               handleNetworkPair(origin, 'erc20')
-              setExpanded(false)
+              handleClose()
             }}
             variant="input"
           />
@@ -78,7 +79,7 @@ const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalPr
             onClick={() => {
               if (user.ercWallet?.connectedWith === 'metamask' && origin === 'from') handleNetworkSwitch('bep20')
               handleNetworkPair(origin, 'bep20')
-              setExpanded(false)
+              handleClose()
             }}
             variant="input"
           />
@@ -92,7 +93,7 @@ const NetworkModal = ({ origin, handleNetworkPair, setExpanded }: NetworkModalPr
                 handleNetworkSwitch('erc20')
               }
               handleNetworkPair(origin, 'ternoa')
-              setExpanded(false)
+              handleClose()
             }}
             variant="input"
           />

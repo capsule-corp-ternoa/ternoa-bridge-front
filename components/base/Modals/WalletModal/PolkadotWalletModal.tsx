@@ -11,13 +11,17 @@ import { middleEllipsis } from 'utils/strings'
 
 import styles from './WalletModal.module.scss'
 
-const PolkadotWalletModal = () => {
+interface Props {
+  isOpen: boolean
+}
+
+const PolkadotWalletModal = ({ isOpen }: Props) => {
   const [accounts, setAccounts] = useState<InjectedAccountWithMeta[]>([])
   const [error, setError] = useState<string>('')
   const dispatch = useAppDispatch()
 
-  const handleModalExpanded = (value: boolean) => {
-    dispatch(actions.setIsPolkadotWalletModalOpen(value))
+  const handleModalClose = () => {
+    dispatch(actions.setIsPolkadotWalletModalOpen(false))
   }
 
   useEffect(() => {
@@ -44,7 +48,7 @@ const PolkadotWalletModal = () => {
   }, [])
 
   return (
-    <Modal setExpanded={handleModalExpanded}>
+    <Modal handleClose={handleModalClose} isOpen={isOpen}>
       <div className={styles.root}>
         {error !== '' && (
           <div className={styles.warning}>

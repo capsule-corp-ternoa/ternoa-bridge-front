@@ -82,6 +82,11 @@ const Transfer = () => {
     await transfer(from, to, amount, user, setResponse)
   }
 
+  const handleResultModalClose = () => {
+    setIsResultModalOpen(false)
+    setResponse(undefined)
+  }
+
   useEffect(() => {
     let shouldUpdate = true
 
@@ -132,15 +137,6 @@ const Transfer = () => {
     handleCheckProceed()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, from, to, user])
-
-  useEffect(() => {
-    const body = document.querySelector('body')
-    if (body) {
-      if (isConfirmModalOpen || isNetworkModalOpen || isLoadingModalOpen || isResultModalOpen)
-        body.style.overflow = 'hidden'
-      else body.style.overflow = 'auto'
-    }
-  }, [isConfirmModalOpen, isNetworkModalOpen, isLoadingModalOpen, isResultModalOpen])
 
   return (
     <>
@@ -232,25 +228,27 @@ const Transfer = () => {
       {isConfirmModalOpen && (
         <ConfirmModal
           amount={amount}
+          handleClose={() => setIsConfirmModalOpen(false)}
           handleContinue={handleConfirmTransaction}
-          setExpanded={setIsConfirmModalOpen}
+          isOpen={isConfirmModalOpen}
           setResponse={setResponse}
           setIsResultModalOpen={setIsResultModalOpen}
         />
       )}
-      {isLoadingModalOpen && <LoadingModal />}
-      {isResultModalOpen && (
-        <ResultModal
-          body={!response ? '' : response.message}
-          link={!response ? '' : response.txLink}
-          isError={!response ? false : response.isError}
-          setExpanded={setIsResultModalOpen}
-          setResponse={setResponse}
-        />
-      )}
-      {isNetworkModalOpen && (
-        <NetworkModal origin={origin} handleNetworkPair={handleNetworkChange} setExpanded={setIsNetworkModalOpen} />
-      )}
+      <LoadingModal isOpen={isLoadingModalOpen} />
+      <ResultModal
+        body={!response ? '' : response.message}
+        link={!response ? '' : response.txLink}
+        handleClose={handleResultModalClose}
+        isError={!response ? false : response.isError}
+        isOpen={isResultModalOpen}
+      />
+      <NetworkModal
+        handleClose={() => setIsNetworkModalOpen(false)}
+        handleNetworkPair={handleNetworkChange}
+        isOpen={isNetworkModalOpen}
+        origin={origin}
+      />
     </>
   )
 }
