@@ -112,9 +112,9 @@
       display: flex;
       width: 100%;
       color: $color-primary400;
-      font-family: $font-bold;
       font-size: 1.6rem;
       text-align: justify;
+      line-height: 1.8;
 
       &:not(:first-child) {
         margin-top: 3.2rem;
