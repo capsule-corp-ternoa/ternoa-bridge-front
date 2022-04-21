@@ -116,7 +116,7 @@ export const getTransferFees = async (user: User, amount: number) => {
 export const transfer = async (
   user: User,
   amount: number,
-  setResponse: (response: { message: string; txLink: string; isError: boolean }) => void
+  setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean }) => void
 ) => {
   if (!user) throw new Error('User not found')
   if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
@@ -134,13 +134,16 @@ export const transfer = async (
       const success = events.find((x) => api.events.system.ExtrinsicSuccess.is(x.event))
       const txLink = `https://explorer.ternoa.com/block/${blockNumber}`
       let message = 'Extrinsic failed'
+      let newBalance
       let isError = true
       if (success) {
         message = 'Your balance will be availble in few moment (may take up to 1 day)'
+        newBalance = await getBalance(address)
         isError = false
       }
       setResponse({
         message,
+        newBalance,
         txLink,
         isError,
       })

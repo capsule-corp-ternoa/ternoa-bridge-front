@@ -16,11 +16,23 @@ import styles from './ConfirmModal.module.scss'
 
 export interface ConfirmModalProps {
   amount: number
+  handleClose: () => void
   handleContinue: () => void
-  setExpanded: (b: boolean) => void
+  isOpen: boolean
+  setResponse: (
+    response: { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
+  ) => void
+  setIsResultModalOpen: (b: boolean) => void
 }
 
-const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps) => {
+const ConfirmModal = ({
+  amount,
+  handleClose,
+  handleContinue,
+  isOpen,
+  setResponse,
+  setIsResultModalOpen,
+}: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
   const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
@@ -47,6 +59,13 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
       }
     } catch (error) {
       console.log(error)
+      handleClose()
+      setIsResultModalOpen(true)
+      setResponse({
+        message: 'Contract approval can not be set',
+        txLink: '',
+        isError: true,
+      })
     } finally {
       setIsApprovalLoading(false)
     }
@@ -55,14 +74,14 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
   useEffect(() => {
     let shouldUpdate = true
 
-    if (shouldUpdate && !isFirstRender) setExpanded(false)
+    if (shouldUpdate && !isFirstRender) handleClose()
     if (shouldUpdate && isFirstRender) setIsFirstRender(false)
 
     return () => {
       shouldUpdate = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, from, setExpanded, to, user])
+  }, [amount, from, to, user])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -76,6 +95,13 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
         console.error(error)
         if (shouldUpdate) {
           setFees('Unable to estimate fees')
+          handleClose()
+          setIsResultModalOpen(true)
+          setResponse({
+            message: 'Unable to estimate fees',
+            txLink: '',
+            isError: true,
+          })
         }
       }
     }
@@ -84,7 +110,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
     return () => {
       shouldUpdate = false
     }
-  }, [amount, from, to, user, isApproved])
+  }, [amount, from, to, user, isApproved, setResponse, setIsResultModalOpen, handleClose])
 
   useEffect(() => {
     let shouldUpdate = true
@@ -116,7 +142,7 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
   }, [from, to, user])
 
   return (
-    <Modal setExpanded={setExpanded}>
+    <Modal handleClose={handleClose} isOpen={isOpen}>
       <div className={styles.root}>
         <h4 className={styles.title}>Confirmation</h4>
         <div className={styles.inputs}>
@@ -148,11 +174,13 @@ const ConfirmModal = ({ amount, handleContinue, setExpanded }: ConfirmModalProps
               <span className={styles.resumeItem}>{middleEllipsis(toAddress)}</span>
             </div>
           )}
-          <div className={styles.resumeLine}>
-            <span className={styles.resumeItem}>Network Fee*</span>
-            {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
-          </div>
-          {from === 'ternoa' && to === 'erc20' && (
+          {isApproved && (
+            <div className={styles.resumeLine}>
+              <span className={styles.resumeItem}>Network Fee*</span>
+              {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
+            </div>
+          )}
+          {isApproved && from === 'ternoa' && to === 'erc20' && (
             <div className={styles.resumeLine}>
               <span className={styles.resumeItem}>Bridge Fee*</span>
               <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>

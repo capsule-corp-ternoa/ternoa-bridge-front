@@ -8,13 +8,14 @@ import styles from './ResultModal.module.scss'
 
 export interface ResultModalProps {
   body: string
+  handleClose: () => void
   isError?: boolean
+  isOpen: boolean
   link?: string
-  setExpanded: (b: boolean) => void
 }
 
-const ResultModal = ({ body, isError, link, setExpanded }: ResultModalProps) => (
-  <Modal setExpanded={setExpanded}>
+const ResultModal = ({ body, handleClose, isError, isOpen, link }: ResultModalProps) => (
+  <Modal handleClose={handleClose} isOpen={isOpen}>
     <div className={styles.root}>
       {isError ? (
         <Warning className={styles.warning} />
