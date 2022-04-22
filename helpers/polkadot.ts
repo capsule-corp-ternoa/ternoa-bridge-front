@@ -13,7 +13,7 @@ import { NUMBER_OF_DECIMALS } from './erc'
 let api: ApiPromise
 
 const CHAIN_ENDPOINT = process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT || 'wss://dev.chaos.ternoa.com'
-const ETH_DEST_ID = 0
+const ETH_DEST_ID = 1
 
 const initializeApi = async () => {
   await cryptoWaitReady()
@@ -88,8 +88,9 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
 }
 
 export const getNativeTokenId = async () => {
-  const api = await getApi()
-  return api.consts.erc20Bridge.nativeTokenId.toString()
+  // const api = await getApi()
+  // return api.consts.ethTerBridge.nativeTokenId.toString()
+  return '0x000000000000000000000000000000efe3f70fbf7b2348cfadb64611d05c7401'
 }
 
 export const ss58ToHex = (address: string) => {
@@ -98,7 +99,7 @@ export const ss58ToHex = (address: string) => {
 
 export const getBridgeFees = async () => {
   const api = await getApi()
-  const fee = await api.query.erc20Bridge.bridgeFee()
+  const fee = await api.query.ethTerBridge.bridgeFee()
   return formatBalance(new BN(fee.toString()).toString())
 }
 
@@ -108,7 +109,7 @@ export const getTransferFees = async (user: User, amount: number) => {
   if (!user.ercWallet) throw new Error('User ERC account not found')
   const api = await getApi()
   const formattedAmount = formatInput(amount)
-  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
+  const tx = api.tx.ethTerBridge.transfer(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   const info = await tx.paymentInfo(user.polkadotWallet.address)
   return formatBalance(info.partialFee.toString(), 6).toString()
 }
@@ -125,7 +126,7 @@ export const transfer = async (
   const address = user.polkadotWallet.address
   const injector = user.polkadotWallet.injector
   const formattedAmount = formatInput(amount)
-  const tx = api.tx.erc20Bridge.transferNative(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
+  const tx = api.tx.ethTerBridge.transfer(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   await tx.signAndSend(address, { signer: injector.signer }, async (data) => {
     const { status, events } = data
     if (status.isInBlock) {
