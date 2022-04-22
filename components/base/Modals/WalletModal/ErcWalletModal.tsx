@@ -13,9 +13,10 @@ import styles from './WalletModal.module.scss'
 
 interface Props {
   chainType: ChainType
+  isOpen: boolean
 }
 
-const ErcWalletModal = ({ chainType }: Props) => {
+const ErcWalletModal = ({ chainType, isOpen }: Props) => {
   const [isWindowEthAvailable, setIsWindowEthAvailable] = useState(false)
   const dispatch = useAppDispatch()
   const { app } = useAppSelector((state) => state.app)
@@ -26,8 +27,8 @@ const ErcWalletModal = ({ chainType }: Props) => {
       ((fromNetwork === 'erc20' && toNetwork !== 'bep20') || (fromNetwork === 'bep20' && toNetwork !== 'erc20'))) ||
     (originForConnection === 'to' && fromNetwork === 'ternoa')
 
-  const handleModalExpanded = (value: boolean) => {
-    dispatch(actions.setIsErcWalletModalOpen(value))
+  const handleModalClose = () => {
+    dispatch(actions.setIsErcWalletModalOpen(false))
   }
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const ErcWalletModal = ({ chainType }: Props) => {
   }, [])
 
   return (
-    <Modal setExpanded={handleModalExpanded}>
+    <Modal handleClose={handleModalClose} isOpen={isOpen}>
       <div className={styles.root}>
         <h4 className={styles.title}>Connect your wallet</h4>
         <div className={styles.wallets}>
@@ -46,7 +47,7 @@ const ErcWalletModal = ({ chainType }: Props) => {
               onClick={() => {
                 try {
                   connect(chainType, dispatch, 'metamask', undefined, isNetworkSwitchAllowed)
-                  handleModalExpanded(false)
+                  handleModalClose()
                 } catch (error) {
                   console.error(error)
                 }
@@ -62,7 +63,7 @@ const ErcWalletModal = ({ chainType }: Props) => {
             onClick={() => {
               try {
                 connect(chainType, dispatch, 'walletConnect')
-                handleModalExpanded(false)
+                handleModalClose()
               } catch (error) {
                 console.error(error)
               }

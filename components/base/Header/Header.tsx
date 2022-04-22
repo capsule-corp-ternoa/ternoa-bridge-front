@@ -10,7 +10,7 @@ const Header = () => (
     <Link href="/">
       <a className={styles.logo} title="Bridge homepage">
         <TernoaIcon />
-        <div className={styles.logoTitle}>Ternoa Bridge</div>
+        <div className={styles.logoTitle}>ternoa Bridge</div>
       </a>
     </Link>
     <div className={styles.networkPill}>

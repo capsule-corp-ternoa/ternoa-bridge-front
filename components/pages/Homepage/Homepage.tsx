@@ -17,10 +17,13 @@ const Homepage = () => {
   const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
-  const { fromNetwork: from, toNetwork: to, chainTypeForConnection: chainType } = app
-
-  const isErcWalletModalOpen = app.isErcWalletModalOpen && (chainType === 'erc20' || chainType === 'bep20')
-  const isPolkadotWalletModalOpen = app.isPolkadotWalletModalOpen && chainType === 'ternoa'
+  const {
+    fromNetwork: from,
+    toNetwork: to,
+    chainTypeForConnection: chainType,
+    isErcWalletModalOpen,
+    isPolkadotWalletModalOpen,
+  } = app
 
   useEffect(() => {
     reconnect(dispatch)
@@ -95,8 +98,10 @@ const Homepage = () => {
           </ul>
         </div>
       </div>
-      {isErcWalletModalOpen && <ErcWalletModal chainType={chainType} />}
-      {isPolkadotWalletModalOpen && <PolkadotWalletModal />}
+      {(chainType === 'erc20' || chainType === 'bep20') && (
+        <ErcWalletModal chainType={chainType} isOpen={isErcWalletModalOpen} />
+      )}
+      {chainType === 'ternoa' && <PolkadotWalletModal isOpen={isPolkadotWalletModalOpen} />}
     </main>
   )
 }

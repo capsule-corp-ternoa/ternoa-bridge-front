@@ -17,6 +17,7 @@ import {
   ETH_CHAIN_ID,
   reconnect as reconnectErc,
   isApproved as isApprovedErc,
+  getBalance as getErcBalance,
   getTransferBscEthFees,
   getTransferEthTernoaFees,
   transferBscEth,
@@ -98,7 +99,7 @@ export const getBalance = (from: ChainType, user: User) => {
 export const checkProceed = async (from: ChainType, to: ChainType, amount: number, user: User) => {
   const key = `${from}-${to}`
   const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
-  const bridgeFee = `${from}-${to}` === 'ternoa-erc20' ? (await getBridgeFees()).toNumber() : 0
+  const bridgeFee = `${from}-${to}` === 'ternoa-erc20' ? await getBridgeFees() : 0
   if (!validDirections.includes(key))
     throw new Error('Invalid combination', {
       cause: new Error('Incorrect network'),
@@ -180,7 +181,7 @@ export const transfer = async (
   to: ChainType,
   amount: number,
   user: User,
-  setResponse: (response: { message: string; txLink: string; isError: boolean }) => void
+  setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean }) => void
 ) => {
   try {
     switch (from) {
@@ -192,8 +193,10 @@ export const transfer = async (
         if (!user.ercWallet) throw new Error('Signer not found')
         const tx = await transferBscEth(user.ercWallet?.signer, amount)
         const receipt = await tx.wait()
+        const newBalance = await getErcBalance(user.ercWallet.signer)
         setResponse({
           message: 'Please check your wallet balance',
+          newBalance,
           txLink: `https://bscscan.com/tx/${receipt.transactionHash}`,
           isError: false,
         })
@@ -204,8 +207,10 @@ export const transfer = async (
           if (!user.ercWallet) throw new Error('Signer not found')
           const tx = await transferBscEth(user.ercWallet?.signer, amount)
           const receipt = await tx.wait()
+          const newBalance = await getErcBalance(user.ercWallet.signer)
           setResponse({
             message: 'Please check your wallet balance',
+            newBalance,
             txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
             isError: false,
           })
@@ -214,8 +219,10 @@ export const transfer = async (
           if (!user.ercWallet) throw new Error('Signer not found')
           const tx: any = await transferEthTernoa(user, amount)
           const receipt = await tx.wait()
+          const newBalance = await getErcBalance(user.ercWallet.signer)
           setResponse({
-            message: 'Your balance will be availble in few moment (may take up to 1 day)',
+            message: 'Your balance will be available in few moment (may take up to 1 day)',
+            newBalance,
             txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
             isError: false,
           })
