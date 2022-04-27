@@ -32,7 +32,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 [Helpers](helpers) are splitted based on both erc and substrate based chains ecosystems.
 
-- [polkadot.ts](helpers/polkadot.ts) handled the [polkadot{.js} extension](https://github.com/polkadot-js/extension) connection and the API initialization with the [Ternoa chain](https://github.com/capsule-corp-ternoa/chain) in order to call ethTerBridge extrinsic to execute a _TERNOA -> ERC20_ transfer.
+- [polkadot.ts](helpers/polkadot.ts) handled the [polkadot{.js} extension](https://github.com/polkadot-js/extension) connection and the API initialization with the [Ternoa chain](https://github.com/capsule-corp-ternoa/chain) in order to call bridge extrinsic to execute a _TERNOA -> ERC20_ transfer.
 - [erc.ts](helpers/erc.ts) handled contracts for _ERC20 <-> BEP20_ and _ERC20 -> TERNOA_ transfers.
 
 Metamask and WalletConnect are the supported wallets to interact with the bridge dapp on the erc20/bep20 networks. Each one has its own dedicated helper in [metamask.ts](helpers/metamask.ts) or [walletconnect.ts](helpers/walletconnect.ts).
