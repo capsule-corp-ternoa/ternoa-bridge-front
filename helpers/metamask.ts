@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { AnyAction } from 'redux'
 
 import { actions } from '../redux/user/actions'
-import { getErcWalletFromSigner } from './erc'
+import { ETH_CHAIN_ID, getErcWalletFromSigner } from './erc'
 
 declare global {
   interface Window {
@@ -72,7 +72,7 @@ export const switchETHNetwork = async () => {
     method: 'wallet_switchEthereumChain',
     params: [
       {
-        chainId: '0x1',
+        chainId: `0x${ETH_CHAIN_ID}`,
       },
     ],
   })

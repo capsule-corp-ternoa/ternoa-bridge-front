@@ -184,6 +184,7 @@ export const transfer = async (
   setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean }) => void
 ) => {
   try {
+    const explorerPrefix = ETH_CHAIN_ID === 1 ? '' : ETH_CHAIN_ID === 5 ? 'goerli.' : 'rinkeby.'
     switch (from) {
       case 'ternoa':
         if (!user.polkadotWallet) throw new Error('Signer not found')
@@ -211,7 +212,7 @@ export const transfer = async (
           setResponse({
             message: 'Please check your wallet balance',
             newBalance,
-            txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+            txLink: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
             isError: false,
           })
         }
@@ -221,9 +222,9 @@ export const transfer = async (
           const receipt = await tx.wait()
           const newBalance = await getErcBalance(user.ercWallet.signer)
           setResponse({
-            message: 'Your balance will be available in few moment (may take up to 1 day)',
+            message: 'Your balance will be available in few moment',
             newBalance,
-            txLink: `https://etherscan.io/tx/${receipt.transactionHash}`,
+            txLink: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
             isError: false,
           })
         }

@@ -12,7 +12,7 @@ import { NUMBER_OF_DECIMALS } from './erc'
 
 let api: ApiPromise
 
-const CHAIN_ENDPOINT = process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT || 'wss://dev.chaos.ternoa.com'
+const CHAIN_ENDPOINT = process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT || 'wss://mainnet.ternoa.network'
 const ETH_DEST_ID = 1
 
 const initializeApi = async () => {
@@ -133,12 +133,14 @@ export const transfer = async (
       const blockHash = status.asInBlock
       const blockNumber = (await api.rpc.chain.getHeader(blockHash)).number.toNumber()
       const success = events.find((x) => api.events.system.ExtrinsicSuccess.is(x.event))
-      const txLink = `https://explorer.ternoa.com/block/${blockNumber}`
+      const txLink = `https://explorer${
+        process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? '-alphanet' : ''
+      }.ternoa.com/block/${blockNumber}`
       let message = 'Extrinsic failed'
       let newBalance
       let isError = true
       if (success) {
-        message = 'Your balance will be availble in few moment (may take up to 1 day)'
+        message = 'Your balance will be availble in few moment'
         newBalance = await getBalance(address)
         isError = false
       }
