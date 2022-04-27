@@ -151,7 +151,7 @@ const getTransferEthTernoaParams = async (user: User, amount: number) => {
   if (!user.ercWallet?.signer) throw new Error('Signer not found')
   if (!user.polkadotWallet?.address) throw new Error('Polkadot address not found')
   const destChainId = TERNOA_DEST_ID
-  const ressourceId = await getNativeTokenId()
+  const ressourceId = getNativeTokenId()
   const data = formatData(user.polkadotWallet.address, amount)
   return [destChainId, ressourceId, data]
 }
