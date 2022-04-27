@@ -10,23 +10,21 @@ import { formatInput, getNativeTokenId, ss58ToHex } from './polkadot'
 
 export const NUMBER_OF_DECIMALS = 18
 
-// export const ETH_CHAIN_ID = 1 // REAL VALUE
-export const ETH_CHAIN_ID = 5 // TEST VALUE
+export const ETH_CHAIN_ID = process.env.NEXT_PUBLIC_ETH_CHAIN_ID ? Number(process.env.NEXT_PUBLIC_ETH_CHAIN_ID) : 1
 export const BSC_CHAIN_ID = 56
 
-//TODO
 const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
-const TERNOA_ETH_BRIDGE_CONTRACT = '0x4FaeD4D60FF265056354EB67e4e12117E5b92284' //TEST VALUE GOERLI
-const TERNOA_ETH_BRIDGE_HANDLER_CONTRACT = '0x1d3c765472119483C2Cb28D1be6D8aAD43273daB' //TEST VALUE GOERLI
+const TERNOA_ETH_BRIDGE_CONTRACT =
+  process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_CONTRACT || '0x4FaeD4D60FF265056354EB67e4e12117E5b92284' //TODO default to mainnet
+const TERNOA_ETH_BRIDGE_HANDLER_CONTRACT =
+  process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT || '0x1d3c765472119483C2Cb28D1be6D8aAD43273daB' //TODO default to mainnet
 
-//TODO
-// export const CAPS_TOKEN_ADDRESS_ETH = '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2' // REAL VALUE
-// const CAPS_TOKEN_ADDRESS_ETH = '0xcE9D9Db4264a50aEF8B5627E882Ed71dF66d2105' // TEST VALUE RINKEBY
-const CAPS_TOKEN_ADDRESS_ETH = '0xC36418f4c2f483405dA151A3fb4153E9E714AF72' // TEST VALUE GOERLI
+const CAPS_TOKEN_ADDRESS_ETH =
+  process.env.NEXT_PUBLIC_CAPS_TOKEN_ADDRESS_ETH || '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2'
 const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
 
-// export const PROVIDER_BASE_URL_ETH = `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}` // REAL VALUE
-export const PROVIDER_BASE_URL_ETH = `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_RINKEBY_ID}` // TEST VALUE
+const providerName = ETH_CHAIN_ID === 1 ? 'mainnet' : ETH_CHAIN_ID === 5 ? 'goerli' : 'rinkeby'
+export const PROVIDER_BASE_URL_ETH = `https://${providerName}.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
 export const PROVIDER_BASE_URL_BSC = 'https://bsc-dataseed.binance.org/'
 
 const TERNOA_DEST_ID = 0
