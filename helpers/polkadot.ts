@@ -87,9 +87,7 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
   dispatch(actions.loginPolkadot(data))
 }
 
-export const getNativeTokenId = async () => {
-  // const api = await getApi()
-  // return api.consts.bridge.nativeTokenId.toString()
+export const getNativeTokenId = () => {
   return '0x000000000000000000000000000000efe3f70fbf7b2348cfadb64611d05c7401'
 }
 
