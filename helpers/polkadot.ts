@@ -133,7 +133,9 @@ export const transfer = async (
       const success = events.find((x) => api.events.system.ExtrinsicSuccess.is(x.event))
       const txLink = `https://explorer${
         process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? '-alphanet' : ''
-      }.ternoa.com/block/${blockNumber}`
+      }.ternoa.${
+        process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? 'dev' : 'com'
+      }/block/${blockNumber}`
       let message = 'Extrinsic failed'
       let newBalance
       let isError = true
