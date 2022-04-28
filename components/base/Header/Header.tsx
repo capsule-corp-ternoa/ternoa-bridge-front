@@ -18,7 +18,9 @@ const Header = () => (
         <div className={styles.outterIndicator} />
         <div className={styles.innerIndicator} />
       </div>
-      <small className={styles.networkEnv}>Mainnet</small>
+      <small className={styles.networkEnv}>
+        {process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? 'Alphanet' : 'Mainnet'}
+      </small>
     </div>
   </nav>
 )
