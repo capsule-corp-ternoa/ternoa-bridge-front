@@ -29,27 +29,12 @@ interface ButtonProps extends IButton {
   text?: string
 }
 
-export const AnchorButton = ({
-  className,
-  color = 'primary500',
-  href,
-  size = 'medium',
-  text,
-  title,
-  variant = 'rounded',
-}: AnchorButtonProps) => {
+export const AnchorButton = ({ className, color = 'primary500', href, size = 'medium', text, title, variant = 'rounded' }: AnchorButtonProps) => {
   if (href.charAt(0) === '/')
     return (
       <Link href={href}>
         <a
-          className={[
-            `${styles.root}`,
-            `${styles.rootAnchor}`,
-            `${styles[color]}`,
-            `${styles[size]}`,
-            `${styles[variant]}`,
-            className,
-          ].join(' ')}
+          className={[`${styles.root}`, `${styles.rootAnchor}`, `${styles[color]}`, `${styles[size]}`, `${styles[variant]}`, className].join(' ')}
           title={title}
         >
           {text}
@@ -60,14 +45,7 @@ export const AnchorButton = ({
 
   return (
     <a
-      className={[
-        `${styles.root}`,
-        `${styles.rootAnchor}`,
-        `${styles[color]}`,
-        `${styles[size]}`,
-        `${styles[variant]}`,
-        className,
-      ].join(' ')}
+      className={[`${styles.root}`, `${styles.rootAnchor}`, `${styles[color]}`, `${styles[size]}`, `${styles[variant]}`, className].join(' ')}
       href={href}
       title={title}
       target="_blank"
@@ -79,26 +57,9 @@ export const AnchorButton = ({
   )
 }
 
-const Button = ({
-  className,
-  color = 'primary500',
-  disabled,
-  icon,
-  isLoading = false,
-  onClick,
-  size = 'medium',
-  text,
-  variant = 'rounded',
-}: ButtonProps) => (
+const Button = ({ className, color = 'primary500', disabled, icon, isLoading = false, onClick, size = 'medium', text, variant = 'rounded' }: ButtonProps) => (
   <button
-    className={[
-      `${styles.root}`,
-      `${styles[color]}`,
-      `${styles[size]}`,
-      `${styles[variant]}`,
-      `${isLoading ? styles.loading : ''}`,
-      className,
-    ].join(' ')}
+    className={[`${styles.root}`, `${styles[color]}`, `${styles[size]}`, `${styles[variant]}`, `${isLoading ? styles.loading : ''}`, className].join(' ')}
     disabled={disabled}
     onClick={onClick}
   >

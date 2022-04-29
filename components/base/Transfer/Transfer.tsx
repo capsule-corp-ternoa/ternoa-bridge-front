@@ -26,9 +26,7 @@ const Transfer = () => {
   const [amountError, setAmountError] = useState<string | undefined>(undefined)
   const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
-  const [response, setResponse] = useState<
-    { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
-  >(undefined)
+  const [response, setResponse] = useState<{ message: string; newBalance?: number; txLink: string; isError: boolean } | undefined>(undefined)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false)
@@ -172,10 +170,7 @@ const Transfer = () => {
             </div>
             <NetworkInput
               className={styles.networkInput}
-              forceIsConnected={
-                ((from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')) &&
-                isConnected(from, user)
-              }
+              forceIsConnected={((from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')) && isConnected(from, user)}
               network={to}
               noNetworkData={(from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')}
               onClick={() => {
@@ -194,9 +189,7 @@ const Transfer = () => {
               <button
                 className={styles.maxButton}
                 disabled={balance === undefined}
-                onClick={() =>
-                  balance !== undefined && balance >= 0 && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)
-                }
+                onClick={() => balance !== undefined && balance >= 0 && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)}
               >
                 Max
               </button>
@@ -243,12 +236,7 @@ const Transfer = () => {
         isError={!response ? false : response.isError}
         isOpen={isResultModalOpen}
       />
-      <NetworkModal
-        handleClose={() => setIsNetworkModalOpen(false)}
-        handleNetworkPair={handleNetworkChange}
-        isOpen={isNetworkModalOpen}
-        origin={origin}
-      />
+      <NetworkModal handleClose={() => setIsNetworkModalOpen(false)} handleNetworkPair={handleNetworkChange} isOpen={isNetworkModalOpen} origin={origin} />
     </>
   )
 }

@@ -23,8 +23,7 @@ const ErcWalletModal = ({ chainType, isOpen }: Props) => {
   const { fromNetwork, toNetwork, originForConnection } = app
 
   const isNetworkSwitchAllowed =
-    (originForConnection === 'from' &&
-      ((fromNetwork === 'erc20' && toNetwork !== 'bep20') || (fromNetwork === 'bep20' && toNetwork !== 'erc20'))) ||
+    (originForConnection === 'from' && ((fromNetwork === 'erc20' && toNetwork !== 'bep20') || (fromNetwork === 'bep20' && toNetwork !== 'erc20'))) ||
     (originForConnection === 'to' && fromNetwork === 'ternoa')
 
   const handleModalClose = () => {

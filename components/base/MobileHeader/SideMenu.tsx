@@ -30,23 +30,12 @@ const SideMenu = ({ isExpanded, setIsExpanded }: Props) => (
               <div className={navStyles.logoTitle}>Ternoa Bridge</div>
             </a>
           </Link>
-          <button
-            className={navStyles.expandIcon}
-            onClick={() => setIsExpanded((prevState) => !prevState)}
-            title="Close menu"
-          >
+          <button className={navStyles.expandIcon} onClick={() => setIsExpanded((prevState) => !prevState)} title="Close menu">
             <Close />
           </button>
         </div>
         <div className={`wrapper ${styles.links}`}>
-          <AnchorButton
-            color="dark"
-            href="https://www.ternoa.com"
-            size="medium"
-            variant="rectangle"
-            text="Back to Ternoa"
-            title="Ternoa website"
-          />
+          <AnchorButton color="dark" href="https://www.ternoa.com" size="medium" variant="rectangle" text="Back to Ternoa" title="Ternoa website" />
           <AnchorButton
             color="dark"
             href="https://intercom.help/ternoa/fr/collections/2774679-legal"
@@ -77,12 +66,7 @@ const SideMenu = ({ isExpanded, setIsExpanded }: Props) => (
             <a href="https://twitter.com/ternoa_" target="_blank" rel="noopener noreferrer" title="Ternoa Twitter">
               <Twitter className={styles.socialLogo} />
             </a>
-            <a
-              href="https://www.instagram.com/ternoa_/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Ternoa Instagram"
-            >
+            <a href="https://www.instagram.com/ternoa_/" target="_blank" rel="noopener noreferrer" title="Ternoa Instagram">
               <Instagram className={styles.socialLogo} />
             </a>
           </div>

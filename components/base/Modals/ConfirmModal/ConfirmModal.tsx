@@ -19,20 +19,11 @@ export interface ConfirmModalProps {
   handleClose: () => void
   handleContinue: () => void
   isOpen: boolean
-  setResponse: (
-    response: { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
-  ) => void
+  setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined) => void
   setIsResultModalOpen: (b: boolean) => void
 }
 
-const ConfirmModal = ({
-  amount,
-  handleClose,
-  handleContinue,
-  isOpen,
-  setResponse,
-  setIsResultModalOpen,
-}: ConfirmModalProps) => {
+const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse, setIsResultModalOpen }: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
   const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
@@ -209,8 +200,7 @@ const ConfirmModal = ({
           variant="rectangle"
         />
         <div className={styles.advise}>
-          *The network fees and execution price depend on the market condition, you may get a different rate when the
-          transaction is complete
+          *The network fees and execution price depend on the market condition, you may get a different rate when the transaction is complete
         </div>
       </div>
     </Modal>

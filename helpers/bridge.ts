@@ -1,6 +1,5 @@
 import { AnyAction } from 'redux'
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
-
 import { formatPrice } from 'utils/strings'
 import { ChainType, User } from '../interfaces'
 import { connect as connectMetamask, switchBSCNetwork, switchETHNetwork } from './metamask'
@@ -11,6 +10,7 @@ import {
   getTransferFees as getTransferFeesPolkadot,
   getBridgeFees,
   transfer as transferTernoaEth,
+  waitForResponseEthTernoa,
 } from './polkadot'
 import {
   BSC_CHAIN_ID,
@@ -23,10 +23,14 @@ import {
   transferBscEth,
   transferEthTernoa,
   approve as approveEthCaps,
+  waitForResponseTernoaEth,
 } from './erc'
 
 export const MIN_AMOUNT = 20 //0 TODO
 export const MAX_AMOUNT = 100000
+export const SLEEP_INTERVAL = 10000
+export const RELAYER_THRESHOLD = 2
+export const BLOCK_LIMIT = 100
 
 export const isConnected = (from: ChainType, user: User) => {
   switch (from) {
@@ -153,12 +157,7 @@ export const approve = async (from: ChainType, to: ChainType, user: User) => {
   }
 }
 
-export const getNetworkFees = async (
-  from: ChainType,
-  to: ChainType,
-  amount: number,
-  user: User
-): Promise<{ value: string; unit: string }> => {
+export const getNetworkFees = async (from: ChainType, to: ChainType, amount: number, user: User): Promise<{ value: string; unit: string }> => {
   switch (from) {
     case 'ternoa':
       if (!user.polkadotWallet) throw new Error('Polkadot wallet not connected')
@@ -189,6 +188,7 @@ export const transfer = async (
       case 'ternoa':
         if (!user.polkadotWallet) throw new Error('Signer not found')
         await transferTernoaEth(user, amount, setResponse)
+        console.log(await waitForResponseTernoaEth(user, amount))
         break
       case 'bep20':
         if (!user.ercWallet) throw new Error('Signer not found')
@@ -227,20 +227,14 @@ export const transfer = async (
             txLink: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
             isError: false,
           })
+          console.log(await waitForResponseEthTernoa(user, amount))
         }
         break
       default:
         throw new Error('Chaintype not recognized')
     }
   } catch (err: any) {
-    const errorMessage =
-      typeof err === 'string'
-        ? err
-        : typeof err !== 'object'
-        ? 'Unknown error'
-        : err.message
-        ? err.message
-        : JSON.stringify(err)
+    const errorMessage = typeof err === 'string' ? err : typeof err !== 'object' ? 'Unknown error' : err.message ? err.message : JSON.stringify(err)
     setResponse({
       message: errorMessage,
       txLink: '',

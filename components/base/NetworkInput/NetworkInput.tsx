@@ -147,18 +147,8 @@ const NetworkInput = ({
         </div>
       </div>
       {variant === 'input' && !noConnectButton && (
-        <div
-          className={styles.connectButton}
-          onMouseEnter={() => setIsConnectButtonHovering(true)}
-          onMouseLeave={() => setIsConnectButtonHovering(false)}
-        >
-          <Button
-            color={getButtonColor()}
-            size="small"
-            onClick={handleWallet}
-            text={getButtonText()}
-            variant="rounded"
-          />
+        <div className={styles.connectButton} onMouseEnter={() => setIsConnectButtonHovering(true)} onMouseLeave={() => setIsConnectButtonHovering(false)}>
+          <Button color={getButtonColor()} size="small" onClick={handleWallet} text={getButtonText()} variant="rounded" />
         </div>
       )}
       {variant === 'preview' && (

@@ -7,6 +7,9 @@ import { clear, get, USER_ERC_CONNECTED_WITH } from './storage'
 import { connect as connectMetamask } from './metamask'
 import { connect as connectWalletConnect } from './walletconnect'
 import { formatInput, getNativeTokenId, ss58ToHex } from './polkadot'
+import { Interface, keccak256, solidityPack, toUtf8Bytes } from 'ethers/lib/utils'
+import { sleep } from 'utils/system'
+import { BLOCK_LIMIT, RELAYER_THRESHOLD, SLEEP_INTERVAL } from './bridge'
 
 export const NUMBER_OF_DECIMALS = 18
 
@@ -14,13 +17,10 @@ export const ETH_CHAIN_ID = process.env.NEXT_PUBLIC_ETH_CHAIN_ID ? Number(proces
 export const BSC_CHAIN_ID = 56
 
 const BSC_ETH_BRIDGE_ADDRESS = '0xE83eA178D7FE5a7dfFD597d5e887d99d279Aa030'
-const TERNOA_ETH_BRIDGE_CONTRACT =
-  process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_CONTRACT || '0x4FaeD4D60FF265056354EB67e4e12117E5b92284' //TODO default to mainnet
-const TERNOA_ETH_BRIDGE_HANDLER_CONTRACT =
-  process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT || '0x1d3c765472119483C2Cb28D1be6D8aAD43273daB' //TODO default to mainnet
+const TERNOA_ETH_BRIDGE_CONTRACT = process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_CONTRACT || '0x4FaeD4D60FF265056354EB67e4e12117E5b92284' //TODO default to mainnet
+const TERNOA_ETH_BRIDGE_HANDLER_CONTRACT = process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT || '0x1d3c765472119483C2Cb28D1be6D8aAD43273daB' //TODO default to mainnet
 
-const CAPS_TOKEN_ADDRESS_ETH =
-  process.env.NEXT_PUBLIC_CAPS_TOKEN_ADDRESS_ETH || '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2'
+const CAPS_TOKEN_ADDRESS_ETH = process.env.NEXT_PUBLIC_CAPS_TOKEN_ADDRESS_ETH || '0x03be5c903c727ee2c8c4e9bc0acc860cca4715e2'
 const CAPS_TOKEN_ADDRESS_BSC = '0xffba7529ac181c2ee1844548e6d7061c9a597df4'
 
 const providerName = ETH_CHAIN_ID === 1 ? 'mainnet' : ETH_CHAIN_ID === 5 ? 'goerli' : 'rinkeby'
@@ -101,12 +101,7 @@ export const approve = async (signer: Signer) => {
   return contract.approve(spender, MaxUint256)
 }
 
-export const getEstimateFees = async (
-  contract: ethers.Contract,
-  signer: Signer,
-  functionName: string,
-  args: any[] = []
-) => {
+export const getEstimateFees = async (contract: ethers.Contract, signer: Signer, functionName: string, args: any[] = []) => {
   const chainId = await signer.getChainId()
   if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) throw new Error('Invalid chain id for gas estimation')
   const gasLimit = await contract.estimateGas[functionName](...args)
@@ -135,9 +130,9 @@ export const transferBscEth = async (signer: Signer, amount: number) => {
 
 /* ETH -> TERNOA */
 
-const formatData = (address: string, amount: number) => {
+const formatData = (address: string, amount: number, convert = true) => {
   const bnAmount = ethers.BigNumber.from(formatInput(amount).toString())
-  const convertedAddress = ss58ToHex(address)
+  const convertedAddress = convert ? ss58ToHex(address) : address
   return (
     '0x' +
     ethers.utils.hexZeroPad(bnAmount.toHexString(), 32).substring(2) +
@@ -171,4 +166,42 @@ export const transferEthTernoa = async (user: User, amount: number) => {
   const [destChainId, ressourceId, data] = await getTransferEthTernoaParams(user, amount)
   const contract = await getBridgeContract(user.ercWallet.signer)
   return contract.deposit(destChainId, ressourceId, data)
+}
+
+export const waitForResponseTernoaEth = async (user: User, amount: number) => {
+  const hashes: string[] = []
+  if (!user.ercWallet) throw new Error('Erc address not found')
+  if (!process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT) throw new Error('ERC20 Handler contract address not found')
+  const chainId = await user.ercWallet.signer.getChainId()
+  if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) throw new Error('Invalid chain id to wait for response')
+  const bridgeContractInterface = new Interface(BRIDGE_CONTRACT_ABI)
+  const contract = await getBridgeContract(user.ercWallet?.signer as Signer)
+  const data = formatData(user.ercWallet.address, amount, false)
+  const dataHash = keccak256(solidityPack(['address', 'bytes'], [process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT, data]))
+  const provider = await getDefaultProvider(chainId)
+  const startBlockNumber = await provider.getBlockNumber()
+  while (true) {
+    const currentBlockNumber = await provider.getBlockNumber()
+    const logs = await provider.getLogs({
+      address: contract.address,
+      fromBlock: startBlockNumber,
+      topics: [keccak256(toUtf8Bytes('ProposalVote(uint8,uint64,uint8,bytes32)'))],
+    })
+    for (const log of logs) {
+      const event = bridgeContractInterface.parseLog(log)
+      const logDatahash: string = event.args[3]
+      if (logDatahash.toLowerCase() === dataHash.toLowerCase() && !hashes.includes(log.transactionHash)) {
+        hashes.push(log.transactionHash)
+      }
+    }
+    if (hashes.length >= RELAYER_THRESHOLD) {
+      return hashes
+    }
+    if (currentBlockNumber - startBlockNumber > BLOCK_LIMIT) {
+      throw new Error(
+        "We could not find the final transaction, please contact the support if you don't receive your funds in few minutes (your funds are safe)"
+      )
+    }
+    await sleep(SLEEP_INTERVAL)
+  }
 }

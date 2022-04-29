@@ -17,13 +17,7 @@ const Homepage = () => {
   const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
 
-  const {
-    fromNetwork: from,
-    toNetwork: to,
-    chainTypeForConnection: chainType,
-    isErcWalletModalOpen,
-    isPolkadotWalletModalOpen,
-  } = app
+  const { fromNetwork: from, toNetwork: to, chainTypeForConnection: chainType, isErcWalletModalOpen, isPolkadotWalletModalOpen } = app
 
   useEffect(() => {
     reconnect(dispatch)
@@ -67,9 +61,7 @@ const Homepage = () => {
     <main className="container">
       <div className={`wrapper ${styles.root}`}>
         <h1 className={styles.mobileTitle}>Token Bridge</h1>
-        <p className={styles.mobileDescription}>
-          The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.
-        </p>
+        <p className={styles.mobileDescription}>The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.</p>
         <div className={styles.transfer}>
           <Transfer />
         </div>
@@ -79,28 +71,21 @@ const Homepage = () => {
             <Lottie className={styles.lottie} path="./lottieBridge.json" />
             <div className={styles.laptopTitleBridge}>Bridge</div>
           </h1>
-          <p className={styles.laptopDescription}>
-            The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.
-          </p>
+          <p className={styles.laptopDescription}>The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.</p>
           <ul className={styles.box}>
             <li className={styles.insight}>
-              Unlike many other bridges, the Ternoa Bridge will lock your ERC20 CAPS and mint the equivalent in native
-              CAPS on the Ternoa Network.
+              Unlike many other bridges, the Ternoa Bridge will lock your ERC20 CAPS and mint the equivalent in native CAPS on the Ternoa Network.
             </li>
             <li className={styles.insight}>
-              In case you decide to sell your native CAPS, you will need to transfer it back to the Ethereum network by
-              using the Ternoa Bridge again.
+              In case you decide to sell your native CAPS, you will need to transfer it back to the Ethereum network by using the Ternoa Bridge again.
             </li>
             <li className={styles.insight}>
-              The native CAPS are necessary to take part in staking and rewards, as well as paying transaction fees in
-              the Ternoa ecosystem.
+              The native CAPS are necessary to take part in staking and rewards, as well as paying transaction fees in the Ternoa ecosystem.
             </li>
           </ul>
         </div>
       </div>
-      {(chainType === 'erc20' || chainType === 'bep20') && (
-        <ErcWalletModal chainType={chainType} isOpen={isErcWalletModalOpen} />
-      )}
+      {(chainType === 'erc20' || chainType === 'bep20') && <ErcWalletModal chainType={chainType} isOpen={isErcWalletModalOpen} />}
       {chainType === 'ternoa' && <PolkadotWalletModal isOpen={isPolkadotWalletModalOpen} />}
     </main>
   )

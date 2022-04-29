@@ -17,8 +17,7 @@ export const handleNetworkPair = (
   network: ChainType,
   dispatch: (action: AnyAction) => void
 ) => {
-  const newAutoAssignedNetwork: ChainType | undefined =
-    network === 'other' ? undefined : (ALLOWED_TRANSFERS[network][0] as ChainType)
+  const newAutoAssignedNetwork: ChainType | undefined = network === 'other' ? undefined : (ALLOWED_TRANSFERS[network][0] as ChainType)
 
   switch (origin) {
     case 'from': {
