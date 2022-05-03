@@ -1,7 +1,9 @@
 import { AnyAction } from 'redux'
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
+
+import { ChainType, ResponseNominalSetState, RESPONSE_DEFAULT_STATE, TransactionLifeCycleStatus, User } from 'interfaces'
 import { formatPrice } from 'utils/strings'
-import { ChainType, User } from '../interfaces'
+
 import { connect as connectMetamask, switchBSCNetwork, switchETHNetwork } from './metamask'
 import { connect as connectWalletConnect } from './walletconnect'
 import {
@@ -175,59 +177,74 @@ export const getNetworkFees = async (from: ChainType, to: ChainType, amount: num
   }
 }
 
-export const transfer = async (
-  from: ChainType,
-  to: ChainType,
-  amount: number,
-  user: User,
-  setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean }) => void
-) => {
+export const transfer = async (from: ChainType, to: ChainType, amount: number, user: User, setResponse: ResponseNominalSetState) => {
   try {
     const explorerPrefix = ETH_CHAIN_ID === 1 ? '' : ETH_CHAIN_ID === 5 ? 'goerli.' : 'rinkeby.'
     switch (from) {
       case 'ternoa':
         if (!user.polkadotWallet) throw new Error('Signer not found')
         await transferTernoaEth(user, amount, setResponse)
-        console.log(await waitForResponseTernoaEth(user, amount))
+        await waitForResponseTernoaEth(user, amount, setResponse)
         break
       case 'bep20':
         if (!user.ercWallet) throw new Error('Signer not found')
         const tx = await transferBscEth(user.ercWallet?.signer, amount)
+        setResponse({
+          ...RESPONSE_DEFAULT_STATE,
+          isTxSubmitted: true,
+        })
         const receipt = await tx.wait()
         const newBalance = await getErcBalance(user.ercWallet.signer)
-        setResponse({
-          message: 'Please check your wallet balance',
+        setResponse((prevState) => ({
+          ...prevState,
           newBalance,
-          txLink: `https://bscscan.com/tx/${receipt.transactionHash}`,
-          isError: false,
-        })
+          status: TransactionLifeCycleStatus.TX_SUCCESS,
+          tx: {
+            hash: receipt.transactionHash,
+            link: `https://bscscan.com/tx/${receipt.transactionHash}`,
+          },
+        }))
         break
       case 'erc20':
         if (to !== 'bep20' && to !== 'ternoa') throw new Error('Invalid combination')
         if (to === 'bep20') {
           if (!user.ercWallet) throw new Error('Signer not found')
           const tx = await transferBscEth(user.ercWallet?.signer, amount)
+          setResponse({
+            ...RESPONSE_DEFAULT_STATE,
+            isTxSubmitted: true,
+          })
           const receipt = await tx.wait()
           const newBalance = await getErcBalance(user.ercWallet.signer)
-          setResponse({
-            message: 'Please check your wallet balance',
+          setResponse((prevState) => ({
+            ...prevState,
             newBalance,
-            txLink: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
-            isError: false,
-          })
+            status: TransactionLifeCycleStatus.TX_SUCCESS,
+            tx: {
+              hash: receipt.transactionHash,
+              link: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
+            },
+          }))
         }
         if (to === 'ternoa') {
           if (!user.ercWallet) throw new Error('Signer not found')
           const tx: any = await transferEthTernoa(user, amount)
+          setResponse({
+            ...RESPONSE_DEFAULT_STATE,
+            isTxSubmitted: true,
+            voteTxs: [],
+          })
           const receipt = await tx.wait()
           const newBalance = await getErcBalance(user.ercWallet.signer)
-          setResponse({
-            message: 'Your balance will be available in few moment',
+          setResponse((prevState) => ({
+            ...prevState,
             newBalance,
-            txLink: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
-            isError: false,
-          })
-          console.log(await waitForResponseEthTernoa(user, amount))
+            tx: {
+              hash: receipt.transactionHash,
+              link: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
+            },
+          }))
+          await waitForResponseEthTernoa(user, amount, setResponse)
         }
         break
       default:
@@ -235,10 +252,10 @@ export const transfer = async (
     }
   } catch (err: any) {
     const errorMessage = typeof err === 'string' ? err : typeof err !== 'object' ? 'Unknown error' : err.message ? err.message : JSON.stringify(err)
-    setResponse({
-      message: errorMessage,
-      txLink: '',
-      isError: true,
-    })
+    setResponse((prevState) => ({
+      ...prevState,
+      body: errorMessage,
+      status: TransactionLifeCycleStatus.TX_FAILED,
+    }))
   }
 }

@@ -7,7 +7,7 @@ import { BlockHash } from '@polkadot/types/interfaces/chain'
 import { AnyAction } from 'redux'
 import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
-import { User } from '../interfaces'
+import { ITx, ResponseNominalSetState, RESPONSE_DEFAULT_STATE, TransactionLifeCycleStatus, User } from '../interfaces'
 import { clear, get, USER_POLKADOT_ADDRESS } from './storage'
 import { NUMBER_OF_DECIMALS } from './erc'
 import { BLOCK_LIMIT, RELAYER_THRESHOLD, SLEEP_INTERVAL } from './bridge'
@@ -98,6 +98,12 @@ export const ss58ToHex = (address: string) => {
   return u8aToHex(decodeAddress(address))
 }
 
+const getTxExplorerLink = (blockNumber: string, index?: string) => {
+  return `https://explorer${process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? '-alphanet' : ''}.ternoa.${
+    process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? 'dev' : 'com'
+  }/block/${blockNumber}/${index ? `${blockNumber}-${index}` : ''}`
+}
+
 export const getBridgeFees = async () => {
   const api = await getApi()
   const fee = await api.query.bridge.bridgeFee()
@@ -115,11 +121,7 @@ export const getTransferFees = async (user: User, amount: number) => {
   return formatBalance(info.partialFee.toString(), 6).toString()
 }
 
-export const transfer = async (
-  user: User,
-  amount: number,
-  setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean }) => void
-) => {
+export const transfer = async (user: User, amount: number, setResponse: ResponseNominalSetState) => {
   if (!user) throw new Error('User not found')
   if (!user.polkadotWallet) throw new Error("User's Polkadot account not found")
   if (!user.ercWallet) throw new Error('User ERC account not found')
@@ -129,29 +131,39 @@ export const transfer = async (
   const formattedAmount = formatInput(amount)
   const tx = api.tx.bridge.deposit(formattedAmount, user.ercWallet.address, ETH_DEST_ID)
   await tx.signAndSend(address, { signer: injector.signer }, async (data) => {
+    setResponse({
+      ...RESPONSE_DEFAULT_STATE,
+      isTxSubmitted: true,
+      voteTxs: [],
+    })
     const { status, events } = data
     if (status.isFinalized) {
       const blockHash = status.asFinalized
       const blockNumber = (await api.rpc.chain.getHeader(blockHash)).number.toNumber()
-      const success = events.find((x) => api.events.system.ExtrinsicSuccess.is(x.event))
-      const index = success?.phase.asApplyExtrinsic
-      const txLink = `https://explorer${process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? '-alphanet' : ''}.ternoa.${
-        process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet') ? 'dev' : 'com'
-      }/block/${blockNumber}/${index ? `${blockNumber}-${index}` : ''}`
-      let message = 'Extrinsic failed'
-      let newBalance
-      let isError = true
-      if (success) {
-        message = 'Your balance will be availble in few moment'
-        newBalance = await getBalance(address)
-        isError = false
+      const successEvent = events.find((x) => api.events.system.ExtrinsicSuccess.is(x.event))
+      const failedEvent = events.find((x) => api.events.system.ExtrinsicFailed.is(x.event))
+      const newBalance = await getBalance(address)
+      if (failedEvent !== undefined) {
+        setResponse((prevState) => ({
+          ...prevState,
+          newBalance,
+          status: TransactionLifeCycleStatus.TX_FAILED,
+          tx: {
+            hash: tx.toHex(),
+            link: getTxExplorerLink(blockNumber.toString(), failedEvent?.phase.asApplyExtrinsic?.toString()),
+            isError: true,
+          },
+        }))
+      } else {
+        setResponse((prevState) => ({
+          ...prevState,
+          newBalance,
+          tx: {
+            hash: tx.toHex(),
+            link: getTxExplorerLink(blockNumber.toString(), successEvent?.phase.asApplyExtrinsic?.toString()),
+          },
+        }))
       }
-      setResponse({
-        message,
-        newBalance,
-        txLink,
-        isError,
-      })
     } else {
       console.log(`Current status: ${status.type}`)
     }
@@ -166,8 +178,9 @@ export const getFinalizedBlockNumber = async () => {
   return finalizedBlockNumber
 }
 
-export const waitForResponseEthTernoa = async (user: User, amount: number) => {
+export const waitForResponseEthTernoa = async (user: User, amount: number, setResponse: ResponseNominalSetState) => {
   const blocks: string[] = []
+  const voteTxs: ITx[] = []
   if (!user.polkadotWallet) throw new Error('Polkadot address not found')
   const api = await getApi()
   const startBlockNumber = await getFinalizedBlockNumber()
@@ -184,17 +197,47 @@ export const waitForResponseEthTernoa = async (user: User, amount: number) => {
       const { event } = record
       if (event.method.toString() == 'RelayerVoted') {
         const index = Number(record.phase.asApplyExtrinsic)
+        const txLink = getTxExplorerLink(currentBlockNumber.toString(), index?.toString())
         const ext = block.block.extrinsics.filter((_x, i) => i === index)[0]
+        const { args, hash } = ext
         const success = records.find((x: any) => {
           return api.events.system.ExtrinsicSuccess.is(x.event) && Number(x.phase.asApplyExtrinsic) === index
         })
-        const args = ext.args
         if (success && args[2].toString() === user.polkadotWallet.address && args[3].toString() === formatInput(amount).toString()) {
           blocks.push(`${currentBlockNumber.toString()}-${index}`)
+          voteTxs.push({
+            hash: hash.toString(),
+            link: txLink,
+          })
+          setResponse((prevState) => ({
+            ...prevState,
+            voteTxs,
+          }))
+        }
+        const failed = records.find((x: any) => {
+          return api.events.system.ExtrinsicFailed.is(x.event) && Number(x.phase.asApplyExtrinsic) === index
+        })
+        if (failed && args[2].toString() === user.polkadotWallet.address && args[3].toString() === formatInput(amount).toString()) {
+          voteTxs.push({
+            hash: hash.toString(),
+            link: txLink,
+            isError: true,
+          })
+          setResponse((prevState) => ({
+            ...prevState,
+            status: TransactionLifeCycleStatus.TX_FAILED,
+            voteTxs,
+          }))
+          break
         }
       }
     }
     if (blocks.length >= RELAYER_THRESHOLD) {
+      setResponse((prevState) => ({
+        ...prevState,
+        status: TransactionLifeCycleStatus.TX_SUCCESS,
+        voteTxs,
+      }))
       return blocks
     }
     if (currentBlockNumber.sub(startBlockNumber).cmp(new BN(2 * BLOCK_LIMIT)) === 1) {

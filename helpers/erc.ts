@@ -1,7 +1,7 @@
 import { ethers, Contract, Signer } from 'ethers'
 import { MaxUint256 } from '@ethersproject/constants'
 import { BRIDGE_CONTRACT_ABI, CAPS_CONTRACT_ABI } from './abis'
-import { ERCProvider, ErcWallet, User } from '../interfaces'
+import { ERCProvider, ErcWallet, ITx, ResponseNominalSetState, TransactionLifeCycleStatus, User } from 'interfaces'
 import { AnyAction } from 'redux'
 import { clear, get, USER_ERC_CONNECTED_WITH } from './storage'
 import { connect as connectMetamask } from './metamask'
@@ -168,8 +168,9 @@ export const transferEthTernoa = async (user: User, amount: number) => {
   return contract.deposit(destChainId, ressourceId, data)
 }
 
-export const waitForResponseTernoaEth = async (user: User, amount: number) => {
+export const waitForResponseTernoaEth = async (user: User, amount: number, setResponse: ResponseNominalSetState) => {
   const hashes: string[] = []
+  const votedProposals: ITx[] = []
   if (!user.ercWallet) throw new Error('Erc address not found')
   if (!process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT) throw new Error('ERC20 Handler contract address not found')
   const chainId = await user.ercWallet.signer.getChainId()
@@ -192,9 +193,18 @@ export const waitForResponseTernoaEth = async (user: User, amount: number) => {
       const logDatahash: string = event.args[3]
       if (logDatahash.toLowerCase() === dataHash.toLowerCase() && !hashes.includes(log.transactionHash)) {
         hashes.push(log.transactionHash)
+        votedProposals.push({
+          hash: log.transactionHash,
+          link: `https://${ETH_CHAIN_ID === 1 ? '' : ETH_CHAIN_ID === 5 ? 'goerli.' : 'rinkeby.'}etherscan.io/tx/${log.transactionHash}`,
+        })
       }
     }
     if (hashes.length >= RELAYER_THRESHOLD) {
+      setResponse((prevState) => ({
+        ...prevState,
+        status: TransactionLifeCycleStatus.TX_SUCCESS,
+        voteTxs: votedProposals,
+      }))
       return hashes
     }
     if (currentBlockNumber - startBlockNumber > BLOCK_LIMIT) {

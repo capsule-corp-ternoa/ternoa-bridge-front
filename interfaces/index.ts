@@ -26,3 +26,36 @@ export interface User {
   ercWallet?: ErcWallet
   polkadotWallet?: PolkadotWallet
 }
+
+export enum TransactionLifeCycleStatus {
+  TX_PENDING,
+  TX_SUCCESS,
+  TX_FAILED,
+}
+
+export const RESPONSE_DEFAULT_STATE = {
+  body: undefined,
+  explorerLink: undefined,
+  isTxSubmitted: false,
+  newBalance: undefined,
+  status: TransactionLifeCycleStatus.TX_PENDING,
+  txHash: undefined,
+  voteTxs: undefined,
+}
+
+export interface ITx {
+  hash: string
+  link: string
+  isError?: boolean
+}
+
+export interface IResponse {
+  body?: string
+  isTxSubmitted?: boolean
+  newBalance?: number
+  status: TransactionLifeCycleStatus
+  tx?: ITx
+  voteTxs?: ITx[]
+}
+
+export type ResponseNominalSetState = React.Dispatch<React.SetStateAction<IResponse>>

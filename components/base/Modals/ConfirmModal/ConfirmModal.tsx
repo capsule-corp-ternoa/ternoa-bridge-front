@@ -8,6 +8,7 @@ import Radio from 'components/ui/Radio'
 
 import { approve, getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
 import { getBridgeFees } from 'helpers/polkadot'
+import { ResponseNominalSetState, RESPONSE_DEFAULT_STATE, TransactionLifeCycleStatus } from 'interfaces'
 import { useAppSelector } from 'redux/hooks'
 import { formatPrice, middleEllipsis } from 'utils/strings'
 
@@ -19,7 +20,7 @@ export interface ConfirmModalProps {
   handleClose: () => void
   handleContinue: () => void
   isOpen: boolean
-  setResponse: (response: { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined) => void
+  setResponse: ResponseNominalSetState
   setIsResultModalOpen: (b: boolean) => void
 }
 
@@ -53,9 +54,9 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
       handleClose()
       setIsResultModalOpen(true)
       setResponse({
-        message: 'Contract approval can not be set',
-        txLink: '',
-        isError: true,
+        ...RESPONSE_DEFAULT_STATE,
+        body: 'Unable to approve the contract',
+        status: TransactionLifeCycleStatus.TX_FAILED,
       })
     } finally {
       setIsApprovalLoading(false)
@@ -89,9 +90,9 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
           handleClose()
           setIsResultModalOpen(true)
           setResponse({
-            message: 'Unable to estimate fees',
-            txLink: '',
-            isError: true,
+            ...RESPONSE_DEFAULT_STATE,
+            body: 'Unable to estimate fees',
+            status: TransactionLifeCycleStatus.TX_FAILED,
           })
         }
       }
