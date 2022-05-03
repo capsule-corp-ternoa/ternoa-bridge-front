@@ -26,6 +26,7 @@ export interface ConfirmModalProps {
 
 const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse, setIsResultModalOpen }: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
+  const [feesUnit, setFeesUnit] = useState('')
   const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
@@ -81,12 +82,14 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
       try {
         if (isApproved) {
           const { value, unit } = await getNetworkFees(from, to, amount, user)
-          if (shouldUpdate) setFees(`${Number(value).toFixed(6)} ${unit}`)
+          if (shouldUpdate) {
+            setFees(Number(value).toFixed(6))
+            setFeesUnit(unit)
+          }
         }
       } catch (error) {
         console.error(error)
         if (shouldUpdate) {
-          setFees('Unable to estimate fees')
           handleClose()
           setIsResultModalOpen(true)
           setResponse({
@@ -169,14 +172,20 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
           {isApproved && (
             <div className={styles.resumeLine}>
               <span className={styles.resumeItem}>Network Fee*</span>
-              {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
+              {fees ? <span className={styles.resumeItem}>{`${fees} ${feesUnit}`}</span> : <div className={styles.shimmerLoading} />}
             </div>
           )}
           {isApproved && from === 'ternoa' && to === 'erc20' && (
-            <div className={styles.resumeLine}>
-              <span className={styles.resumeItem}>Bridge Fee*</span>
-              <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
-            </div>
+            <>
+              <div className={styles.resumeLine}>
+                <span className={styles.resumeItem}>Bridge Fee*</span>
+                <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
+              </div>
+              <div className={styles.resumeLine}>
+                <span className={styles.resumeItem}>Total Fees*</span>
+                <span className={styles.resumeItem}>{`${Number(fees) + bridgeFee} CAPS`}</span>
+              </div>
+            </>
           )}
           <div className={styles.resumeLine}>
             <span className={styles.resumeItem}>You will receive</span>
