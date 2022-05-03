@@ -5,15 +5,14 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks'
 import Arrow from 'assets/svgComponents/Arrow'
 import Switch from 'assets/svgComponents/Switch'
 import ConfirmModal from 'components/base/Modals/ConfirmModal'
-import LoadingModal from 'components/base/Modals/LoadingModal'
-import ResultModal from 'components/base/Modals/ResultModal'
+import ProgressModal from 'components/base/Modals/ProgressModal'
 import NetworkModal from 'components/base/Modals/NetworkModal'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Input from 'components/ui/Input'
 import { checkProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
-import { ChainType } from 'interfaces'
+import { ChainType, IResponse, RESPONSE_DEFAULT_STATE } from 'interfaces'
 import { actions as appActions } from 'redux/app/actions'
 import { actions as userActions } from 'redux/user/actions'
 import { handleNetworkPair } from 'utils/networks'
@@ -26,13 +25,10 @@ const Transfer = () => {
   const [amountError, setAmountError] = useState<string | undefined>(undefined)
   const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
-  const [response, setResponse] = useState<
-    { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
-  >(undefined)
+  const [response, setResponse] = useState<IResponse>(RESPONSE_DEFAULT_STATE)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
-  const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false)
-  const [isResultModalOpen, setIsResultModalOpen] = useState(false)
+  const [isProgressModalOpen, setIsProgressModalOpen] = useState(false)
 
   const dispatch = useAppDispatch()
   const { app } = useAppSelector((state) => state.app)
@@ -77,31 +73,31 @@ const Transfer = () => {
   }
 
   const handleConfirmTransaction = async () => {
+    setResponse({
+      ...RESPONSE_DEFAULT_STATE,
+      body: 'Confirm the transaction on your wallet',
+    })
     setIsConfirmModalOpen(false)
-    setIsLoadingModalOpen(true)
+    setIsProgressModalOpen(true)
     await transfer(from, to, amount, user, setResponse)
   }
 
-  const handleResultModalClose = () => {
-    setIsResultModalOpen(false)
-    setResponse(undefined)
+  const handleProgressModalClose = () => {
+    setIsProgressModalOpen(false)
+    setResponse(RESPONSE_DEFAULT_STATE)
   }
 
   useEffect(() => {
     let shouldUpdate = true
 
     if (shouldUpdate && response) {
-      const { isError, newBalance } = response
-      setIsLoadingModalOpen(false)
-      setIsResultModalOpen(true)
+      const { newBalance } = response
 
-      if (!isError) {
-        if (newBalance !== undefined) {
-          if (from === 'ternoa') {
-            dispatch(userActions.setCapsBalancePolkadot(newBalance))
-          } else {
-            dispatch(userActions.setCapsBalanceErc(newBalance))
-          }
+      if (newBalance !== undefined) {
+        if (from === 'ternoa') {
+          dispatch(userActions.setCapsBalancePolkadot(newBalance))
+        } else {
+          dispatch(userActions.setCapsBalanceErc(newBalance))
         }
         setAmount(0)
       }
@@ -172,10 +168,7 @@ const Transfer = () => {
             </div>
             <NetworkInput
               className={styles.networkInput}
-              forceIsConnected={
-                ((from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')) &&
-                isConnected(from, user)
-              }
+              forceIsConnected={((from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')) && isConnected(from, user)}
               network={to}
               noNetworkData={(from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')}
               onClick={() => {
@@ -194,9 +187,7 @@ const Transfer = () => {
               <button
                 className={styles.maxButton}
                 disabled={balance === undefined}
-                onClick={() =>
-                  balance !== undefined && balance >= 0 && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)
-                }
+                onClick={() => balance !== undefined && balance >= 0 && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)}
               >
                 Max
               </button>
@@ -232,23 +223,11 @@ const Transfer = () => {
           handleContinue={handleConfirmTransaction}
           isOpen={isConfirmModalOpen}
           setResponse={setResponse}
-          setIsResultModalOpen={setIsResultModalOpen}
+          setIsResultModalOpen={setIsProgressModalOpen}
         />
       )}
-      <LoadingModal isOpen={isLoadingModalOpen} />
-      <ResultModal
-        body={!response ? '' : response.message}
-        link={!response ? '' : response.txLink}
-        handleClose={handleResultModalClose}
-        isError={!response ? false : response.isError}
-        isOpen={isResultModalOpen}
-      />
-      <NetworkModal
-        handleClose={() => setIsNetworkModalOpen(false)}
-        handleNetworkPair={handleNetworkChange}
-        isOpen={isNetworkModalOpen}
-        origin={origin}
-      />
+      <ProgressModal handleClose={handleProgressModalClose} isOpen={isProgressModalOpen} response={response} />
+      <NetworkModal handleClose={() => setIsNetworkModalOpen(false)} handleNetworkPair={handleNetworkChange} isOpen={isNetworkModalOpen} origin={origin} />
     </>
   )
 }

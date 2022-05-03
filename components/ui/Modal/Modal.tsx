@@ -13,13 +13,7 @@ export interface ModalProps {
   isOpen: boolean
 }
 
-const Modal: React.FC<ModalProps> = ({
-  children,
-  handleClose,
-  isClickAwayCloseAllowed = true,
-  isClosable = true,
-  isOpen,
-}) => {
+const Modal: React.FC<ModalProps> = ({ children, handleClose, isClickAwayCloseAllowed = true, isClosable = true, isOpen }) => {
   useEffect(() => {
     const body = document.querySelector('body')
     if (body) {

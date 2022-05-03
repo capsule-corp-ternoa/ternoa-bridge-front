@@ -60,10 +60,7 @@ const NetworkModal = ({ handleClose, handleNetworkPair, isOpen, origin }: Networ
             noConnectButton
             noNetworkData
             onClick={() => {
-              if (
-                user.ercWallet?.connectedWith === 'metamask' &&
-                (origin === 'from' || (origin === 'to' && app.fromNetwork === 'ternoa'))
-              ) {
+              if (user.ercWallet?.connectedWith === 'metamask' && (origin === 'from' || (origin === 'to' && app.fromNetwork === 'ternoa'))) {
                 handleNetworkSwitch('erc20')
               }
               handleNetworkPair(origin, 'erc20')

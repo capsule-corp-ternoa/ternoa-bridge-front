@@ -28,11 +28,7 @@ const MobileHeader = () => {
             <div className={styles.logoTitle}>Ternoa Bridge</div>
           </a>
         </Link>
-        <button
-          className={styles.expandIcon}
-          onClick={() => setIsMenuExpanded((prevState) => !prevState)}
-          title="Open menu"
-        >
+        <button className={styles.expandIcon} onClick={() => setIsMenuExpanded((prevState) => !prevState)} title="Open menu">
           <Hamburger />
         </button>
       </nav>

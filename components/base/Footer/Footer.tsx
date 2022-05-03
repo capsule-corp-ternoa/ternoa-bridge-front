@@ -22,22 +22,11 @@ const Footer = () => (
           <a href="https://twitter.com/ternoa_" target="_blank" rel="noopener noreferrer" title="Ternoa Twitter">
             <Twitter className={styles.socialLogo} />
           </a>
-          <a
-            href="https://www.instagram.com/ternoa_/"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Ternoa Instagram"
-          >
+          <a href="https://www.instagram.com/ternoa_/" target="_blank" rel="noopener noreferrer" title="Ternoa Instagram">
             <Instagram className={styles.socialLogo} />
           </a>
         </div>
-        <a
-          className={styles.link}
-          href="https://www.ternoa.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Ternoa official website"
-        >
+        <a className={styles.link} href="https://www.ternoa.com" target="_blank" rel="noopener noreferrer" title="Ternoa official website">
           Ternoa
           <LinkArrow />
         </a>

@@ -8,6 +8,7 @@ import Radio from 'components/ui/Radio'
 
 import { approve, getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
 import { getBridgeFees } from 'helpers/polkadot'
+import { ResponseNominalSetState, RESPONSE_DEFAULT_STATE, TransactionLifeCycleStatus } from 'interfaces'
 import { useAppSelector } from 'redux/hooks'
 import { formatPrice, middleEllipsis } from 'utils/strings'
 
@@ -19,21 +20,13 @@ export interface ConfirmModalProps {
   handleClose: () => void
   handleContinue: () => void
   isOpen: boolean
-  setResponse: (
-    response: { message: string; newBalance?: number; txLink: string; isError: boolean } | undefined
-  ) => void
+  setResponse: ResponseNominalSetState
   setIsResultModalOpen: (b: boolean) => void
 }
 
-const ConfirmModal = ({
-  amount,
-  handleClose,
-  handleContinue,
-  isOpen,
-  setResponse,
-  setIsResultModalOpen,
-}: ConfirmModalProps) => {
+const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse, setIsResultModalOpen }: ConfirmModalProps) => {
   const [fees, setFees] = useState('')
+  const [feesUnit, setFeesUnit] = useState('')
   const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
   const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
@@ -62,9 +55,9 @@ const ConfirmModal = ({
       handleClose()
       setIsResultModalOpen(true)
       setResponse({
-        message: 'Contract approval can not be set',
-        txLink: '',
-        isError: true,
+        ...RESPONSE_DEFAULT_STATE,
+        body: 'Unable to approve the contract',
+        status: TransactionLifeCycleStatus.TX_FAILED,
       })
     } finally {
       setIsApprovalLoading(false)
@@ -89,18 +82,20 @@ const ConfirmModal = ({
       try {
         if (isApproved) {
           const { value, unit } = await getNetworkFees(from, to, amount, user)
-          if (shouldUpdate) setFees(`${Number(value).toFixed(6)} ${unit}`)
+          if (shouldUpdate) {
+            setFees(Number(value).toFixed(6))
+            setFeesUnit(unit)
+          }
         }
       } catch (error) {
         console.error(error)
         if (shouldUpdate) {
-          setFees('Unable to estimate fees')
           handleClose()
           setIsResultModalOpen(true)
           setResponse({
-            message: 'Unable to estimate fees',
-            txLink: '',
-            isError: true,
+            ...RESPONSE_DEFAULT_STATE,
+            body: 'Unable to estimate fees',
+            status: TransactionLifeCycleStatus.TX_FAILED,
           })
         }
       }
@@ -177,14 +172,20 @@ const ConfirmModal = ({
           {isApproved && (
             <div className={styles.resumeLine}>
               <span className={styles.resumeItem}>Network Fee*</span>
-              {fees ? <span className={styles.resumeItem}>{fees}</span> : <div className={styles.shimmerLoading} />}
+              {fees ? <span className={styles.resumeItem}>{`${fees} ${feesUnit}`}</span> : <div className={styles.shimmerLoading} />}
             </div>
           )}
           {isApproved && from === 'ternoa' && to === 'erc20' && (
-            <div className={styles.resumeLine}>
-              <span className={styles.resumeItem}>Bridge Fee*</span>
-              <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
-            </div>
+            <>
+              <div className={styles.resumeLine}>
+                <span className={styles.resumeItem}>Bridge Fee*</span>
+                <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
+              </div>
+              <div className={styles.resumeLine}>
+                <span className={styles.resumeItem}>Total Fees*</span>
+                <span className={styles.resumeItem}>{`${Number(fees) + bridgeFee} CAPS`}</span>
+              </div>
+            </>
           )}
           <div className={styles.resumeLine}>
             <span className={styles.resumeItem}>You will receive</span>
@@ -209,8 +210,7 @@ const ConfirmModal = ({
           variant="rectangle"
         />
         <div className={styles.advise}>
-          *The network fees and execution price depend on the market condition, you may get a different rate when the
-          transaction is complete
+          *The network fees and execution price depend on the market condition, you may get a different rate when the transaction is complete
         </div>
       </div>
     </Modal>

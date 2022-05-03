@@ -15,16 +15,7 @@ interface Props {
 
 const Radio = ({ checked, className, id, label, name, onChange, readOnly, value }: Props) => (
   <label className={[`${styles.root}`, className].join(' ')}>
-    <input
-      className={styles.input}
-      type="radio"
-      id={id}
-      checked={checked}
-      name={name}
-      onChange={onChange}
-      readOnly={readOnly}
-      value={value}
-    />
+    <input className={styles.input} type="radio" id={id} checked={checked} name={name} onChange={onChange} readOnly={readOnly} value={value} />
     {label}
   </label>
 )

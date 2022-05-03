@@ -48,11 +48,7 @@ const TextInput = ({
       )}
       <label className={[`${styles.inputLabel}`, ''].join(' ')}>
         <input
-          className={[
-            `${styles.input}`,
-            `${isError ? styles.error : ''}`,
-            `${endComponent !== undefined ? styles.isEndComponent : ''}`,
-          ].join(' ')}
+          className={[`${styles.input}`, `${isError ? styles.error : ''}`, `${endComponent !== undefined ? styles.isEndComponent : ''}`].join(' ')}
           type={type}
           disabled={disabled}
           inputMode={type === 'number' ? 'numeric' : undefined}
@@ -63,14 +59,17 @@ const TextInput = ({
           min={min}
           name={name}
           value={value}
+          onKeyDown={(evt) => {
+            evt.key
+            const forbidden = type === 'number' ? ['e', '-', ','] : []
+            if (forbidden.includes(evt.key)) {
+              evt.preventDefault()
+            }
+          }}
         />
         <div className={styles.endComponent}>{endComponent}</div>
       </label>
-      {error ? (
-        <div className={styles.errorMessage}>{error}</div>
-      ) : (
-        <div className={styles.adviseMessage}>{advise}</div>
-      )}
+      {error ? <div className={styles.errorMessage}>{error}</div> : <div className={styles.adviseMessage}>{advise}</div>}
     </div>
   )
 }
