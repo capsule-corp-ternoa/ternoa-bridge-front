@@ -1,0 +1,34 @@
+@import 'style/base.scss';
+
+.root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  color: $color-contrast;
+  font-family: $font-bold;
+  font-size: 2.4rem;
+  margin: 0;
+  text-align: center;
+}
+
+.image {
+  width: 28rem;
+  height: auto;
+  margin-top: 4rem;
+}
+
+.body {
+  color: $color-contrast;
+  font-family: $font-bold;
+  font-size: 1.6rem;
+  margin-top: 4rem;
+  text-align: center;
+}
+
+.loader {
+  margin-top: 4rem;
+}

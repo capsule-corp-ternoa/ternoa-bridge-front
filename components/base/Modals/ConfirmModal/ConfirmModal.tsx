@@ -11,9 +11,11 @@ import { getBridgeFees } from 'helpers/polkadot'
 import { ResponseNominalSetState, RESPONSE_DEFAULT_STATE, TransactionLifeCycleStatus } from 'interfaces'
 import { useAppSelector } from 'redux/hooks'
 import { formatPrice, middleEllipsis } from 'utils/strings'
+import { sleep } from 'utils/system'
 
 import transferStyles from '../../Transfer/Transfer.module.scss'
 import styles from './ConfirmModal.module.scss'
+import ApproveModal from '../ApproveModal'
 
 export interface ConfirmModalProps {
   amount: number
@@ -46,9 +48,8 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
       const receipt = await tx.wait()
       if (receipt && receipt.status === 1) {
         //Set timeout in case fees estimation triggers too quickly
-        setTimeout(() => {
-          setIsApproved(true)
-        }, 2000)
+        await sleep(2000)
+        setIsApproved(true)
       }
     } catch (error) {
       console.log(error)
@@ -137,83 +138,86 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
   }, [from, to, user])
 
   return (
-    <Modal handleClose={handleClose} isOpen={isOpen}>
-      <div className={styles.root}>
-        <h4 className={styles.title}>Confirmation</h4>
-        <div className={styles.inputs}>
-          <div className={transferStyles.field}>
-            <div className={transferStyles.top}>
-              <span className={transferStyles.label}>From</span>
-            </div>
-            <NetworkInput className={transferStyles.networkInput} network={from} variant="preview" />
-          </div>
-
-          <div className={transferStyles.switch}>
-            <div className={transferStyles.separator} />
-            <div className={styles.arrowWrapper}>
-              <Arrow className={transferStyles.arrowSvg} />
-            </div>
-          </div>
-
-          <div className={transferStyles.field}>
-            <div className={transferStyles.top}>
-              <span className={transferStyles.label}>To</span>
-            </div>
-            <NetworkInput className={transferStyles.networkInput} network={to} variant="preview" />
-          </div>
-        </div>
-        <div className={styles.resume}>
-          {toAddress && (
-            <div className={styles.resumeLine}>
-              <span className={styles.resumeItem}>Destination</span>
-              <span className={styles.resumeItem}>{middleEllipsis(toAddress)}</span>
-            </div>
-          )}
-          {isApproved && (
-            <div className={styles.resumeLine}>
-              <span className={styles.resumeItem}>Network Fee*</span>
-              {fees ? <span className={styles.resumeItem}>{`${fees} ${feesUnit}`}</span> : <div className={styles.shimmerLoading} />}
-            </div>
-          )}
-          {isApproved && from === 'ternoa' && to === 'erc20' && (
-            <>
-              <div className={styles.resumeLine}>
-                <span className={styles.resumeItem}>Bridge Fee*</span>
-                <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
+    <>
+      <Modal handleClose={handleClose} isOpen={isOpen} isClickAwayCloseAllowed={!isApprovalLoading} isClosable={!isApprovalLoading}>
+        <div className={styles.root}>
+          <h4 className={styles.title}>Confirmation</h4>
+          <div className={styles.inputs}>
+            <div className={transferStyles.field}>
+              <div className={transferStyles.top}>
+                <span className={transferStyles.label}>From</span>
               </div>
-              <div className={styles.resumeLine}>
-                <span className={styles.resumeItem}>Total Fees*</span>
-                <span className={styles.resumeItem}>{`${Number(fees) + bridgeFee} CAPS`}</span>
+              <NetworkInput className={transferStyles.networkInput} network={from} variant="preview" />
+            </div>
+
+            <div className={transferStyles.switch}>
+              <div className={transferStyles.separator} />
+              <div className={styles.arrowWrapper}>
+                <Arrow className={transferStyles.arrowSvg} />
               </div>
-            </>
-          )}
-          <div className={styles.resumeLine}>
-            <span className={styles.resumeItem}>You will receive</span>
-            <span className={styles.resumeBoldItem}>{`${formatPrice(amount, {})} CAPS`}</span>
+            </div>
+
+            <div className={transferStyles.field}>
+              <div className={transferStyles.top}>
+                <span className={transferStyles.label}>To</span>
+              </div>
+              <NetworkInput className={transferStyles.networkInput} network={to} variant="preview" />
+            </div>
+          </div>
+          <div className={styles.resume}>
+            {toAddress && (
+              <div className={styles.resumeLine}>
+                <span className={styles.resumeItem}>Destination</span>
+                <span className={styles.resumeItem}>{middleEllipsis(toAddress)}</span>
+              </div>
+            )}
+            {isApproved && (
+              <div className={styles.resumeLine}>
+                <span className={styles.resumeItem}>Network Fee*</span>
+                {fees ? <span className={styles.resumeItem}>{`${fees} ${feesUnit}`}</span> : <div className={styles.shimmerLoading} />}
+              </div>
+            )}
+            {isApproved && from === 'ternoa' && to === 'erc20' && (
+              <>
+                <div className={styles.resumeLine}>
+                  <span className={styles.resumeItem}>Bridge Fee*</span>
+                  <span className={styles.resumeItem}>{`${bridgeFee} CAPS`}</span>
+                </div>
+                <div className={styles.resumeLine}>
+                  <span className={styles.resumeItem}>Total Fees*</span>
+                  <span className={styles.resumeItem}>{`${Number(fees) + bridgeFee} CAPS`}</span>
+                </div>
+              </>
+            )}
+            <div className={styles.resumeLine}>
+              <span className={styles.resumeItem}>You will receive</span>
+              <span className={styles.resumeBoldItem}>{`${formatPrice(amount, {})} CAPS`}</span>
+            </div>
+          </div>
+          <Radio
+            className={styles.radio}
+            checked={isTermsRadioChecked}
+            name="terms"
+            label="I have read and agree to the terms."
+            onChange={() => setIsTermsRadioChecked(true)}
+          />
+          <Button
+            className={styles.button}
+            color="primary500"
+            disabled={isApprovalLoading || !isTermsRadioChecked}
+            isLoading={isApprovalLoading}
+            onClick={isApproved ? handleContinue : handleApprove}
+            size="medium"
+            text={isApproved ? 'Continue' : 'Approve'}
+            variant="rectangle"
+          />
+          <div className={styles.advise}>
+            *The network fees and execution price depend on the market condition, you may get a different rate when the transaction is complete
           </div>
         </div>
-        <Radio
-          className={styles.radio}
-          checked={isTermsRadioChecked}
-          name="terms"
-          label="I have read and agree to the terms."
-          onChange={() => setIsTermsRadioChecked(true)}
-        />
-        <Button
-          className={styles.button}
-          color="primary500"
-          disabled={isApprovalLoading || !isTermsRadioChecked}
-          isLoading={isApprovalLoading}
-          onClick={isApproved ? handleContinue : handleApprove}
-          size="medium"
-          text={isApproved ? 'Continue' : 'Approve'}
-          variant="rectangle"
-        />
-        <div className={styles.advise}>
-          *The network fees and execution price depend on the market condition, you may get a different rate when the transaction is complete
-        </div>
-      </div>
-    </Modal>
+      </Modal>
+      <ApproveModal isOpen={isApprovalLoading} />
+    </>
   )
 }
 
