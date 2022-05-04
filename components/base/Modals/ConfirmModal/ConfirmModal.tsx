@@ -4,7 +4,6 @@ import Arrow from 'assets/svgComponents/Arrow'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
-import Radio from 'components/ui/Radio'
 
 import { approve, getAddress, getNetworkFees, isApproved as isApprovedHelper } from 'helpers/bridge'
 import { getBridgeFees } from 'helpers/polkadot'
@@ -31,7 +30,6 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
   const [feesUnit, setFeesUnit] = useState('')
   const [isApprovalLoading, setIsApprovalLoading] = useState(false)
   const [isApproved, setIsApproved] = useState(false)
-  const [isTermsRadioChecked, setIsTermsRadioChecked] = useState(false)
   const [isFirstRender, setIsFirstRender] = useState(true)
   const [bridgeFee, setBridgeFee] = useState(0)
   const { app } = useAppSelector((state) => state.app)
@@ -194,17 +192,10 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
               <span className={styles.resumeBoldItem}>{`${formatPrice(amount, {})} CAPS`}</span>
             </div>
           </div>
-          <Radio
-            className={styles.radio}
-            checked={isTermsRadioChecked}
-            name="terms"
-            label="I have read and agree to the terms."
-            onChange={() => setIsTermsRadioChecked(true)}
-          />
           <Button
             className={styles.button}
             color="primary500"
-            disabled={isApprovalLoading || !isTermsRadioChecked}
+            disabled={isApprovalLoading}
             isLoading={isApprovalLoading}
             onClick={isApproved ? handleContinue : handleApprove}
             size="medium"
