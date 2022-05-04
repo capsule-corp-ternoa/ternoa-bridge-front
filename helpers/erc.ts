@@ -200,8 +200,10 @@ export const waitForResponseTernoaEth = async (user: User, amount: number, setRe
       }
     }
     if (hashes.length >= RELAYER_THRESHOLD) {
+      const newErcBalance = await getBalance(user.ercWallet.signer)
       setResponse((prevState) => ({
         ...prevState,
+        newErcBalance,
         status: TransactionLifeCycleStatus.TX_SUCCESS,
         voteTxs: votedProposals,
       }))

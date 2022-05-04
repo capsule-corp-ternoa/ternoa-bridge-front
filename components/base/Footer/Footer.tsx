@@ -32,7 +32,7 @@ const Footer = () => (
         </a>
       </div>
       <div className={styles.bottom}>
-        <span className={styles.laptopCredentials}>© 2021 Ternoa bridge . All rights reserved.</span>
+        <span className={styles.laptopCredentials}>{`© ${new Date().getFullYear()} Ternoa bridge . All rights reserved.`}</span>
         <div className={styles.linksWrapper}>
           <a
             className={styles.footerLink}
@@ -55,7 +55,7 @@ const Footer = () => (
         </div>
       </div>
     </div>
-    <span className={styles.mobileCredentials}>© 2021 Ternoa bridge . All rights reserved.</span>
+    <span className={styles.mobileCredentials}>{`© ${new Date().getFullYear()} Ternoa bridge . All rights reserved.`}</span>
   </footer>
 )
 

@@ -142,11 +142,11 @@ export const transfer = async (user: User, amount: number, setResponse: Response
       const blockNumber = (await api.rpc.chain.getHeader(blockHash)).number.toNumber()
       const successEvent = events.find((x) => api.events.system.ExtrinsicSuccess.is(x.event))
       const failedEvent = events.find((x) => api.events.system.ExtrinsicFailed.is(x.event))
-      const newBalance = await getBalance(address)
+      const newPolkadotBalance = await getBalance(address)
       if (failedEvent !== undefined) {
         setResponse((prevState) => ({
           ...prevState,
-          newBalance,
+          newPolkadotBalance,
           status: TransactionLifeCycleStatus.TX_FAILED,
           tx: {
             hash: tx.toHex(),
@@ -157,7 +157,7 @@ export const transfer = async (user: User, amount: number, setResponse: Response
       } else {
         setResponse((prevState) => ({
           ...prevState,
-          newBalance,
+          newPolkadotBalance,
           tx: {
             hash: tx.toHex(),
             link: getTxExplorerLink(blockNumber.toString(), successEvent?.phase.asApplyExtrinsic?.toString()),
@@ -214,27 +214,13 @@ export const waitForResponseEthTernoa = async (user: User, amount: number, setRe
             voteTxs,
           }))
         }
-        const failed = records.find((x: any) => {
-          return api.events.system.ExtrinsicFailed.is(x.event) && Number(x.phase.asApplyExtrinsic) === index
-        })
-        if (failed && args[2].toString() === user.polkadotWallet.address && args[3].toString() === formatInput(amount).toString()) {
-          voteTxs.push({
-            hash: hash.toString(),
-            link: txLink,
-            isError: true,
-          })
-          setResponse((prevState) => ({
-            ...prevState,
-            status: TransactionLifeCycleStatus.TX_FAILED,
-            voteTxs,
-          }))
-          break
-        }
       }
     }
     if (blocks.length >= RELAYER_THRESHOLD) {
+      const newPolkadotBalance = await getBalance(user.polkadotWallet.address)
       setResponse((prevState) => ({
         ...prevState,
+        newPolkadotBalance,
         status: TransactionLifeCycleStatus.TX_SUCCESS,
         voteTxs,
       }))

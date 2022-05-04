@@ -88,6 +88,14 @@
     }
   }
 
+  .maxButtonLoader {
+    margin: 0 0.4rem;
+
+    @include xl {
+      margin: 0.1rem 0.6rem;
+    }
+  }
+
   @include lg {
     min-width: 32rem;
   }

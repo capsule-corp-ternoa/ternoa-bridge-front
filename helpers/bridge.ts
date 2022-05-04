@@ -102,10 +102,26 @@ export const getBalance = (from: ChainType, user: User) => {
   return from === 'ternoa' ? user.polkadotWallet?.capsBalance : user.ercWallet?.capsBalance
 }
 
+export const getTotalCAPSFees = async (from: ChainType, to: ChainType, amount: number, user: User) => {
+  let totalCAPSFees = 0
+  try {
+    if (`${from}-${to}` === 'ternoa-erc20') {
+      const bridgeFee = await getBridgeFees()
+      const { value } = await getNetworkFees(from, to, amount, user)
+      const fee = Math.ceil(Number(Number(value).toFixed(3)) * 1000) / 1000
+      totalCAPSFees = fee + bridgeFee
+    }
+    return totalCAPSFees
+  } catch (error) {
+    console.log(error)
+    return totalCAPSFees
+  }
+}
+
 export const checkProceed = async (from: ChainType, to: ChainType, amount: number, user: User) => {
   const key = `${from}-${to}`
   const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
-  const bridgeFee = `${from}-${to}` === 'ternoa-erc20' ? await getBridgeFees() : 0
+  const totalCAPSFees = await getTotalCAPSFees(from, to, amount, user)
   if (!validDirections.includes(key))
     throw new Error('Invalid combination', {
       cause: new Error('Incorrect network'),
@@ -133,8 +149,8 @@ export const checkProceed = async (from: ChainType, to: ChainType, amount: numbe
     throw new Error('Insufficient balance', {
       cause: new Error('Incorrect amount'),
     })
-  if (key === 'ternoa-erc20' && balance < amount + bridgeFee)
-    throw new Error(`Insufficient funds to pay ${formatPrice(bridgeFee, {})} CAPS of bridge fee`, {
+  if (key === 'ternoa-erc20' && balance < amount + totalCAPSFees)
+    throw new Error(`Insufficient funds to pay ${formatPrice(totalCAPSFees, {})} CAPS of total fees`, {
       cause: new Error('Incorrect amount'),
     })
 }
@@ -194,10 +210,10 @@ export const transfer = async (from: ChainType, to: ChainType, amount: number, u
           isTxSubmitted: true,
         })
         const receipt = await tx.wait()
-        const newBalance = await getErcBalance(user.ercWallet.signer)
+        const newErcBalance = await getErcBalance(user.ercWallet.signer)
         setResponse((prevState) => ({
           ...prevState,
-          newBalance,
+          newErcBalance,
           status: TransactionLifeCycleStatus.TX_SUCCESS,
           tx: {
             hash: receipt.transactionHash,
@@ -215,10 +231,10 @@ export const transfer = async (from: ChainType, to: ChainType, amount: number, u
             isTxSubmitted: true,
           })
           const receipt = await tx.wait()
-          const newBalance = await getErcBalance(user.ercWallet.signer)
+          const newErcBalance = await getErcBalance(user.ercWallet.signer)
           setResponse((prevState) => ({
             ...prevState,
-            newBalance,
+            newErcBalance,
             status: TransactionLifeCycleStatus.TX_SUCCESS,
             tx: {
               hash: receipt.transactionHash,
@@ -235,10 +251,10 @@ export const transfer = async (from: ChainType, to: ChainType, amount: number, u
             voteTxs: [],
           })
           const receipt = await tx.wait()
-          const newBalance = await getErcBalance(user.ercWallet.signer)
+          const newErcBalance = await getErcBalance(user.ercWallet.signer)
           setResponse((prevState) => ({
             ...prevState,
-            newBalance,
+            newErcBalance,
             tx: {
               hash: receipt.transactionHash,
               link: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,

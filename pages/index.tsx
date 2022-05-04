@@ -15,7 +15,6 @@ export default function Home() {
         <meta name="description" content="Ternoa Bridge" />
       </Head>
 
-      <div className="disclaimer">Warning: this bridge is currently being audited. Use it at your own risks.</div>
       <header className="container">
         <Header />
         <MobileHeader />
