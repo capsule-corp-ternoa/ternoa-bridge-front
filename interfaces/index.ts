@@ -37,7 +37,8 @@ export const RESPONSE_DEFAULT_STATE = {
   body: undefined,
   explorerLink: undefined,
   isTxSubmitted: false,
-  newBalance: undefined,
+  newErcBalance: undefined,
+  newPolkadotBalance: undefined,
   status: TransactionLifeCycleStatus.TX_PENDING,
   txHash: undefined,
   voteTxs: undefined,
@@ -52,7 +53,8 @@ export interface ITx {
 export interface IResponse {
   body?: string
   isTxSubmitted?: boolean
-  newBalance?: number
+  newErcBalance?: number
+  newPolkadotBalance?: number
   status: TransactionLifeCycleStatus
   tx?: ITx
   voteTxs?: ITx[]

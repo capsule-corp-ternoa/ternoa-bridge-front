@@ -111,10 +111,10 @@ const ProgressModal = ({ handleClose, isOpen, response }: ProgressModalProps) =>
               <li className={[`${styles.step}`, `${styles[stepper2Status(status, voteTxs, tx)]}`].join(' ')}>
                 <div className={[`${styles.stepTitle}`, `${styles[stepper2Status(status, voteTxs, tx)]}`].join(' ')}>
                   {stepper2Status(status, voteTxs, tx) === StepperStatus.VOID
-                    ? `Waiting for vote proposals... (${voteTxs.length}/${RELAYER_THRESHOLD})`
+                    ? `Relayers will start voting on tx approved`
                     : stepper2Status(status, voteTxs, tx) === StepperStatus.FAILED
                     ? 'An error is encountered during contract execution'
-                    : `Transactions signed (${voteTxs.length}/${RELAYER_THRESHOLD})`}
+                    : `Waiting for vote proposals... (${voteTxs.length}/${RELAYER_THRESHOLD})`}
                 </div>
                 <ul>
                   {voteTxs.map((voteTx, index) => (

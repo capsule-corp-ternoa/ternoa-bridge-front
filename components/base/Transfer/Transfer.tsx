@@ -91,16 +91,14 @@ const Transfer = () => {
     let shouldUpdate = true
 
     if (shouldUpdate && response) {
-      const { newBalance } = response
-
-      if (newBalance !== undefined) {
-        if (from === 'ternoa') {
-          dispatch(userActions.setCapsBalancePolkadot(newBalance))
-        } else {
-          dispatch(userActions.setCapsBalanceErc(newBalance))
-        }
-        setAmount(0)
+      const { newErcBalance, newPolkadotBalance } = response
+      if (newErcBalance !== undefined) {
+        dispatch(userActions.setCapsBalanceErc(newErcBalance))
       }
+      if (newPolkadotBalance !== undefined) {
+        dispatch(userActions.setCapsBalancePolkadot(newPolkadotBalance))
+      }
+      setAmount(0)
     }
 
     return () => {

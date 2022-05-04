@@ -194,10 +194,10 @@ export const transfer = async (from: ChainType, to: ChainType, amount: number, u
           isTxSubmitted: true,
         })
         const receipt = await tx.wait()
-        const newBalance = await getErcBalance(user.ercWallet.signer)
+        const newErcBalance = await getErcBalance(user.ercWallet.signer)
         setResponse((prevState) => ({
           ...prevState,
-          newBalance,
+          newErcBalance,
           status: TransactionLifeCycleStatus.TX_SUCCESS,
           tx: {
             hash: receipt.transactionHash,
@@ -215,10 +215,10 @@ export const transfer = async (from: ChainType, to: ChainType, amount: number, u
             isTxSubmitted: true,
           })
           const receipt = await tx.wait()
-          const newBalance = await getErcBalance(user.ercWallet.signer)
+          const newErcBalance = await getErcBalance(user.ercWallet.signer)
           setResponse((prevState) => ({
             ...prevState,
-            newBalance,
+            newErcBalance,
             status: TransactionLifeCycleStatus.TX_SUCCESS,
             tx: {
               hash: receipt.transactionHash,
@@ -235,10 +235,10 @@ export const transfer = async (from: ChainType, to: ChainType, amount: number, u
             voteTxs: [],
           })
           const receipt = await tx.wait()
-          const newBalance = await getErcBalance(user.ercWallet.signer)
+          const newErcBalance = await getErcBalance(user.ercWallet.signer)
           setResponse((prevState) => ({
             ...prevState,
-            newBalance,
+            newErcBalance,
             tx: {
               hash: receipt.transactionHash,
               link: `https://${explorerPrefix}etherscan.io/tx/${receipt.transactionHash}`,
