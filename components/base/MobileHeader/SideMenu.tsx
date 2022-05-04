@@ -70,7 +70,7 @@ const SideMenu = ({ isExpanded, setIsExpanded }: Props) => (
               <Instagram className={styles.socialLogo} />
             </a>
           </div>
-          <span className={styles.credentials}>© 2021 Ternoa bridge . All rights reserved.</span>
+          <span className={styles.credentials}>{`© ${new Date().getFullYear()} Ternoa bridge . All rights reserved.`}</span>
         </div>
       </div>
     </div>
