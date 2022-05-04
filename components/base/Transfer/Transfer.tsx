@@ -10,7 +10,8 @@ import NetworkModal from 'components/base/Modals/NetworkModal'
 import NetworkInput from 'components/base/NetworkInput'
 import Button from 'components/ui/Button'
 import Input from 'components/ui/Input'
-import { checkProceed, getBalance, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
+import Loader from 'components/ui/Loader'
+import { checkProceed, getBalance, getTotalCAPSFees, isConnected, MAX_AMOUNT, MIN_AMOUNT, transfer } from 'helpers/bridge'
 import { switchBSCNetwork, switchETHNetwork } from 'helpers/metamask'
 import { ChainType, IResponse, RESPONSE_DEFAULT_STATE } from 'interfaces'
 import { actions as appActions } from 'redux/app/actions'
@@ -26,6 +27,7 @@ const Transfer = () => {
   const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
   const [response, setResponse] = useState<IResponse>(RESPONSE_DEFAULT_STATE)
+  const [isMaxButtonLoading, setIsMaxButtonLoading] = useState(false)
   const [isTransferButtonLoading, setIsTransferButtonLoading] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
@@ -71,6 +73,24 @@ const Transfer = () => {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(Number(e.target.value))
+  }
+
+  const handleMaxAmount = async () => {
+    if (balance !== undefined && balance >= 0) {
+      setIsMaxButtonLoading(true)
+      try {
+        const totalCAPSFees = await getTotalCAPSFees(from, to, balance, user)
+        const transferrableBalance = Math.floor(Number(Number(balance - totalCAPSFees).toFixed(3)) * 1000) / 1000
+        if (transferrableBalance >= MAX_AMOUNT) setAmount(MAX_AMOUNT)
+        setAmount(transferrableBalance)
+      } catch (error) {
+        console.error(error)
+        if (balance >= MAX_AMOUNT) setAmount(MAX_AMOUNT)
+        setAmount(balance)
+      } finally {
+        setIsMaxButtonLoading(false)
+      }
+    }
   }
 
   const handleConfirmTransaction = async () => {
@@ -186,12 +206,8 @@ const Transfer = () => {
             advise={`Min: ${formatPrice(MIN_AMOUNT, {})} CAPS / Max: ${formatPrice(MAX_AMOUNT, {})} CAPS`}
             className={[`${styles.field}`, `${styles.amountField}`].join(' ')}
             endComponent={
-              <button
-                className={styles.maxButton}
-                disabled={balance === undefined}
-                onClick={() => balance !== undefined && balance >= 0 && setAmount(balance < MAX_AMOUNT ? balance : MAX_AMOUNT)}
-              >
-                Max
+              <button className={styles.maxButton} disabled={balance === undefined} onClick={handleMaxAmount}>
+                {isMaxButtonLoading ? <Loader className={styles.maxButtonLoader} size="small" /> : 'Max'}
               </button>
             }
             error={amount !== 0 ? amountError : undefined}
