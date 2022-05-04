@@ -139,7 +139,7 @@ const ConfirmModal = ({ amount, handleClose, handleContinue, isOpen, setResponse
 
   return (
     <>
-      <Modal handleClose={handleClose} isOpen={isOpen} isClickAwayCloseAllowed={!isApprovalLoading} isClosable={!isApprovalLoading}>
+      <Modal handleClose={handleClose} isOpen={isOpen} isClickAwayCloseAllowed={false} isClosable={!isApprovalLoading}>
         <div className={styles.root}>
           <h4 className={styles.title}>Confirmation</h4>
           <div className={styles.inputs}>
