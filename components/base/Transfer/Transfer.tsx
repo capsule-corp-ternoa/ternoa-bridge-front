@@ -26,6 +26,7 @@ const Transfer = () => {
   const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
   const [response, setResponse] = useState<IResponse>(RESPONSE_DEFAULT_STATE)
+  const [isTransferButtonLoading, setIsTransferButtonLoading] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false)
   const [isProgressModalOpen, setIsProgressModalOpen] = useState(false)
@@ -107,10 +108,11 @@ const Transfer = () => {
   }, [dispatch, from, response])
 
   const handleCheckProceed = async () => {
+    setIsTransferButtonLoading(true)
     try {
+      setAmountError(undefined)
       await checkProceed(from, to, amount, user)
       setTransferButtonLabel('Continue')
-      setAmountError(undefined)
     } catch (error) {
       if (error instanceof Error) {
         if (error.cause?.message === 'Incorrect amount') {
@@ -124,6 +126,8 @@ const Transfer = () => {
       } else {
         console.error(error)
       }
+    } finally {
+      setIsTransferButtonLoading(false)
     }
   }
 
@@ -207,6 +211,7 @@ const Transfer = () => {
             className={styles.button}
             color="primary500"
             disabled={transferButtonLabel !== 'Continue' || amountError !== undefined}
+            isLoading={isTransferButtonLoading}
             onClick={() => setIsConfirmModalOpen(true)}
             size="medium"
             text={transferButtonLabel}

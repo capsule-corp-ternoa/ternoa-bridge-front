@@ -105,7 +105,13 @@ export const getBalance = (from: ChainType, user: User) => {
 export const checkProceed = async (from: ChainType, to: ChainType, amount: number, user: User) => {
   const key = `${from}-${to}`
   const validDirections = ['erc20-bep20', 'bep20-erc20', 'erc20-ternoa', 'ternoa-erc20']
-  const bridgeFee = `${from}-${to}` === 'ternoa-erc20' ? await getBridgeFees() : 0
+  let totalCAPSFees = 0
+  if (`${from}-${to}` === 'ternoa-erc20') {
+    const { value } = await getNetworkFees(from, to, amount, user)
+    const fee = Number(Number(value).toFixed(6))
+    const bridgeFee = await getBridgeFees()
+    totalCAPSFees = fee + bridgeFee
+  }
   if (!validDirections.includes(key))
     throw new Error('Invalid combination', {
       cause: new Error('Incorrect network'),
@@ -133,8 +139,8 @@ export const checkProceed = async (from: ChainType, to: ChainType, amount: numbe
     throw new Error('Insufficient balance', {
       cause: new Error('Incorrect amount'),
     })
-  if (key === 'ternoa-erc20' && balance < amount + bridgeFee)
-    throw new Error(`Insufficient funds to pay ${formatPrice(bridgeFee, {})} CAPS of bridge fee`, {
+  if (key === 'ternoa-erc20' && balance < amount + totalCAPSFees)
+    throw new Error(`Insufficient funds to pay ${formatPrice(totalCAPSFees, {})} CAPS of total fees`, {
       cause: new Error('Incorrect amount'),
     })
 }
