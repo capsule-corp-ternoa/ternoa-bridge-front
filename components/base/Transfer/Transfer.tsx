@@ -27,6 +27,7 @@ const Transfer = () => {
   const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
   const [response, setResponse] = useState<IResponse>(RESPONSE_DEFAULT_STATE)
+  const [isInputDebounce, setIsInputDebounce] = useState(false)
   const [isMaxButtonLoading, setIsMaxButtonLoading] = useState(false)
   const [isTransferButtonLoading, setIsTransferButtonLoading] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
@@ -152,9 +153,25 @@ const Transfer = () => {
   }
 
   useEffect(() => {
+    setIsInputDebounce(true)
+    const delayDebounceFn = setTimeout(() => {
+      if (amount > 0) {
+        handleCheckProceed()
+      }
+      setIsInputDebounce(false)
+    }, 500)
+
+    return () => {
+      setIsInputDebounce(false)
+      clearTimeout(delayDebounceFn)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount])
+
+  useEffect(() => {
     handleCheckProceed()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, from, to, user])
+  }, [from, to, user])
 
   return (
     <>
@@ -210,9 +227,9 @@ const Transfer = () => {
                 {isMaxButtonLoading ? <Loader className={styles.maxButtonLoader} size="small" /> : 'Max'}
               </button>
             }
-            error={amount !== 0 ? amountError : undefined}
+            error={amount !== 0 && !isInputDebounce ? amountError : undefined}
             insight={balance !== undefined && balance >= 0 ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
-            isError={amount !== 0 && amountError !== undefined}
+            isError={amount !== 0 && !isInputDebounce && amountError !== undefined}
             label="Amount"
             max={MAX_AMOUNT}
             min={MIN_AMOUNT}
@@ -226,7 +243,7 @@ const Transfer = () => {
           <Button
             className={styles.button}
             color="primary500"
-            disabled={transferButtonLabel !== 'Continue' || amountError !== undefined}
+            disabled={transferButtonLabel !== 'Continue' || amountError !== undefined || amount === 0}
             isLoading={isTransferButtonLoading}
             onClick={() => setIsConfirmModalOpen(true)}
             size="medium"
