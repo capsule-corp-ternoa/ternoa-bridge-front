@@ -214,22 +214,6 @@ export const waitForResponseEthTernoa = async (user: User, amount: number, setRe
             voteTxs,
           }))
         }
-        const failed = records.find((x: any) => {
-          return api.events.system.ExtrinsicFailed.is(x.event) && Number(x.phase.asApplyExtrinsic) === index
-        })
-        if (failed && args[2].toString() === user.polkadotWallet.address && args[3].toString() === formatInput(amount).toString()) {
-          voteTxs.push({
-            hash: hash.toString(),
-            link: txLink,
-            isError: true,
-          })
-          setResponse((prevState) => ({
-            ...prevState,
-            status: TransactionLifeCycleStatus.TX_FAILED,
-            voteTxs,
-          }))
-          break
-        }
       }
     }
     if (blocks.length >= RELAYER_THRESHOLD) {
