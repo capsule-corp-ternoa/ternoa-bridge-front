@@ -17,6 +17,7 @@ const Homepage = () => {
   const dispatch = useAppDispatch()
   const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
+  const isAlphanetEnv = Boolean(process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet'))
 
   const { fromNetwork: from, toNetwork: to, chainTypeForConnection: chainType, isErcWalletModalOpen, isPolkadotWalletModalOpen } = app
 
@@ -60,27 +61,34 @@ const Homepage = () => {
 
   return (
     <main className="container">
-      <div className={`wrapper ${styles.rootDisclaimer}`}>
-        <div className={styles.disclaimer}>
-          <div className={styles.warning}>
-            <Warning className={styles.warningIcon} />
-            <div className={styles.warningLabel}>WARNING</div>
-          </div>
-          <div className={styles.message}>
-            <div>This Bridge is currently on the Alphanet network and being audited before going live on the mainnet. Use it at your own risks.</div>
-            <div className={styles.faucetsMessage}>
-              <span>You can try it using :</span>
-              <a className={styles.faucetLink} href="https://rinkebyfaucet.com/" target="_blank" rel="noopener noreferrer" title="Rinkeby faucet">
-                Rinkeby faucet
-              </a>
-              <span>&</span>
-              <a className={styles.faucetLink} href="https://www.ternoa.com/alphanet" target="_blank" rel="noopener noreferrer" title="Alphanet faucet">
-                Alphanet faucet
-              </a>
+      {isAlphanetEnv && (
+        <div className={`wrapper ${styles.rootDisclaimer}`}>
+          <div className={styles.disclaimer}>
+            <div className={styles.warning}>
+              <Warning className={styles.warningIcon} />
+              <div className={styles.warningLabel}>WARNING</div>
+            </div>
+            <div className={styles.message}>
+              <div>
+                This Bridge is on the Alphanet network, you can try it using :
+                <a className={styles.link} href="https://rinkebyfaucet.com/" target="_blank" rel="noopener noreferrer" title="Rinkeby faucet">
+                  Rinkeby faucet
+                </a>
+                <span className={styles.separator}>&</span>
+                <a className={styles.link} href="https://www.ternoa.com/alphanet" target="_blank" rel="noopener noreferrer" title="Alphanet faucet">
+                  Alphanet faucet
+                </a>
+              </div>
+              <div>
+                The Mainnet version can be found here:{' '}
+                <a className={styles.link} href="https://bridge.ternoa.com/" title="Bridge Mainnet">
+                  Bridge Mainnet
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       <div className={`wrapper ${styles.root}`}>
         <h1 className={styles.mobileTitle}>Token Bridge</h1>
         <p className={styles.mobileDescription}>The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.</p>

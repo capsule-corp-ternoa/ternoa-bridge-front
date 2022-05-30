@@ -49,20 +49,17 @@
         border-left: 1px solid #f2a400;
       }
 
-      .faucetsMessage {
-        > * {
-          &:not(:first-child) {
-            margin-left: 1.2rem;
-          }
-        }
+      .link {
+        margin-left: 1.2rem;
+        text-decoration: underline;
 
-        .faucetLink {
-          text-decoration: underline;
-
-          &:hover {
-            color: $color-contrast;
-          }
+        &:hover {
+          color: $color-contrast;
         }
+      }
+
+      .separator {
+        margin-left: 1.2rem;
       }
     }
   }

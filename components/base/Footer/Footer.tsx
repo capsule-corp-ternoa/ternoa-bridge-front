@@ -36,6 +36,15 @@ const Footer = () => (
         <div className={styles.linksWrapper}>
           <a
             className={styles.footerLink}
+            href="https://github.com/chainsulting/Smart-Contract-Security-Audits/blob/master/Ternoa/02_Architecture_Audit_Ternoa_Bridge_Relayer.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Smart Contract Audit"
+          >
+            Smart Contract Audit
+          </a>
+          <a
+            className={styles.footerLink}
             href="https://ternoahelp.zendesk.com/hc/fr/articles/360019045538-Terms-of-Use"
             target="_blank"
             rel="noopener noreferrer"

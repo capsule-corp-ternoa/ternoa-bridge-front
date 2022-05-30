@@ -72,6 +72,10 @@
     background: $color-success300;
     border-radius: 100%;
     animation: 1.6s ease-in-out 0s infinite normal none running indicatorScale;
+
+    &.alphanet {
+      background: $color-danger300 !important;
+    }
   }
 
   .innerIndicator {
@@ -80,5 +84,9 @@
     height: 0.6rem;
     border-radius: 100%;
     background: $color-success500;
+
+    &.alphanet {
+      background: $color-danger300 !important;
+    }
   }
 }
