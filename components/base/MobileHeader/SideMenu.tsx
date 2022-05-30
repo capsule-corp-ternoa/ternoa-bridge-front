@@ -38,6 +38,14 @@ const SideMenu = ({ isExpanded, setIsExpanded }: Props) => (
           <AnchorButton color="dark" href="https://www.ternoa.com" size="medium" variant="rectangle" text="Back to Ternoa" title="Ternoa website" />
           <AnchorButton
             color="dark"
+            href="https://github.com/chainsulting/Smart-Contract-Security-Audits/blob/master/Ternoa/02_Architecture_Audit_Ternoa_Bridge_Relayer.pdf"
+            size="medium"
+            variant="rectangle"
+            text="Smart Contract Audit"
+            title="Smart Contract Audit"
+          />
+          <AnchorButton
+            color="dark"
             href="https://intercom.help/ternoa/fr/collections/2774679-legal"
             size="medium"
             variant="rectangle"
