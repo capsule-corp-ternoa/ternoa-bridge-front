@@ -40,6 +40,7 @@ const Transfer = () => {
 
   const { fromNetwork: from, toNetwork: to } = app
   const balance = isConnected(from, user) ? getBalance(from, user) : undefined
+  const isAlphanetEnv = Boolean(process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet'))
 
   const handleNetworkChange = (rawOrigin: 'from' | 'to' | undefined, network: ChainType) => {
     setAmount(0)
@@ -189,7 +190,7 @@ const Transfer = () => {
                 setIsNetworkModalOpen(true)
               }}
               origin="from"
-              variant="input"
+              variant={isAlphanetEnv ? 'preview' : 'input'}
             />
           </div>
 
@@ -215,7 +216,7 @@ const Transfer = () => {
                 setIsNetworkModalOpen(true)
               }}
               origin="to"
-              variant="input"
+              variant={isAlphanetEnv ? 'preview' : 'input'}
             />
           </div>
 
