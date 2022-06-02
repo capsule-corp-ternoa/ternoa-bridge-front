@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://bridge.ternoa.com">
+  <a href="https://bridge.ternoa.network">
     <p>Ternoa Bridge</p>
     <p>🌉</p>
   </a>
