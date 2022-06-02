@@ -28,7 +28,7 @@ import {
   waitForResponseTernoaEth,
 } from './erc'
 
-export const MIN_AMOUNT = 20 //0 TODO
+export const MIN_AMOUNT = 200
 export const MAX_AMOUNT = 100000
 export const SLEEP_INTERVAL = 10000
 export const RELAYER_THRESHOLD = 2
