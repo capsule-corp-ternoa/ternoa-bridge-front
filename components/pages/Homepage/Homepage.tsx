@@ -81,7 +81,7 @@ const Homepage = () => {
               </div>
               <div>
                 The Mainnet version can be found here:{' '}
-                <a className={styles.link} href="https://bridge.ternoa.com/" title="Bridge Mainnet">
+                <a className={styles.link} href="https://bridge.ternoa.network/" title="Bridge Mainnet">
                   Bridge Mainnet
                 </a>
               </div>
