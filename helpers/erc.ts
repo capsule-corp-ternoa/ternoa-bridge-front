@@ -141,6 +141,20 @@ const formatData = (address: string, amount: number, convert = true) => {
   )
 }
 
+//console.log(formatDataForWithdrawal("0xdA99829d809CeA08301c7ae09931a1AC8Db027F6", 10))
+export const formatDataForWithdrawal = (address: string, amount: number) => {
+  if (!process.env.NEXT_PUBLIC_CAPS_TOKEN_ADDRESS_ETH) throw new Error('NEXT_PUBLIC_CAPS_TOKEN_ADDRESS_ETH not defined')
+  if (!process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT) throw new Error('NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT not defined')
+  const bnAmount = ethers.BigNumber.from(formatInput(amount).toString())
+  return [
+    process.env.NEXT_PUBLIC_TERNOA_ETH_BRIDGE_HANDLER_CONTRACT,
+    '0x' +
+      ethers.utils.hexZeroPad(ethers.utils.hexlify(process.env.NEXT_PUBLIC_CAPS_TOKEN_ADDRESS_ETH), 32).substring(2) +
+      ethers.utils.hexZeroPad(ethers.utils.hexlify(address), 32).substring(2) +
+      ethers.utils.hexZeroPad(bnAmount.toHexString(), 32).substring(2),
+  ]
+}
+
 const getTransferEthTernoaParams = async (user: User, amount: number) => {
   if (!user) throw new Error('User not found')
   if (!user.ercWallet?.signer) throw new Error('Signer not found')
@@ -156,7 +170,7 @@ export const getTransferEthTernoaFees = async (user: User, amount: number): Prom
   if (!user.ercWallet?.signer) throw new Error('Signer not found')
   const [destChainId, ressourceId, data] = await getTransferEthTernoaParams(user, amount)
   const contract = await getBridgeContract(user.ercWallet.signer)
-  const fees = await getEstimateFees(contract, user.ercWallet.signer, 'deposit', [destChainId, ressourceId, data])
+  const fees = await getEstimateFees(contract, user.ercWallet.signer, 'deposit', [destChainId, ressourceId, data, []])
   return fees
 }
 
@@ -165,7 +179,7 @@ export const transferEthTernoa = async (user: User, amount: number) => {
   if (!user.ercWallet?.signer) throw new Error('Signer not found')
   const [destChainId, ressourceId, data] = await getTransferEthTernoaParams(user, amount)
   const contract = await getBridgeContract(user.ercWallet.signer)
-  return contract.deposit(destChainId, ressourceId, data)
+  return contract.deposit(destChainId, ressourceId, data, [])
 }
 
 export const waitForResponseTernoaEth = async (user: User, amount: number, setResponse: ResponseNominalSetState) => {
