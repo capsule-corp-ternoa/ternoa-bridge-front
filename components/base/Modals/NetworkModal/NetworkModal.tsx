@@ -19,6 +19,7 @@ export interface NetworkModalProps {
 const NetworkModal = ({ handleClose, handleNetworkPair, isOpen, origin }: NetworkModalProps) => {
   const { app } = useAppSelector((state) => state.app)
   const { user } = useAppSelector((state) => state.user)
+  const isAlphanetEnv = Boolean(process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet'))
 
   const handleNetworkSwitch = async (network: 'erc20' | 'bep20') => {
     try {
@@ -68,18 +69,20 @@ const NetworkModal = ({ handleClose, handleNetworkPair, isOpen, origin }: Networ
             }}
             variant="input"
           />
-          <NetworkInput
-            className={styles.networkInput}
-            network="bep20"
-            noConnectButton
-            noNetworkData
-            onClick={() => {
-              if (user.ercWallet?.connectedWith === 'metamask' && origin === 'from') handleNetworkSwitch('bep20')
-              handleNetworkPair(origin, 'bep20')
-              handleClose()
-            }}
-            variant="input"
-          />
+          {!isAlphanetEnv && (
+            <NetworkInput
+              className={styles.networkInput}
+              network="bep20"
+              noConnectButton
+              noNetworkData
+              onClick={() => {
+                if (user.ercWallet?.connectedWith === 'metamask' && origin === 'from') handleNetworkSwitch('bep20')
+                handleNetworkPair(origin, 'bep20')
+                handleClose()
+              }}
+              variant="input"
+            />
+          )}
           <NetworkInput
             className={styles.networkInput}
             network="ternoa"
