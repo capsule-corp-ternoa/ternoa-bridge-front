@@ -113,7 +113,7 @@ const NetworkInput = ({
 
   return (
     <div
-      className={[`${styles.root}`, `${variant === 'input' ? styles.rootInput : ''}`, className].join(' ')}
+      className={[`${styles.root}`, `${variant === 'input' && onClick !== undefined ? styles.rootInput : ''}`, className].join(' ')}
       onClick={variant === 'input' ? onClick : undefined}
     >
       <div className={styles.network}>

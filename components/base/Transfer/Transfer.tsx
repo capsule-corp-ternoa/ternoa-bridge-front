@@ -185,12 +185,16 @@ const Transfer = () => {
             <NetworkInput
               className={styles.networkInput}
               network={from}
-              onClick={() => {
-                setOrigin('from')
-                setIsNetworkModalOpen(true)
-              }}
+              onClick={
+                isAlphanetEnv
+                  ? undefined
+                  : () => {
+                      setOrigin('from')
+                      setIsNetworkModalOpen(true)
+                    }
+              }
               origin="from"
-              variant={isAlphanetEnv ? 'preview' : 'input'}
+              variant="input"
             />
           </div>
 
@@ -211,12 +215,16 @@ const Transfer = () => {
               forceIsConnected={((from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')) && isConnected(from, user)}
               network={to}
               noNetworkData={(from === 'erc20' && to === 'bep20') || (from === 'bep20' && to === 'erc20')}
-              onClick={() => {
-                setOrigin('to')
-                setIsNetworkModalOpen(true)
-              }}
+              onClick={
+                isAlphanetEnv
+                  ? undefined
+                  : () => {
+                      setOrigin('to')
+                      setIsNetworkModalOpen(true)
+                    }
+              }
               origin="to"
-              variant={isAlphanetEnv ? 'preview' : 'input'}
+              variant="input"
             />
           </div>
 
