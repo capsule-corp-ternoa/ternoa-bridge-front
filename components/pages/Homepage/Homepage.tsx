@@ -61,34 +61,49 @@ const Homepage = () => {
 
   return (
     <main className="container">
-      {isAlphanetEnv && (
-        <div className={`wrapper ${styles.rootDisclaimer}`}>
-          <div className={styles.disclaimer}>
-            <div className={styles.warning}>
-              <Warning className={styles.warningIcon} />
-              <div className={styles.warningLabel}>WARNING</div>
-            </div>
-            <div className={styles.message}>
-              <div>
-                This Bridge is on the Alphanet network, you can try it using :
-                <a className={styles.link} href="https://rinkebyfaucet.com/" target="_blank" rel="noopener noreferrer" title="Rinkeby faucet">
-                  Rinkeby faucet
-                </a>
-                <span className={styles.separator}>&</span>
-                <a className={styles.link} href="https://www.ternoa.com/alphanet" target="_blank" rel="noopener noreferrer" title="Alphanet faucet">
-                  Alphanet faucet
-                </a>
-              </div>
-              <div>
-                The Mainnet version can be found here:{' '}
-                <a className={styles.link} href="https://bridge.ternoa.network/" title="Bridge Mainnet">
-                  Bridge Mainnet
-                </a>
-              </div>
-            </div>
+      <div className={`wrapper ${styles.rootDisclaimer}`}>
+        <div className={styles.disclaimer}>
+          <div className={styles.warning}>
+            <Warning className={styles.warningIcon} />
+            <div className={styles.warningLabel}>WARNING</div>
+          </div>
+          <div className={styles.message}>
+            {isAlphanetEnv ? (
+              <>
+                <div>
+                  This Bridge is on the Alphanet network, you can try it using :
+                  <a className={styles.link} href="https://rinkebyfaucet.com/" target="_blank" rel="noopener noreferrer" title="Rinkeby faucet">
+                    Rinkeby faucet
+                  </a>
+                  <span className={styles.separator}>&</span>
+                  <a className={styles.link} href="https://www.ternoa.com/alphanet" target="_blank" rel="noopener noreferrer" title="Alphanet faucet">
+                    Alphanet faucet
+                  </a>
+                </div>
+                <div>
+                  The Mainnet version can be found here:{' '}
+                  <a className={styles.link} href="https://bridge.ternoa.network/" title="Bridge Mainnet">
+                    Bridge Mainnet
+                  </a>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  The bridge has quantum limitations to reduce network congestion. Therefore, we offer OTC bridge services for all transfers between ethereum
+                  and ternoa chain over 1M CAPS.
+                </div>
+                <div>
+                  To place a request for an OTC transfer, please contact our support team:{' '}
+                  <a className={styles.link} href="mailto:otcbridge@ternoa.network" title="OTC mail contact">
+                    otcbridge@ternoa.network
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      )}
+      </div>
       <div className={`wrapper ${styles.root}`}>
         <h1 className={styles.mobileTitle}>Token Bridge</h1>
         <p className={styles.mobileDescription}>The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.</p>
