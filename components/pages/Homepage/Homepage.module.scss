@@ -216,3 +216,11 @@
     max-width: 48rem;
   }
 }
+
+.otcLink {
+  text-decoration: underline;
+
+  &:hover {
+    color: $color-contrast;
+  }
+}

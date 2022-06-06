@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-  The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.
+  Swap your CAPS between Ternoa Chain (native), Ethereum (erc20) and Binance Smart Chain (bep20).
 </h3>
 
 </br>
