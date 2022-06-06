@@ -91,7 +91,11 @@ const Homepage = () => {
       )}
       <div className={`wrapper ${styles.root}`}>
         <h1 className={styles.mobileTitle}>Token Bridge</h1>
-        <p className={styles.mobileDescription}>The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.</p>
+        <p className={styles.mobileDescription}>
+          {`Safest and fastest way to swap your CAPS between Ternoa Chain(native) to Ethereum (ERC20)${
+            isAlphanetEnv ? '' : ', or Ethereum (ERC20) to Binance Smart Chain(BEP20)'
+          }.`}
+        </p>
         <div className={styles.transfer}>
           <Transfer />
         </div>
@@ -101,17 +105,30 @@ const Homepage = () => {
             <Lottie className={styles.lottie} path="./lottieBridge.json" />
             <div className={styles.laptopTitleBridge}>Bridge</div>
           </h1>
-          <p className={styles.laptopDescription}>The safest and fastest way to swap your ERC20 CAPS to Ternoa Native CAPS.</p>
+          <p className={styles.laptopDescription}>
+            {`Safest and fastest way to swap your CAPS between Ternoa Chain (native) to Ethereum (ERC20)${
+              isAlphanetEnv ? '' : ', or Ethereum (ERC20) to Binance Smart Chain(BEP20)'
+            }.`}
+          </p>
           <ul className={styles.box}>
-            <li className={styles.insight}>
-              Unlike many other bridges, the Ternoa Bridge will lock your ERC20 CAPS and mint the equivalent in native CAPS on the Ternoa Network.
-            </li>
-            <li className={styles.insight}>
-              In case you decide to sell your native CAPS, you will need to transfer it back to the Ethereum network by using the Ternoa Bridge again.
-            </li>
-            <li className={styles.insight}>
-              The native CAPS are necessary to take part in staking and rewards, as well as paying transaction fees in the Ternoa ecosystem.
-            </li>
+            <li className={styles.insight}>The native CAPS are necessary to stake, earn rewards and pay txn fees on Ternoa chain.</li>
+            {!isAlphanetEnv && (
+              <>
+                <li className={styles.insight}>
+                  The bridge has quantum limitations to reduce network congestion. Therefore, we offer OTC bridge services for all transfers between ethereum
+                  and Ternoa chain over 1M CAPS.
+                </li>
+                <li className={styles.insight}>
+                  <div>
+                    To place a request for an OTC transfer, please contact our support team:
+                    <br />
+                    <a className={styles.otcLink} href="mailto:otcbridge@ternoa.network" title="OTC mail contact">
+                      otcbridge@ternoa.network
+                    </a>
+                  </div>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>
