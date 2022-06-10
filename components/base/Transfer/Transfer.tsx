@@ -22,7 +22,7 @@ import { formatPrice } from 'utils/strings'
 import styles from './Transfer.module.scss'
 
 const Transfer = () => {
-  const [amount, setAmount] = useState<number>(0)
+  const [amount, setAmount] = useState<string>('0')
   const [amountError, setAmountError] = useState<string | undefined>(undefined)
   const [transferButtonLabel, setTransferButtonLabel] = useState<string>('...')
   const [origin, setOrigin] = useState<'from' | 'to' | undefined>(undefined)
@@ -43,7 +43,7 @@ const Transfer = () => {
   const isAlphanetEnv = Boolean(process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet'))
 
   const handleNetworkChange = (rawOrigin: 'from' | 'to' | undefined, network: ChainType) => {
-    setAmount(0)
+    setAmount('0')
     handleNetworkPair(from, to, rawOrigin, network, dispatch)
   }
 
@@ -68,13 +68,13 @@ const Transfer = () => {
       console.error(error)
     }
 
-    setAmount(0)
+    setAmount('0')
     dispatch(appActions.setFromNetwork(newFrom))
     dispatch(appActions.setToNetwork(newTo))
   }
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(Number(e.target.value))
+    setAmount(e.target.value)
   }
 
   const handleMaxAmount = async () => {
@@ -83,12 +83,12 @@ const Transfer = () => {
       try {
         const totalCAPSFees = await getTotalCAPSFees(from, to, balance, user)
         const transferrableBalance = Math.floor(Number(Number(balance - totalCAPSFees).toFixed(3)) * 1000) / 1000
-        if (transferrableBalance >= MAX_AMOUNT) setAmount(MAX_AMOUNT)
-        setAmount(transferrableBalance)
+        if (transferrableBalance >= MAX_AMOUNT) setAmount(MAX_AMOUNT.toString())
+        else setAmount(transferrableBalance.toString())
       } catch (error) {
         console.error(error)
-        if (balance >= MAX_AMOUNT) setAmount(MAX_AMOUNT)
-        setAmount(balance)
+        if (balance >= MAX_AMOUNT) setAmount(MAX_AMOUNT.toString())
+        else setAmount(balance.toString())
       } finally {
         setIsMaxButtonLoading(false)
       }
@@ -102,7 +102,7 @@ const Transfer = () => {
     })
     setIsConfirmModalOpen(false)
     setIsProgressModalOpen(true)
-    await transfer(from, to, amount, user, setResponse)
+    await transfer(from, to, Number(amount), user, setResponse)
   }
 
   const handleProgressModalClose = () => {
@@ -121,7 +121,7 @@ const Transfer = () => {
       if (newPolkadotBalance !== undefined) {
         dispatch(userActions.setCapsBalancePolkadot(newPolkadotBalance))
       }
-      setAmount(0)
+      setAmount('0')
     }
 
     return () => {
@@ -133,7 +133,7 @@ const Transfer = () => {
     setIsTransferButtonLoading(true)
     try {
       setAmountError(undefined)
-      await checkProceed(from, to, amount, user)
+      await checkProceed(from, to, Number(amount), user)
       setTransferButtonLabel('Continue')
     } catch (error) {
       if (error instanceof Error) {
@@ -156,7 +156,7 @@ const Transfer = () => {
   useEffect(() => {
     setIsInputDebounce(true)
     const delayDebounceFn = setTimeout(() => {
-      if (amount > 0) {
+      if (Number(amount) > 0 || amountError) {
         handleCheckProceed()
       }
       setIsInputDebounce(false)
@@ -236,23 +236,23 @@ const Transfer = () => {
                 {isMaxButtonLoading ? <Loader className={styles.maxButtonLoader} size="small" /> : 'Max'}
               </button>
             }
-            error={amount !== 0 && !isInputDebounce ? amountError : undefined}
+            error={Number(amount) !== 0 && !isInputDebounce ? amountError : undefined}
             insight={balance !== undefined && balance >= 0 ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}
-            isError={amount !== 0 && !isInputDebounce && amountError !== undefined}
+            isError={Number(amount) !== 0 && !isInputDebounce && amountError !== undefined}
             label="Amount"
             max={MAX_AMOUNT}
             min={MIN_AMOUNT}
             name="amount"
             onChange={handleAmountChange}
             placeholder="Enter an amount..."
-            type="number"
-            value={amount || ''}
+            type="text"
+            value={Number(amount) > 0 ? amount : ''}
           />
 
           <Button
             className={styles.button}
             color="primary500"
-            disabled={transferButtonLabel !== 'Continue' || amountError !== undefined || amount === 0}
+            disabled={transferButtonLabel !== 'Continue' || amountError !== undefined || Number(amount) === 0}
             isLoading={isTransferButtonLoading}
             onClick={() => setIsConfirmModalOpen(true)}
             size="medium"
@@ -263,7 +263,7 @@ const Transfer = () => {
       </div>
       {isConfirmModalOpen && (
         <ConfirmModal
-          amount={amount}
+          amount={Number(amount)}
           handleClose={() => setIsConfirmModalOpen(false)}
           handleContinue={handleConfirmTransaction}
           isOpen={isConfirmModalOpen}
