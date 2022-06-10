@@ -64,8 +64,8 @@ const TextInput = ({
           className={[`${styles.input}`, `${isError ? styles.error : ''}`, `${endComponent !== undefined ? styles.isEndComponent : ''}`].join(' ')}
           type={type}
           disabled={disabled}
-          inputMode={type === 'number' ? 'numeric' : undefined}
-          pattern={type === 'number' ? '[0-9]+([.,][0-9]+)?' : undefined}
+          inputMode="numeric"
+          pattern="[0-9]+([.,][0-9]+)?"
           placeholder={placeholder}
           onChange={onChange}
           onWheel={numberInputOnWheelPreventChange}
@@ -75,7 +75,7 @@ const TextInput = ({
           value={value}
           onKeyDown={(evt) => {
             evt.key
-            const forbidden = type === 'number' ? ['e', '-', ','] : []
+            const forbidden = ['e', '-', ',']
             if (forbidden.includes(evt.key)) {
               evt.preventDefault()
             }
