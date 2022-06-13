@@ -232,9 +232,11 @@ const Transfer = () => {
             advise={`Min: ${formatPrice(MIN_AMOUNT, {})} CAPS / Max: ${formatPrice(MAX_AMOUNT, {})} CAPS`}
             className={[`${styles.field}`, `${styles.amountField}`].join(' ')}
             endComponent={
-              <button className={styles.maxButton} disabled={balance === undefined} onClick={handleMaxAmount}>
-                {isMaxButtonLoading ? <Loader className={styles.maxButtonLoader} size="small" /> : 'Max'}
-              </button>
+              balance === undefined ? null : (
+                <button className={styles.maxButton} disabled={balance === undefined} onClick={handleMaxAmount}>
+                  {isMaxButtonLoading ? <Loader className={styles.maxButtonLoader} size="small" /> : 'Max'}
+                </button>
+              )
             }
             error={Number(amount) !== 0 && !isInputDebounce ? amountError : undefined}
             insight={balance !== undefined && balance >= 0 ? `Balance: ${formatPrice(balance, {})} CAPS` : undefined}

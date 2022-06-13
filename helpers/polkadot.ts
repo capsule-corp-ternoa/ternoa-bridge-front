@@ -49,8 +49,9 @@ export const formatInput = (input: number) => {
 
 export const getBalance = async (address: string) => {
   const api = await getApi()
-  const balance: { free: BN } = ((await api.query.system.account(address)) as any).data
-  return formatBalance(balance.free.toString())
+  const balance: { free: BN; miscFrozen: BN } = ((await api.query.system.account(address)) as any).data
+  const availableBalance = balance.free.sub(balance.miscFrozen)
+  return formatBalance(availableBalance.toString())
 }
 
 export const reconnect = async (dispatch: (action: AnyAction) => void) => {
