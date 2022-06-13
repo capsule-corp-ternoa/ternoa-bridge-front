@@ -30,6 +30,7 @@ const PolkadotWalletModal = ({ isOpen }: Props) => {
       try {
         const accounts = await getAccounts()
         if (shouldUpdate) setAccounts(accounts)
+        dispatch(actions.setIsPolkadotWalletModalOpen(true))
       } catch (error) {
         console.error(error)
         if (error instanceof Error) {
@@ -45,7 +46,7 @@ const PolkadotWalletModal = ({ isOpen }: Props) => {
     return () => {
       shouldUpdate = false
     }
-  }, [])
+  }, [dispatch])
 
   return (
     <Modal handleClose={handleModalClose} isOpen={isOpen}>
