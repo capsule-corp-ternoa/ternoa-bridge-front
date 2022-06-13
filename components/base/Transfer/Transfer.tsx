@@ -130,9 +130,9 @@ const Transfer = () => {
   }, [dispatch, from, response])
 
   const handleCheckProceed = async () => {
+    setAmountError(undefined)
     setIsTransferButtonLoading(true)
     try {
-      setAmountError(undefined)
       await checkProceed(from, to, Number(amount), user)
       setTransferButtonLabel('Continue')
     } catch (error) {
@@ -170,6 +170,7 @@ const Transfer = () => {
   }, [amount])
 
   useEffect(() => {
+    setAmount('0')
     handleCheckProceed()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to, user])
