@@ -69,7 +69,7 @@
     position: absolute;
     width: 1.4rem;
     height: 1.4rem;
-    background: $color-success300;
+    background: #004fff;
     border-radius: 100%;
     animation: 1.6s ease-in-out 0s infinite normal none running indicatorScale;
 
@@ -83,7 +83,7 @@
     width: 0.6rem;
     height: 0.6rem;
     border-radius: 100%;
-    background: $color-success500;
+    background: #004fff;
 
     &.alphanet {
       background: $color-danger300 !important;

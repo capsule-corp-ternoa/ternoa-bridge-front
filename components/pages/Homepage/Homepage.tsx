@@ -92,8 +92,8 @@ const Homepage = () => {
       <div className={`wrapper ${styles.root}`}>
         <h1 className={styles.mobileTitle}>Token Bridge</h1>
         <p className={styles.mobileDescription}>
-          {`Safest and fastest way to swap your CAPS between Ternoa Chain(native) to Ethereum (ERC20)${
-            isAlphanetEnv ? '' : ', or Ethereum (ERC20) to Binance Smart Chain(BEP20)'
+          {`Safest and fastest way to swap your CAPS between Ternoa Chain(native) and Ethereum (ERC20)${
+            isAlphanetEnv ? '' : ', or Ethereum (ERC20) and Binance Smart Chain(BEP20)'
           }.`}
         </p>
         <div className={styles.transfer}>
@@ -106,12 +106,12 @@ const Homepage = () => {
             <div className={styles.laptopTitleBridge}>Bridge</div>
           </h1>
           <p className={styles.laptopDescription}>
-            {`Safest and fastest way to swap your CAPS between Ternoa Chain (native) to Ethereum (ERC20)${
-              isAlphanetEnv ? '' : ', or Ethereum (ERC20) to Binance Smart Chain(BEP20)'
+            {`Safest and fastest way to swap your CAPS between Ternoa Chain (native) and Ethereum (ERC20)${
+              isAlphanetEnv ? '' : ', or Ethereum (ERC20) and Binance Smart Chain(BEP20)'
             }.`}
           </p>
           <ul className={styles.box}>
-            <li className={styles.insight}>The native CAPS are necessary to stake, earn rewards and pay txn fees on Ternoa chain.</li>
+            <li className={styles.insight}>The native CAPS are necessary to stake, earn rewards and pay transaction fees on Ternoa chain.</li>
             {!isAlphanetEnv && (
               <>
                 <li className={styles.insight}>
