@@ -170,6 +170,7 @@ const Transfer = () => {
   }, [amount])
 
   useEffect(() => {
+    setAmountError(undefined)
     handleCheckProceed()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to, user])
