@@ -9,8 +9,7 @@ import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
 import { ITx, ResponseNominalSetState, RESPONSE_DEFAULT_STATE, TransactionLifeCycleStatus, User } from '../interfaces'
 import { clear, get, USER_POLKADOT_ADDRESS } from './storage'
-import { NUMBER_OF_DECIMALS } from './erc'
-import { BLOCK_LIMIT, RELAYER_THRESHOLD, SLEEP_INTERVAL } from './bridge'
+import { formatBalance, BLOCK_LIMIT, RELAYER_THRESHOLD, SLEEP_INTERVAL } from './bridge'
 import { sleep } from 'utils/system'
 
 let api: ApiPromise
@@ -35,10 +34,6 @@ const getApi = async () => {
 
 export const safeDisconnect = async () => {
   if (api && api.isConnected) await api.disconnect()
-}
-
-export const formatBalance = (balance: string, decimals = 3) => {
-  return Number(balance.slice(0, -(NUMBER_OF_DECIMALS - decimals))) / Math.pow(10, decimals)
 }
 
 export const formatInput = (input: number) => {

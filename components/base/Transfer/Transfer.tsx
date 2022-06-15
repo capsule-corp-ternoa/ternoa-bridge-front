@@ -82,7 +82,7 @@ const Transfer = () => {
       setIsMaxButtonLoading(true)
       try {
         const totalCAPSFees = await getTotalCAPSFees(from, to, balance, user)
-        const transferrableBalance = Math.floor(Number(Number(balance - totalCAPSFees).toFixed(3)) * 1000) / 1000
+        const transferrableBalance = Math.trunc((balance - totalCAPSFees) * 1000) / 1000
         if (transferrableBalance >= MAX_AMOUNT) setAmount(MAX_AMOUNT.toString())
         else setAmount(transferrableBalance.toString())
       } catch (error) {
