@@ -9,9 +9,7 @@ import { connect as connectWalletConnect } from './walletconnect'
 import { formatInput, getNativeTokenId, ss58ToHex } from './polkadot'
 import { Interface, keccak256, solidityPack, toUtf8Bytes } from 'ethers/lib/utils'
 import { sleep } from 'utils/system'
-import { BLOCK_LIMIT, RELAYER_THRESHOLD, SLEEP_INTERVAL } from './bridge'
-
-export const NUMBER_OF_DECIMALS = 18
+import { formatBalance, BLOCK_LIMIT, NUMBER_OF_DECIMALS, RELAYER_THRESHOLD, SLEEP_INTERVAL } from './bridge'
 
 export const ETH_CHAIN_ID = process.env.NEXT_PUBLIC_ETH_CHAIN_ID ? Number(process.env.NEXT_PUBLIC_ETH_CHAIN_ID) : 1
 export const BSC_CHAIN_ID = 56
@@ -75,16 +73,12 @@ export const getErcWalletFromSigner = async (signer: Signer, connectedWith: ERCP
   }
 }
 
-export const formatBalance = async (balance: string) => {
-  return Number(Number(balance).toFixed(3))
-}
-
 export const getBalance = async (signer: Signer) => {
   const chainId = await signer.getChainId()
   if (chainId !== ETH_CHAIN_ID && chainId !== BSC_CHAIN_ID) return 0
   const contract = await getTokenContract(signer)
   const balance = await contract.balanceOf(await signer.getAddress())
-  return formatBalance(ethers.utils.formatUnits(balance))
+  return formatBalance(balance.toString())
 }
 
 export const isApproved = async (signer: Signer) => {

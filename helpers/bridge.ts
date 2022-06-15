@@ -28,6 +28,7 @@ import {
   waitForResponseTernoaEth,
 } from './erc'
 
+export const NUMBER_OF_DECIMALS = 18
 export const MIN_AMOUNT = 200
 export const MAX_AMOUNT = 200000
 export const SLEEP_INTERVAL = 10000
@@ -100,6 +101,10 @@ export const getAddress = (from: ChainType, user: User) => {
 
 export const getBalance = (from: ChainType, user: User) => {
   return from === 'ternoa' ? user.polkadotWallet?.capsBalance : user.ercWallet?.capsBalance
+}
+
+export const formatBalance = (balance: string, decimals = 3) => {
+  return Number(balance.slice(0, -(NUMBER_OF_DECIMALS - decimals))) / Math.pow(10, decimals)
 }
 
 export const getTotalCAPSFees = async (from: ChainType, to: ChainType, amount: number, user: User) => {
