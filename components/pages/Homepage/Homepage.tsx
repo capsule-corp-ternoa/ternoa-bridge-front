@@ -61,7 +61,7 @@ const Homepage = () => {
 
   return (
     <main className="container">
-      {isAlphanetEnv && (
+      {isAlphanetEnv ? (
         <div className={`wrapper ${styles.rootDisclaimer}`}>
           <div className={styles.disclaimer}>
             <div className={styles.warning}>
@@ -88,6 +88,16 @@ const Homepage = () => {
             </div>
           </div>
         </div>
+      ) : (
+        <div className={`wrapper ${styles.rootDisclaimer}`}>
+          <div className={styles.disclaimer}>
+            <div className={styles.warning}>
+              <Warning className={styles.warningIcon} />
+              <div className={styles.warningLabel}>WARNING</div>
+            </div>
+            <div className={styles.message}>Binance Smart Chain (BEP20) to Ethereum (ERC20) transactions can take upto 45 mins to process.</div>
+          </div>
+        </div>
       )}
       <div className={`wrapper ${styles.root}`}>
         <h1 className={styles.mobileTitle}>Token Bridge</h1>
@@ -107,7 +117,7 @@ const Homepage = () => {
           </h1>
           <p className={styles.laptopDescription}>
             {`Safest and fastest way to swap your CAPS between Ternoa Chain (native) and Ethereum (ERC20)${
-              isAlphanetEnv ? '' : ', or Ethereum (ERC20) and Binance Smart Chain(BEP20)'
+              isAlphanetEnv ? '' : ', or Ethereum (ERC20) and Binance Smart Chain (BEP20)'
             }.`}
           </p>
           <ul className={styles.box}>
