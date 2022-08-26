@@ -137,10 +137,11 @@ const Transfer = () => {
       setTransferButtonLabel('Continue')
     } catch (error) {
       if (error instanceof Error) {
-        if (error.cause?.message === 'Incorrect amount') {
+        const cause = error.cause as any
+        if (cause?.message === 'Incorrect amount') {
           setAmountError(error.message)
           setTransferButtonLabel('Continue')
-        } else if (error.cause?.message === 'Incorrect network') {
+        } else if (cause?.message === 'Incorrect network') {
           setTransferButtonLabel(error.message)
         } else {
           console.error(error)
