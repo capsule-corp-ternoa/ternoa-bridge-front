@@ -37,7 +37,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Metamask and WalletConnect are the supported wallets to interact with the bridge dapp on the erc20/bep20 networks. Each one has its own dedicated helper in [metamask.ts](helpers/metamask.ts) or [walletconnect.ts](helpers/walletconnect.ts).
 
-[bridge.ts](helpers/bridge.ts) supplies functions for the front-end components.
+[bridge.ts](helpers/bridge.ts) supplies functions for the front-end components
 
 # Notes
 
