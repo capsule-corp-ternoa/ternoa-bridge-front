@@ -30,7 +30,7 @@
   "dependencies": {
     "@ethersproject/constants": "^5.7.0",
     "@netlify/plugin-nextjs": "^4.19.0",
-    "@polkadot/api": "^9.2.3",
+    "@polkadot/api": "9.6.1",
     "@polkadot/extension-dapp": "^0.44.6",
     "@walletconnect/web3-provider": "^1.8.0",
     "bn.js": "^5.2.1",
