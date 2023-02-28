@@ -95,7 +95,7 @@ const Homepage = () => {
               <Warning className={styles.warningIcon} />
               <div className={styles.warningLabel}>WARNING</div>
             </div>
-            <div className={styles.message}>Binance Smart Chain (BEP20) to Ethereum (ERC20) transactions can take upto 45 mins to process.</div>
+            <div className={styles.message}>You are using the bridge in god mode.</div>
           </div>
         </div>
       )}
