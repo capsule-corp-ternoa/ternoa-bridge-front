@@ -95,11 +95,7 @@ const Homepage = () => {
               <Warning className={styles.warningIcon} />
               <div className={styles.warningLabel}>WARNING</div>
             </div>
-            <div className={styles.message}>
-              Binance Smart Chain (BEP20) to Ethereum (ERC20) is under maintenance.
-              <br />
-              Pending transactions will proceed once the bridge will restart.
-            </div>
+            <div className={styles.message}>Binance Smart Chain (BEP20) to Ethereum (ERC20) transactions can take upto 45 mins to process.</div>
           </div>
         </div>
       )}
