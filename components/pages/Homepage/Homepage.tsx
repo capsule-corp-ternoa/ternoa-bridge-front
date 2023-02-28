@@ -93,7 +93,7 @@ const Homepage = () => {
           <div className={styles.disclaimer}>
             <div className={styles.warning}>
               <Warning className={styles.warningIcon} />
-              <div className={styles.warningLabel}>WARNING</div>
+              <div className={styles.warningLabel}>WARNING - GOD MODE</div>
             </div>
             <div className={styles.message}>You are using the bridge in god mode.</div>
           </div>
