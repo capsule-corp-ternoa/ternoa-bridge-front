@@ -78,12 +78,12 @@ export const BRIDGE_CONTRACT_ABI = [
   {
     inputs: [
       {
-        internalType: 'uint256',
-        name: 'newFee',
-        type: 'uint256',
+        internalType: 'address',
+        name: 'newFeeHandler',
+        type: 'address',
       },
     ],
-    name: 'adminChangeFee',
+    name: 'adminChangeFeeHandler',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -298,7 +298,12 @@ export const BRIDGE_CONTRACT_ABI = [
       },
       {
         internalType: 'bytes',
-        name: 'data',
+        name: 'depositData',
+        type: 'bytes',
+      },
+      {
+        internalType: 'bytes',
+        name: 'feeData',
         type: 'bytes',
       },
     ],
@@ -355,11 +360,6 @@ export const BRIDGE_CONTRACT_ABI = [
       {
         internalType: 'uint256',
         name: 'initialRelayerThreshold',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'fee',
         type: 'uint256',
       },
       {
@@ -425,6 +425,19 @@ export const BRIDGE_CONTRACT_ABI = [
       },
     ],
     name: 'FailedHandlerExecution',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'newFeeHandler',
+        type: 'address',
+      },
+    ],
+    name: 'FeeHandlerChanged',
     type: 'event',
   },
   {
@@ -659,24 +672,6 @@ export const BRIDGE_CONTRACT_ABI = [
     type: 'event',
   },
   {
-    inputs: [
-      {
-        internalType: 'address payable[]',
-        name: 'addrs',
-        type: 'address[]',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'amounts',
-        type: 'uint256[]',
-      },
-    ],
-    name: 'transferFunds',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     anonymous: false,
     inputs: [
       {
@@ -764,12 +759,12 @@ export const BRIDGE_CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: '_fee',
+    name: '_feeHandler',
     outputs: [
       {
-        internalType: 'uint128',
+        internalType: 'contract IFeeHandler',
         name: '',
-        type: 'uint128',
+        type: 'address',
       },
     ],
     stateMutability: 'view',

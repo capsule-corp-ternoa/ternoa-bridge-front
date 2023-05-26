@@ -200,7 +200,7 @@ export const getNetworkFees = async (from: ChainType, to: ChainType, amount: num
 
 export const transfer = async (from: ChainType, to: ChainType, amount: number, user: User, setResponse: ResponseNominalSetState) => {
   try {
-    const explorerPrefix = ETH_CHAIN_ID === 1 ? '' : ETH_CHAIN_ID === 5 ? 'goerli.' : 'rinkeby.'
+    const explorerPrefix = ETH_CHAIN_ID === 1 ? '' : ETH_CHAIN_ID === 5 ? 'goerli.' : 'sepolia.'
     switch (from) {
       case 'ternoa':
         if (!user.polkadotWallet) throw new Error('Signer not found')

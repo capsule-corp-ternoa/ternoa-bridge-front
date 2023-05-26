@@ -71,8 +71,8 @@ const Homepage = () => {
             <div className={styles.message}>
               <div>
                 This Bridge is on the Alphanet network, you can try it using :
-                <a className={styles.link} href="https://rinkebyfaucet.com/" target="_blank" rel="noopener noreferrer" title="Rinkeby faucet">
-                  Rinkeby faucet
+                <a className={styles.link} href="https://sepoliafaucet.com/" target="_blank" rel="noopener noreferrer" title="Sepolia faucet">
+                  Sepolia faucet
                 </a>
                 <span className={styles.separator}>&</span>
                 <a className={styles.link} href="https://www.ternoa.com/alphanet" target="_blank" rel="noopener noreferrer" title="Alphanet faucet">
