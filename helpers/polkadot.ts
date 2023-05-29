@@ -87,7 +87,7 @@ export const connect = async (account: InjectedAccountWithMeta, dispatch: (actio
 }
 
 export const getNativeTokenId = () => {
-  return '0x000000000000000000000000000000efe3f70fbf7b2348cfadb64611d05c7401'
+  return process.env.NEXT_PUBLIC_TOKEN_RESOURCE_ID || '0x000000000000000000000000000000efe3f70fbf7b2348cfadb64611d05c7401'
 }
 
 export const ss58ToHex = (address: string) => {
