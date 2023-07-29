@@ -9,7 +9,7 @@
   Swap your CAPS between Ternoa Chain (native), Ethereum (erc20) and Binance Smart Chain (bep20).
 </h3>
 
-</br>
+</br> 
 </br>
 
 
