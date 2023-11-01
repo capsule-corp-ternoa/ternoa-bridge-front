@@ -1,24 +1,19 @@
 import { ethers } from 'ethers'
 import { AnyAction } from 'redux'
-import WalletConnectProvider from '@walletconnect/web3-provider'
+import { EthereumProvider } from '@walletconnect/ethereum-provider'
 
 import { actions } from '../redux/user/actions'
-import { getErcWalletFromSigner, PROVIDER_BASE_URL_BSC, PROVIDER_BASE_URL_ETH } from './erc'
+import { getErcWalletFromSigner } from './erc'
 
-const WALLETCONNECT_BRIDGE = 'https://uniswap.bridge.walletconnect.org'
-
-export let walletConnectProvider: WalletConnectProvider
+export let walletConnectProvider: any
 let isListening = false
 
 const initWalletConnectProvider = async () => {
   if (!walletConnectProvider || !walletConnectProvider.connected) {
-    walletConnectProvider = new WalletConnectProvider({
-      rpc: {
-        1: PROVIDER_BASE_URL_ETH,
-        56: PROVIDER_BASE_URL_BSC,
-      },
-      infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
-      bridge: WALLETCONNECT_BRIDGE,
+    walletConnectProvider = await EthereumProvider.init({
+      projectId: '7ad487a4ee34c967ea617be202715c74', // project id from https://cloud.walletconnect.com/
+      chains: [1, 56], // required, 1 eth , 56 bsc
+      showQrModal: true, // requires @walletconnect/modal
     })
 
     await walletConnectProvider.enable()
@@ -29,6 +24,7 @@ export const connect = async (dispatch: (action: AnyAction) => void) => {
   try {
     await initWalletConnectProvider()
     const accounts = walletConnectProvider.accounts
+    console.log('accounts', accounts)
     if (accounts && accounts.length > 0) {
       const provider = new ethers.providers.Web3Provider(walletConnectProvider)
       const signer = provider.getSigner(accounts[0])
@@ -44,10 +40,12 @@ export const connect = async (dispatch: (action: AnyAction) => void) => {
           }
         })
         walletConnectProvider.on('chainChanged', async () => {
+          console.log('chainChanged')
           await connect(dispatch)
         })
         walletConnectProvider.on('disconnect', async () => {
           isListening = false
+          console.log('disconnected')
           dispatch(actions.logoutErc(false))
         })
       }
