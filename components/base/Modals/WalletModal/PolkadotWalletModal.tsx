@@ -52,6 +52,7 @@ const PolkadotWalletModal = ({ isOpen }: Props) => {
   return (
     <Modal handleClose={handleModalClose} isOpen={isOpen}>
       <div className={styles.root}>
+        <Tooltip id="account-warning-tooltip" opacity={0.9} />
         {error !== '' && (
           <div className={styles.warning}>
             <Warning />
@@ -94,7 +95,6 @@ const PolkadotWalletModal = ({ isOpen }: Props) => {
           </div>
         )}
       </div>
-      <Tooltip id="account-warning-tooltip" opacity={0.9} />
     </Modal>
   )
 }
