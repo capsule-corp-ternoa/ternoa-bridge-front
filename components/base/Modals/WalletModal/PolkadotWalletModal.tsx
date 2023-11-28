@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
+import { Tooltip } from 'react-tooltip'
 
 import Warning from 'assets/svgComponents/Warning'
 import Modal from 'components/ui/Modal'
@@ -78,11 +79,22 @@ const PolkadotWalletModal = ({ isOpen }: Props) => {
                   {meta.name && <span className={styles.accountName}>{meta.name}</span>}
                   <span className={styles.accountAddress}>{middleEllipsis(address, 15)}</span>
                 </div>
+                {(meta.genesisHash == '' || meta.genesisHash == null) && (
+                  <div
+                    data-tooltip-id="account-warning-tooltip"
+                    data-tooltip-html="<p>This account is declared 'Allow use on any chain' in Polkadot extension
+                <br>To remove this warning please select only to be used on 'Ternoa Mainnet' for this account</p>"
+                    data-tooltip-variant="light"
+                  >
+                    <Warning className={styles.warningIcon} />
+                  </div>
+                )}
               </button>
             ))}
           </div>
         )}
       </div>
+      <Tooltip id="account-warning-tooltip" opacity={0.9} />
     </Modal>
   )
 }

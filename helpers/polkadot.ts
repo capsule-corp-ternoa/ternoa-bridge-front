@@ -72,7 +72,11 @@ export const getAccounts = async () => {
       'polkadot{.js} extension is not installed.\n\nOtherwise make sure you allowed Ternoa Bridge application in the "Manage Website Access" settings of your wallet.'
     )
   const allAccounts = await web3Accounts()
-  return allAccounts
+  const TERNOA_MAINNET_GENESIS_HASH = '0x6859c81ca95ef624c9dfe4dc6e3381c33e5d6509e35e147092bfbc780f777c4e'
+  const filtered = allAccounts.filter(
+    (acc) => acc.meta.genesisHash == null || acc.meta.genesisHash == '' || acc.meta.genesisHash == TERNOA_MAINNET_GENESIS_HASH
+  )
+  return filtered
 }
 
 export const connect = async (account: InjectedAccountWithMeta, dispatch: (action: AnyAction) => void) => {
