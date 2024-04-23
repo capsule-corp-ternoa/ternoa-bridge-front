@@ -44,8 +44,8 @@ export const formatInput = (input: number) => {
 
 export const getBalance = async (address: string) => {
   const api = await getApi()
-  const balance: { free: BN; miscFrozen: BN } = ((await api.query.system.account(address)) as any).data
-  const availableBalance = balance.free.sub(balance.miscFrozen)
+  const balance: { free: BN; frozen: BN } = ((await api.query.system.account(address)) as any).data
+  const availableBalance = balance.free.sub(balance.frozen)
   return formatBalance(availableBalance.toString())
 }
 
