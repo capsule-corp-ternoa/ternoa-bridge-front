@@ -30,8 +30,10 @@
   "dependencies": {
     "@ethersproject/constants": "^5.7.0",
     "@netlify/plugin-nextjs": "^4.19.0",
-    "@polkadot/api": "9.6.1",
-    "@polkadot/extension-dapp": "^0.44.6",
+    "@polkadot/api": "9.14.2",
+    "@polkadot/extension-dapp": "^0.44.9",
+    "@walletconnect/ethereum-provider": "^2.10.4",
+    "@walletconnect/modal": "^2.6.2",
     "@walletconnect/web3-provider": "^1.8.0",
     "bn.js": "^5.2.1",
     "ethers": "^5.7.0",
@@ -41,6 +43,7 @@
     "react-click-away-listener": "^2.2.1",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.2",
+    "react-tooltip": "^5.24.0",
     "redux": "^4.2.0",
     "sass": "^1.54.5"
   },
