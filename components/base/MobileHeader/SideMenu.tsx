@@ -24,7 +24,7 @@ const SideMenu = ({ isExpanded, setIsExpanded }: Props) => (
     <div className={styles.radialGradientBg}>
       <div>
         <div className={`wrapper ${navStyles.nav}`}>
-          <Link href="/">
+          <Link legacyBehavior href="/">
             <a className={navStyles.logo} title="Bridge homepage">
               <TernoaIcon />
               <div className={navStyles.logoTitle}>Ternoa Bridge</div>
