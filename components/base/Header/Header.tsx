@@ -9,7 +9,7 @@ const Header = () => {
   const isAlphanetEnv = Boolean(process.env.NEXT_PUBLIC_TERNOA_WSS_CHAIN_ENDPOINT?.includes('alphanet'))
   return (
     <nav className={`wrapper ${styles.nav}`}>
-      <Link href="/">
+      <Link legacyBehavior href="/">
         <a className={styles.logo} title="Bridge homepage">
           <TernoaIcon />
           <div className={styles.logoTitle}>ternoa Bridge</div>

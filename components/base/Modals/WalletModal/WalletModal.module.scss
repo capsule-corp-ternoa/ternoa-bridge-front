@@ -131,8 +131,16 @@
       }
     }
 
+    .warningIcon {
+      height: 2rem;
+      path {
+        fill: #f2a400;
+      }
+    }
+
     .accountData {
       display: flex;
+      width: 100%;
       flex-direction: column;
       justify-content: flex-start;
       margin-left: 1.6rem;

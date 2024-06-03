@@ -3,7 +3,6 @@ import { ApiPromise, WsProvider } from '@polkadot/api'
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
 import { decodeAddress } from '@polkadot/util-crypto'
 import { u8aToHex } from '@polkadot/util'
-import { BlockHash } from '@polkadot/types/interfaces/chain'
 import { AnyAction } from 'redux'
 import { actions } from '../redux/user/actions'
 import BN from 'bn.js'
@@ -72,7 +71,11 @@ export const getAccounts = async () => {
       'polkadot{.js} extension is not installed.\n\nOtherwise make sure you allowed Ternoa Bridge application in the "Manage Website Access" settings of your wallet.'
     )
   const allAccounts = await web3Accounts()
-  return allAccounts
+  const TERNOA_MAINNET_GENESIS_HASH = '0x6859c81ca95ef624c9dfe4dc6e3381c33e5d6509e35e147092bfbc780f777c4e'
+  const filtered = allAccounts.filter(
+    (acc) => acc.meta.genesisHash == null || acc.meta.genesisHash == '' || acc.meta.genesisHash == TERNOA_MAINNET_GENESIS_HASH
+  )
+  return filtered
 }
 
 export const connect = async (account: InjectedAccountWithMeta, dispatch: (action: AnyAction) => void) => {
@@ -168,7 +171,7 @@ export const transfer = async (user: User, amount: number, setResponse: Response
 
 export const getFinalizedBlockNumber = async () => {
   const api = await getApi()
-  const finalizedHash = (await api.rpc.chain.getFinalizedHead()) as BlockHash
+  const finalizedHash = await api.rpc.chain.getFinalizedHead()
   const finalizedHeader = await api.rpc.chain.getHeader(finalizedHash)
   const finalizedBlockNumber = finalizedHeader.number.toBn()
   return finalizedBlockNumber
@@ -186,7 +189,7 @@ export const waitForResponseEthTernoa = async (user: User, amount: number, setRe
       await sleep(SLEEP_INTERVAL)
       continue
     }
-    const hash = (await api.rpc.chain.getBlockHash(currentBlockNumber)) as BlockHash
+    const hash = await api.rpc.chain.getBlockHash(currentBlockNumber)
     const block = await api.rpc.chain.getBlock(hash)
     const records = (await (await api.at(hash)).query.system.events()) as any
     for (const record of records) {

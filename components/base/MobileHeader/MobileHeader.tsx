@@ -22,7 +22,7 @@ const MobileHeader = () => {
   return (
     <>
       <nav className={`wrapper ${styles.nav}`}>
-        <Link href="/">
+        <Link legacyBehavior href="/">
           <a className={styles.logo} title="Bridge homepage">
             <TernoaIcon />
             <div className={styles.logoTitle}>Ternoa Bridge</div>

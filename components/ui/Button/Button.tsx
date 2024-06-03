@@ -32,7 +32,7 @@ interface ButtonProps extends IButton {
 export const AnchorButton = ({ className, color = 'primary500', href, size = 'medium', text, title, variant = 'rounded' }: AnchorButtonProps) => {
   if (href.charAt(0) === '/')
     return (
-      <Link href={href}>
+      <Link legacyBehavior href={href}>
         <a
           className={[`${styles.root}`, `${styles.rootAnchor}`, `${styles[color]}`, `${styles[size]}`, `${styles[variant]}`, className].join(' ')}
           title={title}
