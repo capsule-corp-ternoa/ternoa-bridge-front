@@ -14,6 +14,7 @@
 
 # Development
 
+
 ## Environment Setup
 
 This is a [Next.js](https://nextjs.org/) project using CSS modules and redux.
