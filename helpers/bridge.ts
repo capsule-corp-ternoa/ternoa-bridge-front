@@ -30,7 +30,7 @@ import {
 
 export const NUMBER_OF_DECIMALS = 18
 export const MIN_AMOUNT = 200
-export const MAX_AMOUNT = 200000
+export const MAX_AMOUNT = 1000000
 export const SLEEP_INTERVAL = 10000
 export const RELAYER_THRESHOLD = 2
 export const BLOCK_LIMIT = 100
