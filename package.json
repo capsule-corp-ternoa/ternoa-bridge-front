@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@ethersproject/constants": "^5.7.0",
-    "@netlify/plugin-nextjs": "^4.19.0",
+    "@netlify/plugin-nextjs": "^5.16.6",
     "@polkadot/api": "^10.10.1",
     "@polkadot/extension-dapp": "^0.44.9",
     "@walletconnect/ethereum-provider": "^2.10.4",
